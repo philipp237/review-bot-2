@@ -4,3 +4,7 @@ spring:
     url: ${DB_URL}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
+
+bot:
+  name: ${BOT_NAME}
+  token: ${BOT_TOKEN}

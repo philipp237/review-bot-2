@@ -1,11 +1,13 @@
 package dev.reviewbot2.processor;
 
+import lombok.extern.slf4j.Slf4j;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+@Slf4j
 public class Utils {
     public static SendMessage sendMessage (String chatId, String text) {
         SendMessage.SendMessageBuilder sendMessage = SendMessage.builder();
@@ -54,6 +56,7 @@ public class Utils {
         } else if (update.hasMessage()) {
             return update.getMessage();
         } else {
+            log.error("Update with id={} has no message", update.getUpdateId());
             throw new TelegramApiException("Update has no message");
         }
     }

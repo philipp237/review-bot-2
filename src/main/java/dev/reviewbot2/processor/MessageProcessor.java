@@ -1,21 +1,32 @@
 package dev.reviewbot2.processor;
 
 import dev.reviewbot2.app.api.MemberService;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import static dev.reviewbot2.config.Config.JIRA_LINK;
+import java.util.List;
+
 import static dev.reviewbot2.processor.Utils.*;
 
 @Component
 @RequiredArgsConstructor
 @Slf4j
+@Getter
+@Setter
 public class MessageProcessor {
     private final MemberService memberService;
+
+    @Value("jira.link")
+    private String jiraLink;
+    @Value("jira.dashboards")
+    private List<String> dashboards;
 
     public BotApiMethod<?> processMessage(Update update) throws TelegramApiException {
         if (updateHasMessage(update) && hasAuthorities(update)) {
@@ -31,10 +42,11 @@ public class MessageProcessor {
 
     private BotApiMethod<?> processRequest(Update update) throws TelegramApiException {
         if (update.hasCallbackQuery()) {
-            return deletePreviousMessage(update);
+            // TODO Нужно добавить feign-client, через который можно будет отправить эту команду без return
+//            return deletePreviousMessage(update);
         }
         String messageText = getTextFromUpdate(update);
-        if (messageText.startsWith(JIRA_LINK)) {
+        if (messageText.startsWith(jiraLink)) {
             //TODO Обработка ссылки на задачу
         }
         if (messageText.startsWith("/")) {

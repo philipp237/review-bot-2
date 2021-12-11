@@ -6,10 +6,9 @@ import dev.reviewbot2.domain.task.Task;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
+import javax.persistence.*;
 import java.time.Instant;
+import java.util.List;
 
 /**
  * Ревью
@@ -31,9 +30,8 @@ public class Review extends DomainObject {
     private Task task;
 
     /**
-     * Ревьюер
+     * Ревью отдельным участником команды
      */
-    @JoinColumn(name = "reviewer_id")
-    @OneToOne
-    private Member reviewer;
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "reviewer")
+    private List<MemberReview> reviewers;
 }

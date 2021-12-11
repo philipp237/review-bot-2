@@ -16,16 +16,6 @@ public class Utils {
         return sendMessage.build();
     }
 
-    public static DeleteMessage deletePreviousMessage(Update update) throws TelegramApiException {
-        int messageId = getMessageId(update);
-        String chatId = getChatId(update);
-
-        DeleteMessage.DeleteMessageBuilder deleteMessage = DeleteMessage.builder();
-        deleteMessage.messageId(messageId);
-        deleteMessage.chatId(chatId);
-        return deleteMessage.build();
-    }
-
     public static boolean updateHasMessage(Update update) throws TelegramApiException {
         return getMessageFromUpdate(update) != null;
     }

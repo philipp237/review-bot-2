@@ -1,6 +1,7 @@
 package dev.reviewbot2.processor;
 
 import dev.reviewbot2.app.api.MemberService;
+import dev.reviewbot2.app.api.UpdateService;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -22,6 +23,7 @@ import static dev.reviewbot2.processor.Utils.*;
 @Setter
 public class MessageProcessor {
     private final MemberService memberService;
+    private final UpdateService updateService;
 
     @Value("jira.link")
     private String jiraLink;
@@ -42,8 +44,7 @@ public class MessageProcessor {
 
     private BotApiMethod<?> processRequest(Update update) throws TelegramApiException {
         if (update.hasCallbackQuery()) {
-            // TODO Нужно добавить feign-client, через который можно будет отправить эту команду без return
-//            return deletePreviousMessage(update);
+            updateService.deletePreviousMessage(update);
         }
         String messageText = getTextFromUpdate(update);
         if (messageText.startsWith(jiraLink)) {

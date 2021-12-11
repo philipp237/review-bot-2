@@ -1,6 +1,7 @@
-package dev.reviewbot2.service;
+package dev.reviewbot2.mock;
 
 import dev.reviewbot2.app.api.MemberService;
+import dev.reviewbot2.domain.member.Member;
 import lombok.RequiredArgsConstructor;
 
 import static org.mockito.ArgumentMatchers.anyString;
@@ -12,5 +13,9 @@ public class MemberServiceMock {
 
     public void mockIsExistsByChatId(boolean expectedResult) {
         doReturn(expectedResult).when(memberService).isExists(anyString());
+    }
+
+    public void mockGetMemberByChatId(Member member) {
+        doReturn(member).when(memberService).getMemberByChatId(anyString());
     }
 }

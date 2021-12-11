@@ -2,8 +2,8 @@ package dev.reviewbot2.domain.task;
 
 import dev.reviewbot2.domain.DomainObject;
 import dev.reviewbot2.domain.member.Member;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
@@ -14,9 +14,16 @@ import java.time.Instant;
  * Задача
  */
 @Entity
-@Getter
-@Setter
+@Data
+@SuperBuilder
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class Task extends DomainObject {
+
+    /**
+     * uuid задачи
+     */
+    private String uuid;
 
     /**
      * Имя задачи

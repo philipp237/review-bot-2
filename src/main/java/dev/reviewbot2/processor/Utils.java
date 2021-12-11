@@ -5,14 +5,24 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
 public class Utils {
     public static SendMessage sendMessage (String chatId, String text) {
+        return sendMessage(chatId, text, null);
+    }
+
+    public static SendMessage sendMessage (String chatId, String text, InlineKeyboardMarkup keyboard) {
         SendMessage.SendMessageBuilder sendMessage = SendMessage.builder();
         sendMessage.chatId(chatId);
         sendMessage.text(text);
+        sendMessage.replyMarkup(keyboard);
         return sendMessage.build();
     }
 
@@ -34,6 +44,25 @@ public class Utils {
 
     public static String getLoginFromUpdate(Update update) throws TelegramApiException {
         return getMessageFromUpdate(update).getFrom().getUserName();
+    }
+
+    public static InlineKeyboardMarkup getKeyboard(int rows) {
+        InlineKeyboardMarkup keyboardMarkup = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
+        for (int i = 0; i < rows; i++) {
+            List<InlineKeyboardButton> row = new ArrayList<>();
+            keyboard.add(row);
+        }
+        keyboardMarkup.setKeyboard(keyboard);
+
+        return keyboardMarkup;
+    }
+
+    public static InlineKeyboardButton getButton(String text, String callbackData) {
+        InlineKeyboardButton button = new InlineKeyboardButton();
+        button.setText(text);
+        button.setCallbackData(callbackData);
+        return button;
     }
 
     // ================================================================================================================

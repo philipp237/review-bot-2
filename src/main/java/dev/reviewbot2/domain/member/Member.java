@@ -1,8 +1,8 @@
 package dev.reviewbot2.domain.member;
 
 import dev.reviewbot2.domain.DomainObject;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import javax.persistence.Entity;
 
@@ -10,8 +10,10 @@ import javax.persistence.Entity;
  * Участник команды
  */
 @Entity
-@Getter
-@Setter
+@Data
+@SuperBuilder
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class Member extends DomainObject {
 
     /**

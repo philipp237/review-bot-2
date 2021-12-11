@@ -9,6 +9,7 @@ CREATE TABLE member (
 
 CREATE TABLE task (
     id              BIGSERIAL PRIMARY KEY,
+    uuid            VARCHAR(36) NOT NULL UNIQUE,
     name            VARCHAR NOT NULL,
     link            VARCHAR NOT NULL,
     task_type       VARCHAR NOT NULL,

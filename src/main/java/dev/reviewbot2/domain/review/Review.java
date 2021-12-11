@@ -1,21 +1,21 @@
 package dev.reviewbot2.domain.review;
 
 import dev.reviewbot2.domain.DomainObject;
-import dev.reviewbot2.domain.member.Member;
 import dev.reviewbot2.domain.task.Task;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import javax.persistence.*;
-import java.time.Instant;
 import java.util.List;
 
 /**
  * Ревью
  */
 @Entity
-@Getter
-@Setter
+@Data
+@SuperBuilder
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class Review extends DomainObject {
     /**
      * Стадия ревью

@@ -13,7 +13,7 @@ CREATE TABLE task (
     name            VARCHAR NOT NULL,
     link            VARCHAR NOT NULL,
     task_type       VARCHAR NOT NULL,
-    status          VARCHAR NOT NULL,
+    status          VARCHAR,
     creation_time   TIMESTAMP,
     close_time      TIMESTAMP,
     author_id       INTEGER,

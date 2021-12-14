@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_1c82dgr" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.11.1" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.15.0">
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_1c82dgr" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.5.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.15.0">
   <bpmn:process id="review-process" name="review-process" isExecutable="true" camunda:versionTag="1.0">
-    <bpmn:intermediateThrowEvent id="ready-for-review" name="Готово к ревью">
+    <bpmn:intermediateThrowEvent id="ready-for-review" name="Готово к ревью" camunda:asyncBefore="true" camunda:asyncAfter="true">
+      <bpmn:extensionElements>
+        <camunda:executionListener delegateExpression="${updateStatusDelegate}" event="start" />
+      </bpmn:extensionElements>
       <bpmn:incoming>Flow_1luamp4</bpmn:incoming>
       <bpmn:incoming>Flow_1cjk6kx</bpmn:incoming>
       <bpmn:incoming>Flow_029x501</bpmn:incoming>
@@ -32,6 +35,9 @@
       </bpmn:receiveTask>
       <bpmn:sequenceFlow id="Flow_1lm810w" sourceRef="send-notification" targetRef="take-on-review" />
       <bpmn:intermediateThrowEvent id="in-review" name="Задача в ревью">
+        <bpmn:extensionElements>
+          <camunda:executionListener delegateExpression="${updateStatusDelegate}" event="start" />
+        </bpmn:extensionElements>
         <bpmn:incoming>Flow_0lmpsds</bpmn:incoming>
         <bpmn:outgoing>Flow_0nldt9v</bpmn:outgoing>
       </bpmn:intermediateThrowEvent>
@@ -39,13 +45,16 @@
       <bpmn:sequenceFlow id="Flow_0nldt9v" sourceRef="in-review" targetRef="task-in-review" />
     </bpmn:subProcess>
     <bpmn:sequenceFlow id="Flow_03qjh60" sourceRef="ready-for-review" targetRef="review" />
-    <bpmn:exclusiveGateway id="Gateway_1aa2ni8">
+    <bpmn:exclusiveGateway id="Gateway_1aa2ni8" default="Flow_0a9urc7">
       <bpmn:incoming>Flow_01qbjgu</bpmn:incoming>
       <bpmn:outgoing>Flow_1k3xs06</bpmn:outgoing>
       <bpmn:outgoing>Flow_0a9urc7</bpmn:outgoing>
     </bpmn:exclusiveGateway>
     <bpmn:sequenceFlow id="Flow_01qbjgu" sourceRef="review" targetRef="Gateway_1aa2ni8" />
     <bpmn:intermediateThrowEvent id="in-progress" name="Задача на доработке">
+      <bpmn:extensionElements>
+        <camunda:executionListener delegateExpression="${updateStatusDelegate}" event="start" />
+      </bpmn:extensionElements>
       <bpmn:incoming>Flow_1k3xs06</bpmn:incoming>
       <bpmn:outgoing>Flow_1sgbemm</bpmn:outgoing>
     </bpmn:intermediateThrowEvent>
@@ -59,6 +68,9 @@
     <bpmn:sequenceFlow id="Flow_1sgbemm" sourceRef="in-progress" targetRef="send-for-review" />
     <bpmn:sequenceFlow id="Flow_1cjk6kx" sourceRef="send-for-review" targetRef="ready-for-review" />
     <bpmn:intermediateThrowEvent id="approved" name="Задача утверждена">
+      <bpmn:extensionElements>
+        <camunda:executionListener delegateExpression="${updateStatusDelegate}" event="start" />
+      </bpmn:extensionElements>
       <bpmn:incoming>Flow_1bka3ha</bpmn:incoming>
       <bpmn:outgoing>Flow_00moknf</bpmn:outgoing>
     </bpmn:intermediateThrowEvent>
@@ -67,15 +79,6 @@
       <bpmn:incoming>Flow_00moknf</bpmn:incoming>
       <bpmn:outgoing>Flow_0r4wi53</bpmn:outgoing>
     </bpmn:receiveTask>
-    <bpmn:intermediateThrowEvent id="closed" name="Задача закрыта">
-      <bpmn:incoming>force-closing</bpmn:incoming>
-      <bpmn:incoming>Flow_0r4wi53</bpmn:incoming>
-      <bpmn:outgoing>Flow_0o0lfxx</bpmn:outgoing>
-    </bpmn:intermediateThrowEvent>
-    <bpmn:endEvent id="end" name="Конец процесса">
-      <bpmn:incoming>Flow_0o0lfxx</bpmn:incoming>
-    </bpmn:endEvent>
-    <bpmn:sequenceFlow id="Flow_0o0lfxx" sourceRef="closed" targetRef="end" />
     <bpmn:sequenceFlow id="force-closing" name="Принудительное закрытие задачи" sourceRef="review" targetRef="closed">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">action=close</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
@@ -90,11 +93,49 @@
     <bpmn:sequenceFlow id="Flow_029x501" name="На следующую стадию" sourceRef="review-stage-check" targetRef="ready-for-review">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">last-stage=false</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
+    <bpmn:intermediateThrowEvent id="closed" name="Задача закрыта">
+      <bpmn:extensionElements>
+        <camunda:executionListener delegateExpression="${updateStatusDelegate}" event="start" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0r4wi53</bpmn:incoming>
+      <bpmn:incoming>force-closing</bpmn:incoming>
+      <bpmn:outgoing>Flow_0o0lfxx</bpmn:outgoing>
+    </bpmn:intermediateThrowEvent>
+    <bpmn:endEvent id="end" name="Конец процесса">
+      <bpmn:incoming>Flow_0o0lfxx</bpmn:incoming>
+      <bpmn:terminateEventDefinition id="TerminateEventDefinition_15smud3" />
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_0o0lfxx" sourceRef="closed" targetRef="end" />
   </bpmn:process>
   <bpmn:message id="Message_1woxlc9" name="take-on-review-message" />
   <bpmn:message id="Message_03i9lfy" name="send-for-review-message" />
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="review-process">
+      <bpmndi:BPMNEdge id="Flow_0o0lfxx_di" bpmnElement="Flow_0o0lfxx">
+        <di:waypoint x="1658" y="290" />
+        <di:waypoint x="1722" y="290" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_029x501_di" bpmnElement="Flow_029x501">
+        <di:waypoint x="1240" y="330" />
+        <di:waypoint x="1240" y="580" />
+        <di:waypoint x="310" y="580" />
+        <di:waypoint x="310" y="308" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="738" y="546" width="79" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0a9urc7_di" bpmnElement="Flow_0a9urc7">
+        <di:waypoint x="1125" y="290" />
+        <di:waypoint x="1190" y="290" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1bka3ha_di" bpmnElement="Flow_1bka3ha">
+        <di:waypoint x="1290" y="290" />
+        <di:waypoint x="1362" y="290" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0r4wi53_di" bpmnElement="Flow_0r4wi53">
+        <di:waypoint x="1560" y="290" />
+        <di:waypoint x="1622" y="290" />
+      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0pjjiys_di" bpmnElement="force-closing">
         <di:waypoint x="700" y="190" />
         <di:waypoint x="700" y="120" />
@@ -103,14 +144,6 @@
         <bpmndi:BPMNLabel>
           <dc:Bounds x="1137" y="86" width="86" height="27" />
         </bpmndi:BPMNLabel>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0o0lfxx_di" bpmnElement="Flow_0o0lfxx">
-        <di:waypoint x="1658" y="290" />
-        <di:waypoint x="1722" y="290" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0r4wi53_di" bpmnElement="Flow_0r4wi53">
-        <di:waypoint x="1560" y="290" />
-        <di:waypoint x="1622" y="290" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_00moknf_di" bpmnElement="Flow_00moknf">
         <di:waypoint x="1398" y="290" />
@@ -141,23 +174,6 @@
         <di:waypoint x="218" y="290" />
         <di:waypoint x="292" y="290" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1bka3ha_di" bpmnElement="Flow_1bka3ha">
-        <di:waypoint x="1290" y="290" />
-        <di:waypoint x="1362" y="290" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0a9urc7_di" bpmnElement="Flow_0a9urc7">
-        <di:waypoint x="1125" y="290" />
-        <di:waypoint x="1190" y="290" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_029x501_di" bpmnElement="Flow_029x501">
-        <di:waypoint x="1240" y="330" />
-        <di:waypoint x="1240" y="580" />
-        <di:waypoint x="310" y="580" />
-        <di:waypoint x="310" y="308" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="738" y="546" width="79" height="27" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Event_0r1wbu3_di" bpmnElement="ready-for-review">
         <dc:Bounds x="292" y="272" width="36" height="36" />
         <bpmndi:BPMNLabel>
@@ -168,30 +184,6 @@
         <dc:Bounds x="182" y="272" width="36" height="36" />
         <bpmndi:BPMNLabel>
           <dc:Bounds x="157" y="316" width="85" height="27" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_045fn6v_di" bpmnElement="closing-task">
-        <dc:Bounds x="1460" y="250" width="100" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_0e41qbn_di" bpmnElement="end">
-        <dc:Bounds x="1722" y="272" width="36" height="36" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="1700" y="315" width="82" height="14" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_0m1039g_di" bpmnElement="closed">
-        <dc:Bounds x="1622" y="272" width="36" height="36" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="1599" y="318" width="81" height="14" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_0pl9g4w_di" bpmnElement="review-stage-check">
-        <dc:Bounds x="1190" y="250" width="100" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_09jian7_di" bpmnElement="approved">
-        <dc:Bounds x="1362" y="272" width="36" height="36" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="1350" y="316" width="60" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_12011ye_di" bpmnElement="review" isExpanded="true">
@@ -248,6 +240,30 @@
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_1q1hsw1_di" bpmnElement="send-for-review">
         <dc:Bounds x="650" y="440" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_09jian7_di" bpmnElement="approved">
+        <dc:Bounds x="1362" y="272" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1350" y="316" width="60" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_045fn6v_di" bpmnElement="closing-task">
+        <dc:Bounds x="1460" y="250" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0pl9g4w_di" bpmnElement="review-stage-check">
+        <dc:Bounds x="1190" y="250" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0m1039g_di" bpmnElement="closed">
+        <dc:Bounds x="1622" y="272" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1599" y="318" width="81" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_199in48_di" bpmnElement="end">
+        <dc:Bounds x="1722" y="272" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1700" y="315" width="82" height="14" />
+        </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>

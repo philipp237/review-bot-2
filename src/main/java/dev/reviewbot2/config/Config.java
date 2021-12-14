@@ -8,15 +8,15 @@ import java.util.List;
 @Component
 public class Config {
 
-    @Value("bot.name")
+    @Value("${bot.name}")
     public String BOT_NAME;
 
-    @Value("bot.token")
+    @Value("${bot.token}")
     public String BOT_TOKEN;
 
-    @Value("jira.link")
+    @Value("${jira.link}")
     public String JIRA_LINK;
 
-    @Value("jira.dashboards")
+    @Value("${jira.dashboards}")
     public List<String> DASHBOARDS;
 }

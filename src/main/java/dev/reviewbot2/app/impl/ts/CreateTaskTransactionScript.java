@@ -7,9 +7,7 @@ import dev.reviewbot2.app.impl.camunda.ProcessAccessor;
 import dev.reviewbot2.domain.member.Member;
 import dev.reviewbot2.domain.review.Review;
 import dev.reviewbot2.domain.task.Task;
-import dev.reviewbot2.domain.task.TaskStatus;
 import dev.reviewbot2.domain.task.TaskType;
-import dev.reviewbot2.processor.Utils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -24,10 +22,11 @@ import static dev.reviewbot2.processor.Utils.sendMessage;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class CreateTaskTransactionalScript {
+public class CreateTaskTransactionScript {
     private static final String TASK_CREATED = "Задача %s создана";
 
     private final MemberService memberService;
+    private final TaskService taskService;
     private final ReviewService reviewService;
     private final ProcessAccessor processAccessor;
 
@@ -41,7 +40,6 @@ public class CreateTaskTransactionalScript {
                 .link(link)
                 .creationTime(Instant.now())
                 .taskType(taskType)
-                .status(TaskStatus.READY_FOR_REVIEW)
                 .author(author)
                 .build();
 
@@ -52,6 +50,7 @@ public class CreateTaskTransactionalScript {
 
         processAccessor.startProcess(task.getUuid());
 
+        taskService.save(task);
         reviewService.save(review);
         log.info("{} create {} task {} with uuid={}",
                 author.getLogin(), taskType.toString().toLowerCase(), taskName, task.getUuid());

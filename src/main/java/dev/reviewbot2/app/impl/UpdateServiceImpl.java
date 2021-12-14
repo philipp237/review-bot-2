@@ -1,11 +1,12 @@
 package dev.reviewbot2.app.impl;
 
 import dev.reviewbot2.app.api.UpdateService;
-import dev.reviewbot2.app.impl.ts.CreateTaskTransactionalScript;
+import dev.reviewbot2.app.impl.ts.CreateTaskTransactionScript;
 import dev.reviewbot2.config.Config;
 import dev.reviewbot2.domain.task.TaskType;
 import dev.reviewbot2.webhook.WebhookRestClient;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -14,6 +15,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import static dev.reviewbot2.processor.Utils.*;
 
+@Component
 @RequiredArgsConstructor
 public class UpdateServiceImpl implements UpdateService {
     private final String TASK_TYPE_CHOOSE_HINT = "Выберите тип задачи";
@@ -21,7 +23,7 @@ public class UpdateServiceImpl implements UpdateService {
     private final WebhookRestClient webhookRestClient;
     private final Config config;
 
-    private final CreateTaskTransactionalScript createTask;
+    private final CreateTaskTransactionScript createTask;
 
     @Override
     public void deletePreviousMessage(Update update) throws TelegramApiException {
@@ -79,7 +81,7 @@ public class UpdateServiceImpl implements UpdateService {
     }
 
     private void validateTaskName(String taskName) throws TelegramApiException {
-        if (!config.DASHBOARDS.contains(taskName)) {
+        if (config.DASHBOARDS.stream().noneMatch(taskName::contains)) {
             throw new TelegramApiException("Incorrect task name " + taskName);
         }
     }

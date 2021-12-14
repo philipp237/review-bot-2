@@ -42,7 +42,7 @@ public class MessageProcessor {
         }
         String messageText = getTextFromUpdate(update);
         if (messageText.startsWith(config.JIRA_LINK)) {
-            updateService.processTaskLink(update);
+            return updateService.processTaskLink(update);
             //TODO Добавить интеграционные тесты на это дело
         }
         if (messageText.startsWith("/")) {

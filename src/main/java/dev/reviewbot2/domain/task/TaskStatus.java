@@ -1,31 +1,49 @@
 package dev.reviewbot2.domain.task;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+import java.util.Arrays;
+
+import static java.util.Arrays.*;
+
 /**
  * Статус задачи
  */
+@AllArgsConstructor
+@Getter
 public enum TaskStatus {
     /**
      * Задача на доработке
      */
-    IN_PROGRESS,
+    IN_PROGRESS("in-progress"),
 
     /**
      * Задача готова к ревью
      */
-    READY_FOR_REVIEW,
+    READY_FOR_REVIEW("ready-for-review"),
 
     /**
      * Задача в ревью
      */
-    IN_REVIEW,
+    IN_REVIEW("in-review"),
 
     /**
      * Задача одобрена
      */
-    APPROVED,
+    APPROVED("approved"),
 
     /**
      * Задача закрыта
      */
-    CLOSED
+    CLOSED("closed");
+
+    private String activityId;
+
+    public static TaskStatus getTaskStatusFromActivityId(String activityId) {
+        return stream(TaskStatus.values())
+            .filter(taskStatus -> activityId.equals(taskStatus.getActivityId()))
+            .findAny()
+            .orElseThrow();
+    }
 }

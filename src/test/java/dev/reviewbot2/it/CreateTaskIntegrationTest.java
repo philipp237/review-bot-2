@@ -4,7 +4,6 @@ import dev.reviewbot2.AbstractIntegrationTest;
 import dev.reviewbot2.domain.member.Member;
 import dev.reviewbot2.domain.task.Task;
 import dev.reviewbot2.domain.task.TaskType;
-import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.junit.jupiter.api.Test;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -27,6 +26,20 @@ public class CreateTaskIntegrationTest extends AbstractIntegrationTest {
 
     @Test
     void createTask() throws Exception {
+        Update update = getUpdateWithCallbackQuery(TASK_LINK + "#" + TaskType.IMPLEMENTATION);
+        Member member = getMemberFromDB(0, false, false);
+
+        SendMessage sendMessage = performUpdateReceived(update);
+
+        String uuid = getUuidFromProcess();
+        Task task = taskRepository.getByUuid(uuid);
+
+        assertEquals(TASK_NAME, task.getName());
+        assertEquals(member.getChatId(), sendMessage.getChatId());
+    }
+
+    @Test
+    void createTask_manually() throws Exception {
         Update update = getUpdateWithMessage(TASK_LINK + "#" + TaskType.IMPLEMENTATION);
         Member member = getMemberFromDB(0, false, false);
 

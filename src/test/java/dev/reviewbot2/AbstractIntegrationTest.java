@@ -13,12 +13,10 @@ import dev.reviewbot2.repository.MemberRepository;
 import dev.reviewbot2.repository.ReviewRepository;
 import dev.reviewbot2.repository.TaskRepository;
 import dev.reviewbot2.webhook.WebhookRestClient;
-import org.camunda.bpm.engine.HistoryService;
-import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.RepositoryService;
-import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.*;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.runtime.Execution;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -32,6 +30,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -80,26 +79,30 @@ public abstract class AbstractIntegrationTest extends AbstractTest {
 
     @BeforeEach
     void clearDB() {
-        List<String> processIds = runtimeService.createProcessInstanceQuery()
+        doWithCamundaRetry(() -> {
+            List<String> processIds = runtimeService.createProcessInstanceQuery()
                 .rootProcessInstances()
                 .list()
                 .stream()
                 .map(Execution::getId)
                 .collect(Collectors.toList());
-        if (!processIds.isEmpty()) {
-            runtimeService.deleteProcessInstances(processIds, "cleanup", true, true);
-        }
+            if (!processIds.isEmpty()) {
+                runtimeService.deleteProcessInstances(processIds, "cleanup", true, true);
+            }
+        });
 
-        List<String> historicProcessIds =
+        doWithCamundaRetry(() -> {
+            List<String> historicProcessIds =
                 historyService.createHistoricProcessInstanceQuery()
-                .rootProcessInstances()
-                .list()
-                .stream()
-                .map(HistoricProcessInstance::getId)
-                .collect(Collectors.toList());
-        if (!historicProcessIds.isEmpty()) {
-            historyService.deleteHistoricProcessInstances(historicProcessIds);
-        }
+                    .rootProcessInstances()
+                    .list()
+                    .stream()
+                    .map(HistoricProcessInstance::getId)
+                    .collect(Collectors.toList());
+            if (!historicProcessIds.isEmpty()) {
+                historyService.deleteHistoricProcessInstances(historicProcessIds);
+            }
+        });
 
         reviewRepository.deleteAll();
         taskRepository.deleteAll();
@@ -127,5 +130,19 @@ public abstract class AbstractIntegrationTest extends AbstractTest {
             .processDefinitionName(PROCESS_NAME)
             .singleResult()
             .getBusinessKey();
+    }
+
+    private void doWithCamundaRetry(Runnable action) {
+        int retry = 3;
+        while (true) {
+            try {
+                action.run();
+                break;
+            } catch (OptimisticLockingException e) {
+                if (retry-- <= 0) {
+                    throw e;
+                }
+            }
+        }
     }
 }

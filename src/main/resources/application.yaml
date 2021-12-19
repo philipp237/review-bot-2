@@ -1,1 +1,14 @@
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
 
+bot:
+  name: ${BOT_NAME}
+  token: ${BOT_TOKEN}
+
+jira:
+  link: ${JIRA_LINK}
+  dashboards: ${JIRA_DASHBOARDS}

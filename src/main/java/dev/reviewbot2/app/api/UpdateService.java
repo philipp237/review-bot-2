@@ -23,4 +23,13 @@ public interface UpdateService {
      * @return - сообщение для отправки
      */
     SendMessage processTaskLink(Update update) throws TelegramApiException;
+
+    /**
+     * Взять задачу в ревью
+     *
+     * @param update - обновление, в котором содержится сообщение с командой взятия задачи в ревью
+     * @return - сообщение об успешном взятии в ревью или список задач для ревью, если не был передан id задачи,
+     * которую берут в ревью
+     */
+    SendMessage takeInReview(Update update) throws TelegramApiException;
 }

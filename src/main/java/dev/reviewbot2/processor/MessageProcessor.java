@@ -17,11 +17,10 @@ import static dev.reviewbot2.processor.Utils.*;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-@Getter
-@Setter
 public class MessageProcessor {
     private final MemberService memberService;
     private final UpdateService updateService;
+    private final CommandProcessor commandProcessor;
     private final Config config;
 
     public BotApiMethod<?> processMessage(Update update) throws TelegramApiException {
@@ -43,10 +42,9 @@ public class MessageProcessor {
         String messageText = getTextFromUpdate(update);
         if (messageText.startsWith(config.JIRA_LINK)) {
             return updateService.processTaskLink(update);
-            //TODO Добавить интеграционные тесты на это дело
         }
         if (messageText.startsWith("/")) {
-            //TODO Обработка команд
+            return commandProcessor.processCommand(update);
         }
         return null;
     }

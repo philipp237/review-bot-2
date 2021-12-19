@@ -8,8 +8,12 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 @Slf4j
 public class Utils {
@@ -62,6 +66,13 @@ public class Utils {
         button.setText(text);
         button.setCallbackData(callbackData);
         return button;
+    }
+
+    public static String getFormattedTime(Instant dateTime) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yy HH:mm")
+            .withLocale(Locale.ROOT)
+            .withZone(ZoneId.of("Europe/Moscow"));
+        return formatter.format(dateTime);
     }
 
     // ================================================================================================================

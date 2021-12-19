@@ -7,6 +7,7 @@ import dev.reviewbot2.app.api.TaskService;
 import dev.reviewbot2.app.api.UpdateService;
 import dev.reviewbot2.app.impl.camunda.ProcessAccessor;
 import dev.reviewbot2.domain.member.Member;
+import dev.reviewbot2.processor.CommandProcessor;
 import dev.reviewbot2.processor.MessageProcessor;
 import dev.reviewbot2.processor.TelegramBot;
 import dev.reviewbot2.repository.MemberRepository;
@@ -50,6 +51,8 @@ public abstract class AbstractIntegrationTest extends AbstractTest {
     private TelegramBot telegramBot;
     @Autowired
     private MessageProcessor messageProcessor;
+    @Autowired
+    private CommandProcessor commandProcessor;
 
     @Autowired
     private MemberRepository memberRepository;
@@ -131,6 +134,10 @@ public abstract class AbstractIntegrationTest extends AbstractTest {
             .singleResult()
             .getBusinessKey();
     }
+
+    // ================================================================================================================
+    //  Implementation
+    // ================================================================================================================
 
     private void doWithCamundaRetry(Runnable action) {
         int retry = 3;

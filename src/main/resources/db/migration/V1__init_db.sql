@@ -8,15 +8,16 @@ CREATE TABLE member (
 );
 
 CREATE TABLE task (
-    id              BIGSERIAL PRIMARY KEY,
-    uuid            VARCHAR(36) NOT NULL UNIQUE,
-    name            VARCHAR NOT NULL,
-    link            VARCHAR NOT NULL,
-    task_type       VARCHAR NOT NULL,
-    status          VARCHAR,
-    creation_time   TIMESTAMP,
-    close_time      TIMESTAMP,
-    author_id       INTEGER,
+    id                  BIGSERIAL PRIMARY KEY,
+    uuid                VARCHAR(36) NOT NULL UNIQUE,
+    name                VARCHAR NOT NULL,
+    link                VARCHAR NOT NULL,
+    task_type           VARCHAR NOT NULL,
+    status              VARCHAR,
+    creation_time       TIMESTAMP,
+    close_time          TIMESTAMP,
+    last_review_time    TIMESTAMP,
+    author_id           INTEGER,
 
     CONSTRAINT fk_author FOREIGN KEY (author_id) REFERENCES member(id)
 );

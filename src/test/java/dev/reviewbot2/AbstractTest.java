@@ -15,14 +15,21 @@ public class AbstractTest {
     protected static final int MESSAGE_ID = 51632862;
     protected static final int UPDATE_ID = 42368635;
     protected static final long CHAT_ID = 57164325;
-    protected static final String UUID = "29e286b2-5aa9-11ec-bf63-0242ac130002";
     protected static final String LOGIN = "test_login";
     protected static final String BOT_NAME = "test_bot_name";
     protected static final String BOT_TOKEN = "test_bot_token";
     protected static final String JIRA_LINK = "https://test.com/";
     protected static final List<String> DASHBOARD = List.of("TEST1");
-    protected static final String TASK_NAME = DASHBOARD.get(0) + "-1234";
-    protected static final String TASK_LINK = JIRA_LINK + TASK_NAME;
+
+    protected static final String UUID_1 = "29e286b2-5aa9-11ec-bf63-0242ac130002";
+    protected static final String UUID_2 = "1258ce35-b1a9-494b-b1e0-76cc64e8f0c5";
+    protected static final String UUID_3 = "0385cd13-44e3-4bf5-901e-15ce4f58f6dd";
+    protected static final String UUID_4 = "b0a7165f-7c6e-419e-bdb3-8bebf7bf3ee9";
+
+    protected static final String TASK_NAME_1 = DASHBOARD.get(0) + "-1111";
+    protected static final String TASK_NAME_2 = DASHBOARD.get(0) + "-2222";
+    protected static final String TASK_NAME_3 = DASHBOARD.get(0) + "-3333";
+    protected static final String TASK_NAME_4 = DASHBOARD.get(0) + "-4444";
 
     protected Update getUpdateWithoutMessage() {
         Update update = new Update();
@@ -81,11 +88,12 @@ public class AbstractTest {
             .build();
     }
 
-    protected Task getTask(TaskType taskType) {
+    protected Task getTask(TaskType taskType, String uuid, String taskName, long taskId) {
         return Task.builder()
-            .uuid(UUID)
-            .name(TASK_NAME)
-            .link(TASK_LINK)
+            .id(taskId)
+            .uuid(uuid)
+            .name(taskName)
+            .link(JIRA_LINK + taskName)
             .creationTime(Instant.now())
             .taskType(taskType)
             .status(READY_FOR_REVIEW)
@@ -93,10 +101,10 @@ public class AbstractTest {
             .build();
     }
 
-    protected Review getReview(TaskType taskType) {
+    protected Review getReview(TaskType taskType, int reviewStage, String uuid, String taskName, long taskId) {
         return Review.builder()
-            .reviewStage(1)
-            .task(getTask(taskType))
+            .reviewStage(reviewStage)
+            .task(getTask(taskType, uuid, taskName, taskId))
             .build();
     }
 }

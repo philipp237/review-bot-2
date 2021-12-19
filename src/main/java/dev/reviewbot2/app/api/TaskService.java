@@ -19,4 +19,12 @@ public interface TaskService {
      * @return задача с заданным uuid
      */
     Task getTaskByUuid(String uuid);
+
+    /**
+     * Найти задачу по ее id
+     *
+     * @param id - идентификатор задачи
+     * @return задача с заданным id
+     */
+    Task getTaskById(Long id);
 }

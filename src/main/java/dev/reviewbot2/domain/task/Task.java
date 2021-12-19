@@ -46,6 +46,11 @@ public class Task extends DomainObject {
     private Instant closeTime;
 
     /**
+     * Время последнего ревью
+     */
+    private Instant lastReviewTime;
+
+    /**
      * Тип задачи
      */
     private TaskType taskType;
@@ -61,4 +66,8 @@ public class Task extends DomainObject {
     @JoinColumn(name = "author_id")
     @OneToOne
     private Member author;
+
+    public Instant getLastActionTime() {
+        return lastReviewTime == null ? creationTime : lastReviewTime;
+    }
 }

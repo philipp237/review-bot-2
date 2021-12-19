@@ -20,4 +20,9 @@ public class TaskServiceImpl implements TaskService {
     public Task getTaskByUuid(String uuid) {
         return taskRepository.getByUuid(uuid);
     }
+
+    @Override
+    public Task getTaskById(Long id) {
+        return taskRepository.getById(id);
+    }
 }

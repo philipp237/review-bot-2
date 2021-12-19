@@ -1,10 +1,6 @@
 package dev.reviewbot2.ts;
 
 import dev.reviewbot2.AbstractUnitTest;
-import dev.reviewbot2.app.api.MemberService;
-import dev.reviewbot2.app.api.ReviewService;
-import dev.reviewbot2.app.api.TaskService;
-import dev.reviewbot2.app.impl.TaskServiceImpl;
 import dev.reviewbot2.app.impl.ts.CreateTaskTransactionScript;
 import dev.reviewbot2.domain.member.Member;
 import dev.reviewbot2.domain.review.Review;
@@ -14,11 +10,8 @@ import dev.reviewbot2.mock.MemberServiceMock;
 import dev.reviewbot2.mock.ProcessAccessorMock;
 import dev.reviewbot2.mock.ReviewServiceMock;
 import dev.reviewbot2.mock.TaskServiceMock;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -26,21 +19,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 public class CreateTaskTest extends AbstractUnitTest {
-    @Mock
-    private MemberService memberService;
-    @Mock
-    private TaskService taskService;
-    @Mock
-    private ReviewService reviewService;
-
-    private AutoCloseable closeable;
-    private ArgumentCaptor<Review> reviewArgumentCaptor;
-
-    private MemberServiceMock memberServiceMock;
-    private TaskServiceMock taskServiceMock;
-    private ReviewServiceMock reviewServiceMock;
-    private ProcessAccessorMock processAccessorMock;
-
     private CreateTaskTransactionScript createTaskTransactionScript;
 
     @BeforeEach
@@ -51,26 +29,19 @@ public class CreateTaskTest extends AbstractUnitTest {
         this.taskServiceMock = new TaskServiceMock(taskService);
         this.reviewServiceMock = new ReviewServiceMock(reviewService);
         this.processAccessorMock = new ProcessAccessorMock(processAccessor);
-
-        this.reviewArgumentCaptor = ArgumentCaptor.forClass(Review.class);
-    }
-
-    @AfterEach
-    void close() throws Exception {
-        closeable.close();
     }
 
     @Test
     void execute() {
         TaskType taskType = TaskType.IMPLEMENTATION;
-        Review review = getReview(taskType);
+        Review review = getReview(taskType, 1, UUID_1, TASK_NAME_1, 1);
         Member member = review.getTask().getAuthor();
 
         memberServiceMock.mockGetMemberByChatId(member);
         reviewServiceMock.mockSave();
         processAccessorMock.mockStartProcess();
 
-        createTaskTransactionScript.execute(String.valueOf(CHAT_ID), TASK_NAME, TASK_LINK, taskType);
+        createTaskTransactionScript.execute(String.valueOf(CHAT_ID), TASK_NAME_1, JIRA_LINK + TASK_NAME_1, taskType);
 
         verify(reviewService, times(1)).save(reviewArgumentCaptor.capture());
         assertReview(review, reviewArgumentCaptor.getValue());

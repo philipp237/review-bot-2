@@ -42,8 +42,8 @@ public class TakeInReviewTest extends AbstractUnitTest {
 
     @Test
     void execute_firstGroupReviewer_taskInfo() throws TelegramApiException {
-        Member reviewer = getMember(1, false, false);
-        Update update = getUpdateWithCallbackQuery("/" + TAKE_IN_REVIEW + "#" + review1.getTask().getId());
+        Member reviewer = getMember(REVIEWER_CHAT_ID, 1, false, false);
+        Update update = getUpdateWithCallbackQuery("/" + TAKE_IN_REVIEW + "#" + review1.getTask().getId(), REVIEWER_CHAT_ID);
 
         memberServiceMock.mockGetMemberByChatId(reviewer);
         taskServiceMock.mockGetTaskById(review1.getTask());
@@ -59,8 +59,8 @@ public class TakeInReviewTest extends AbstractUnitTest {
 
     @Test
     void execute_firstGroupReviewer_reviewList() throws TelegramApiException {
-        Member reviewer = getMember(1, false, false);
-        Update update = getUpdateWithCallbackQuery("/" + TAKE_IN_REVIEW);
+        Member reviewer = getMember(REVIEWER_CHAT_ID, 1, false, false);
+        Update update = getUpdateWithCallbackQuery("/" + TAKE_IN_REVIEW, REVIEWER_CHAT_ID);
         List<Review> reviews = List.of(review1, review2);
 
         memberServiceMock.mockGetMemberByChatId(reviewer);
@@ -77,8 +77,8 @@ public class TakeInReviewTest extends AbstractUnitTest {
 
     @Test
     void execute_secondGroupReviewer_taskInfo() throws TelegramApiException {
-        Member reviewer = getMember(2, false, false);
-        Update update = getUpdateWithCallbackQuery("/" + TAKE_IN_REVIEW + "#" + review3.getTask().getId());
+        Member reviewer = getMember(REVIEWER_CHAT_ID, 2, false, false);
+        Update update = getUpdateWithCallbackQuery("/" + TAKE_IN_REVIEW + "#" + review3.getTask().getId(), REVIEWER_CHAT_ID);
 
         memberServiceMock.mockGetMemberByChatId(reviewer);
         taskServiceMock.mockGetTaskById(review3.getTask());
@@ -94,8 +94,8 @@ public class TakeInReviewTest extends AbstractUnitTest {
 
     @Test
     void execute_secondGroupReviewerAndDesign_reviewList() throws TelegramApiException {
-        Member reviewer = getMember(2, true, false);
-        Update update = getUpdateWithCallbackQuery("/" + TAKE_IN_REVIEW);
+        Member reviewer = getMember(REVIEWER_CHAT_ID, 2, true, false);
+        Update update = getUpdateWithCallbackQuery("/" + TAKE_IN_REVIEW, REVIEWER_CHAT_ID);
         List<Review> reviews = List.of(review3, review4);
 
         memberServiceMock.mockGetMemberByChatId(reviewer);
@@ -112,8 +112,8 @@ public class TakeInReviewTest extends AbstractUnitTest {
 
     @Test
     void execute_nonReviewer() throws TelegramApiException {
-        Member member = getMember(0, false, false);
-        Update update = getUpdateWithCallbackQuery("/" + TAKE_IN_REVIEW + "#" + review1.getTask().getId());
+        Member member = getMember(REVIEWER_CHAT_ID, 0, false, false);
+        Update update = getUpdateWithCallbackQuery("/" + TAKE_IN_REVIEW + "#" + review1.getTask().getId(), REVIEWER_CHAT_ID);
 
         memberServiceMock.mockGetMemberByChatId(member);
         taskServiceMock.mockGetTaskById(review1.getTask());

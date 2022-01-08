@@ -41,7 +41,7 @@ public class CreateTaskTest extends AbstractUnitTest {
         reviewServiceMock.mockSave();
         processAccessorMock.mockStartProcess();
 
-        createTaskTransactionScript.execute(String.valueOf(CHAT_ID), TASK_NAME_1, JIRA_LINK + TASK_NAME_1, taskType);
+        createTaskTransactionScript.execute(MEMBER_CHAT_ID, TASK_NAME_1, JIRA_LINK + TASK_NAME_1, taskType);
 
         verify(reviewService, times(1)).save(reviewArgumentCaptor.capture());
         assertReview(review, reviewArgumentCaptor.getValue());

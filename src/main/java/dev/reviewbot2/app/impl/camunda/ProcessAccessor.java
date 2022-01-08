@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class ProcessAccessor {
     private final String PROCESS_ID = "review-process";
-    private final String TAKE_ON_REVIEW_MESSAGE = "take-on-review-message";
+    private final String TAKE_IN_REVIEW_MESSAGE = "take-in-review-message";
 
     private final RuntimeService runtimeService;
 
@@ -23,8 +23,8 @@ public class ProcessAccessor {
         return execution.getBusinessKey();
     }
 
-    public void takeOnReview(String taskUuid) {
-        correlateProcess(runtimeService.createMessageCorrelation(TAKE_ON_REVIEW_MESSAGE)
+    public void takeInReview(String taskUuid) {
+        correlateProcess(runtimeService.createMessageCorrelation(TAKE_IN_REVIEW_MESSAGE)
             .processInstanceBusinessKey(taskUuid));
     }
 

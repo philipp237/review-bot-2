@@ -1,15 +1,13 @@
 package dev.reviewbot2;
 
+import dev.reviewbot2.app.api.MemberReviewService;
 import dev.reviewbot2.app.api.MemberService;
 import dev.reviewbot2.app.api.ReviewService;
 import dev.reviewbot2.app.api.TaskService;
 import dev.reviewbot2.app.impl.camunda.ProcessAccessor;
 import dev.reviewbot2.config.Config;
 import dev.reviewbot2.domain.review.Review;
-import dev.reviewbot2.mock.MemberServiceMock;
-import dev.reviewbot2.mock.ProcessAccessorMock;
-import dev.reviewbot2.mock.ReviewServiceMock;
-import dev.reviewbot2.mock.TaskServiceMock;
+import dev.reviewbot2.mock.*;
 import org.junit.jupiter.api.AfterEach;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
@@ -28,6 +26,8 @@ public abstract class AbstractUnitTest extends AbstractTest {
     protected ReviewService reviewService;
     @Mock
     protected ProcessAccessor processAccessor;
+    @Mock
+    protected MemberReviewService memberReviewService;
 
     @Captor
     protected ArgumentCaptor<Review> reviewArgumentCaptor;
@@ -36,6 +36,7 @@ public abstract class AbstractUnitTest extends AbstractTest {
     protected TaskServiceMock taskServiceMock;
     protected ReviewServiceMock reviewServiceMock;
     protected ProcessAccessorMock processAccessorMock;
+    protected MemberReviewServiceMock memberReviewServiceMock;
 
     public AbstractUnitTest() {
         Config config = new Config();

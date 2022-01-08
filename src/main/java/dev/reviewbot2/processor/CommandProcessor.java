@@ -23,18 +23,21 @@ public class CommandProcessor {
                 return null;
             case TAKE_IN_REVIEW:
                 return updateService.takeInReview(update);
+            case ACCEPT_REVIEW:
+                return updateService.acceptReview(update);
         }
         return null;
     }
 
     private Command parseCommand(String textFromUpdate) throws TelegramApiException {
-        validateCommand(textFromUpdate);
+        String parsedCommand = textFromUpdate.split("#")[0];
+        validateCommand(parsedCommand);
 
-        return Command.valueOf(textFromUpdate.split("/")[1].split("#")[0]);
+        return Command.valueOf(parsedCommand.split("/")[1].toUpperCase());
     }
 
     private void validateCommand(String textFromUpdate) throws TelegramApiException {
-        if (textFromUpdate.matches("^/[a-z_]*[a-z|#]")) {
+        if (textFromUpdate.matches("^/[a-zA-Z_]*")) {
             return;
         }
         throw new TelegramApiException("Validations errors: incorrect command " + textFromUpdate);

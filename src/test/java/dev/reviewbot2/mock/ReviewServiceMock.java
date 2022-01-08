@@ -22,4 +22,8 @@ public class ReviewServiceMock {
     public void mockGetReview(List<Review> reviews) {
         doReturn(reviews).when(reviewService).getReviewsForTaskReadyForReview(anyInt(), anyBoolean());
     }
+
+    public void mockGetReviewByTask(Review review) {
+        doReturn(review).when(reviewService).getReviewByTask(any());
+    }
 }

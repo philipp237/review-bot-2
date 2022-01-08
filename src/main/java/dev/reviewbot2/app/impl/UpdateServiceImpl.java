@@ -1,15 +1,10 @@
 package dev.reviewbot2.app.impl;
 
-import dev.reviewbot2.app.api.MemberService;
-import dev.reviewbot2.app.api.ReviewService;
-import dev.reviewbot2.app.api.TaskService;
 import dev.reviewbot2.app.api.UpdateService;
+import dev.reviewbot2.app.impl.ts.AcceptReviewTransactionScript;
 import dev.reviewbot2.app.impl.ts.CreateTaskTransactionScript;
 import dev.reviewbot2.app.impl.ts.TakeInReviewTransactionScript;
 import dev.reviewbot2.config.Config;
-import dev.reviewbot2.domain.member.Member;
-import dev.reviewbot2.domain.review.Review;
-import dev.reviewbot2.domain.task.Task;
 import dev.reviewbot2.domain.task.TaskType;
 import dev.reviewbot2.webhook.WebhookRestClient;
 import lombok.RequiredArgsConstructor;
@@ -21,11 +16,6 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import java.util.List;
-
-import static dev.reviewbot2.domain.task.TaskType.DESIGN;
-import static dev.reviewbot2.processor.Command.ACCEPT_REVIEW;
-import static dev.reviewbot2.processor.Command.TAKE_IN_REVIEW;
 import static dev.reviewbot2.processor.Utils.*;
 
 @Slf4j
@@ -37,6 +27,7 @@ public class UpdateServiceImpl implements UpdateService {
 
     private final CreateTaskTransactionScript createTask;
     private final TakeInReviewTransactionScript takeInReview;
+    private final AcceptReviewTransactionScript acceptReview;
 
     @Override
     public void deletePreviousMessage(Update update) throws TelegramApiException {
@@ -61,7 +52,7 @@ public class UpdateServiceImpl implements UpdateService {
         }
 
         InlineKeyboardMarkup keyboard = getKeyboard(TaskType.values().length);
-        fillKeyboardWithTaskTypes(keyboard, link);
+        fillKeyboardWithTaskTypes(keyboard, taskName);
 
         String TASK_TYPE_CHOOSE_HINT = "Выберите тип задачи";
         return sendMessage(chatId, TASK_TYPE_CHOOSE_HINT, keyboard);
@@ -70,6 +61,11 @@ public class UpdateServiceImpl implements UpdateService {
     @Override
     public SendMessage takeInReview(Update update) throws TelegramApiException {
         return takeInReview.execute(update);
+    }
+
+    @Override
+    public SendMessage acceptReview(Update update) throws TelegramApiException {
+        return acceptReview.execute(update);
     }
 
     // ================================================================================================================
@@ -105,11 +101,11 @@ public class UpdateServiceImpl implements UpdateService {
         }
     }
 
-    private void fillKeyboardWithTaskTypes(InlineKeyboardMarkup keyboard, String taskLink) {
+    private void fillKeyboardWithTaskTypes(InlineKeyboardMarkup keyboard, String taskName) {
         int i = 0;
 
         for (TaskType taskType : TaskType.values()) {
-            keyboard.getKeyboard().get(i).add(getButton(taskType.getName(), taskLink + "#" + taskType.toString()));
+            keyboard.getKeyboard().get(i).add(getButton(taskType.getName(), "/" + taskName + "#" + taskType.toString()));
             i++;
         }
     }

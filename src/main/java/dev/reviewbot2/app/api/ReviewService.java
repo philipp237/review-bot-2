@@ -1,6 +1,7 @@
 package dev.reviewbot2.app.api;
 
 import dev.reviewbot2.domain.review.Review;
+import dev.reviewbot2.domain.task.Task;
 
 import java.util.List;
 
@@ -21,4 +22,12 @@ public interface ReviewService {
      * @return ревью
      */
     List<Review> getReviewsForTaskReadyForReview(int reviewStage, boolean isReviewDesigner);
+
+    /**
+     * Получить ревью по задаче
+     *
+     * @param task - задача
+     * @return ревью
+     */
+    Review getReviewByTask(Task task);
 }

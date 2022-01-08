@@ -1,40 +1,41 @@
 package dev.reviewbot2;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import dev.reviewbot2.app.api.MemberService;
-import dev.reviewbot2.app.api.ReviewService;
-import dev.reviewbot2.app.api.TaskService;
-import dev.reviewbot2.app.api.UpdateService;
-import dev.reviewbot2.app.impl.camunda.ProcessAccessor;
+import dev.reviewbot2.app.api.*;
 import dev.reviewbot2.domain.member.Member;
+import dev.reviewbot2.domain.task.TaskType;
 import dev.reviewbot2.processor.CommandProcessor;
 import dev.reviewbot2.processor.MessageProcessor;
 import dev.reviewbot2.processor.TelegramBot;
 import dev.reviewbot2.repository.MemberRepository;
+import dev.reviewbot2.repository.MemberReviewRepository;
 import dev.reviewbot2.repository.ReviewRepository;
 import dev.reviewbot2.repository.TaskRepository;
 import dev.reviewbot2.webhook.WebhookRestClient;
-import org.camunda.bpm.engine.*;
+import org.camunda.bpm.engine.HistoryService;
+import org.camunda.bpm.engine.OptimisticLockingException;
+import org.camunda.bpm.engine.RepositoryService;
+import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.runtime.Execution;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
-import javax.transaction.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static dev.reviewbot2.domain.task.TaskType.DESIGN;
+import static dev.reviewbot2.processor.Command.ACCEPT_REVIEW;
+import static dev.reviewbot2.processor.Command.TAKE_IN_REVIEW;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest("ReveiwBot2Application")
@@ -55,11 +56,13 @@ public abstract class AbstractIntegrationTest extends AbstractTest {
     private CommandProcessor commandProcessor;
 
     @Autowired
-    private MemberRepository memberRepository;
+    protected MemberRepository memberRepository;
     @Autowired
     protected TaskRepository taskRepository;
     @Autowired
-    private ReviewRepository reviewRepository;
+    protected ReviewRepository reviewRepository;
+    @Autowired
+    protected MemberReviewRepository memberReviewRepository;
 
     @Autowired
     private UpdateService updateService;
@@ -69,6 +72,8 @@ public abstract class AbstractIntegrationTest extends AbstractTest {
     private TaskService taskService;
     @Autowired
     private ReviewService reviewService;
+    @Autowired
+    private MemberReviewService memberReviewService;
 
     @Autowired
     protected HistoryService historyService;
@@ -107,9 +112,30 @@ public abstract class AbstractIntegrationTest extends AbstractTest {
             }
         });
 
+        memberReviewRepository.deleteAll();
         reviewRepository.deleteAll();
         taskRepository.deleteAll();
         memberRepository.deleteAll();
+    }
+
+    protected SendMessage performCreateTask(String chatId, TaskType taskType) throws Exception {
+        Update update = getUpdateWithMessage(JIRA_LINK + TASK_NAME_1 + "#" + taskType, chatId);
+        Member member = getMemberFromDB(chatId, 0, false, false);
+
+        return performUpdateReceived(update);
+    }
+
+    protected SendMessage performTakeInReview(String chatId, TaskType taskType, int reviewGroup, Long taskId) throws Exception {
+        Update update = getUpdateWithCallbackQuery("/" + TAKE_IN_REVIEW + "#" + taskId, chatId);
+        Member reviewer = getMemberFromDB(chatId, reviewGroup, DESIGN.equals(taskType), false);
+
+        return performUpdateReceived(update);
+    }
+
+    protected SendMessage performAcceptReview(String chatId, Long taskId) throws Exception {
+        Update update = getUpdateWithCallbackQuery("/" + ACCEPT_REVIEW + "#" + taskId, chatId);
+
+        return performUpdateReceived(update);
     }
 
     protected SendMessage performUpdateReceived(Update update) throws Exception {
@@ -124,11 +150,15 @@ public abstract class AbstractIntegrationTest extends AbstractTest {
         return objectMapper.readValue(content, SendMessage.class);
     }
 
-    protected Member getMemberFromDB(int reviewGroup, boolean canReviewDesign, boolean isOmni) {
-        return memberRepository.save(getMember(reviewGroup, canReviewDesign, isOmni));
+    protected Member getMemberFromDB(String chatId, int reviewGroup, boolean canReviewDesign, boolean isOmni) {
+        if (memberRepository.existsByChatId(chatId)) {
+            return memberRepository.getMemberByChatId(chatId);
+        }
+        return memberRepository.save(getMember(chatId, reviewGroup, canReviewDesign, isOmni));
     }
 
-    protected String getUuidFromProcess() {
+    protected String getUuidFromProcess() throws InterruptedException {
+        Thread.sleep(100);
         return historyService.createHistoricProcessInstanceQuery()
             .processDefinitionName(PROCESS_NAME)
             .singleResult()

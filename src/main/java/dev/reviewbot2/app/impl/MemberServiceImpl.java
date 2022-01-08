@@ -3,13 +3,13 @@ package dev.reviewbot2.app.impl;
 import dev.reviewbot2.app.api.MemberService;
 import dev.reviewbot2.domain.member.Member;
 import dev.reviewbot2.repository.MemberRepository;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
-@Service
-@AllArgsConstructor
 @Slf4j
+@Component
+@RequiredArgsConstructor
 public class MemberServiceImpl implements MemberService {
     private final MemberRepository memberRepository;
 

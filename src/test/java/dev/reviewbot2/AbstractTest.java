@@ -14,7 +14,8 @@ import static dev.reviewbot2.domain.task.TaskStatus.READY_FOR_REVIEW;
 public class AbstractTest {
     protected static final int MESSAGE_ID = 51632862;
     protected static final int UPDATE_ID = 42368635;
-    protected static final long CHAT_ID = 57164325;
+    protected static final String MEMBER_CHAT_ID = "57164325";
+    protected static final String REVIEWER_CHAT_ID = "27621396";
     protected static final String LOGIN = "test_login";
     protected static final String BOT_NAME = "test_bot_name";
     protected static final String BOT_TOKEN = "test_bot_token";
@@ -37,32 +38,32 @@ public class AbstractTest {
         return update;
     }
 
-    protected Update getUpdateWithMessage(String text) {
+    protected Update getUpdateWithMessage(String text, String chatId) {
         Update update = new Update();
         update.setUpdateId(UPDATE_ID);
-        update.setMessage(getMessage(text));
+        update.setMessage(getMessage(text, chatId));
         return update;
     }
 
-    protected Update getUpdateWithCallbackQuery(String text) {
+    protected Update getUpdateWithCallbackQuery(String text, String chatId) {
         Update update = new Update();
         update.setUpdateId(UPDATE_ID);
-        update.setCallbackQuery(getCallbackQuery(text));
+        update.setCallbackQuery(getCallbackQuery(text, chatId));
         return update;
     }
 
-    protected CallbackQuery getCallbackQuery(String text) {
+    protected CallbackQuery getCallbackQuery(String text, String chatId) {
         CallbackQuery callbackQuery = new CallbackQuery();
-        callbackQuery.setMessage(getMessage(text));
+        callbackQuery.setMessage(getMessage(text, chatId));
         return callbackQuery;
     }
 
-    protected Message getMessage(String text) {
+    protected Message getMessage(String text, String chatId) {
         Message message = new Message();
         message.setMessageId(MESSAGE_ID);
         message.setText(text);
         message.setFrom(getUser());
-        message.setChat(getChat());
+        message.setChat(getChat(chatId));
         return message;
     }
 
@@ -72,15 +73,15 @@ public class AbstractTest {
         return user;
     }
 
-    protected Chat getChat() {
+    protected Chat getChat(String chatId) {
         Chat chat = new Chat();
-        chat.setId(CHAT_ID);
+        chat.setId(Long.parseLong(chatId));
         return chat;
     }
 
-    protected Member getMember(int reviewGroup, boolean canReviewDesign, boolean isOmni) {
+    protected Member getMember(String chatId, int reviewGroup, boolean canReviewDesign, boolean isOmni) {
         return Member.builder()
-            .chatId(String.valueOf(CHAT_ID))
+            .chatId(chatId)
             .login(LOGIN)
             .reviewGroup(reviewGroup)
             .canReviewDesign(canReviewDesign)
@@ -97,7 +98,7 @@ public class AbstractTest {
             .creationTime(Instant.now())
             .taskType(taskType)
             .status(READY_FOR_REVIEW)
-            .author(getMember(0, false, false))
+            .author(getMember(MEMBER_CHAT_ID, 0, false, false))
             .build();
     }
 

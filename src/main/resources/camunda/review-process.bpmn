@@ -28,11 +28,11 @@
         <bpmn:incoming>Flow_0g927mk</bpmn:incoming>
       </bpmn:endEvent>
       <bpmn:sequenceFlow id="Flow_0g927mk" sourceRef="task-in-review" targetRef="end-review" />
-      <bpmn:receiveTask id="take-on-review" name="Задача взята в ревью" messageRef="Message_1woxlc9">
+      <bpmn:receiveTask id="take-in-review" name="Задача взята в ревью" messageRef="Message_1woxlc9">
         <bpmn:incoming>Flow_1lm810w</bpmn:incoming>
         <bpmn:outgoing>Flow_0lmpsds</bpmn:outgoing>
       </bpmn:receiveTask>
-      <bpmn:sequenceFlow id="Flow_1lm810w" sourceRef="send-notification" targetRef="take-on-review" />
+      <bpmn:sequenceFlow id="Flow_1lm810w" sourceRef="send-notification" targetRef="take-in-review" />
       <bpmn:intermediateThrowEvent id="in-review" name="Задача в ревью">
         <bpmn:extensionElements>
           <camunda:executionListener delegateExpression="${updateStatusDelegate}" event="start" />
@@ -40,7 +40,7 @@
         <bpmn:incoming>Flow_0lmpsds</bpmn:incoming>
         <bpmn:outgoing>Flow_0nldt9v</bpmn:outgoing>
       </bpmn:intermediateThrowEvent>
-      <bpmn:sequenceFlow id="Flow_0lmpsds" sourceRef="take-on-review" targetRef="in-review" />
+      <bpmn:sequenceFlow id="Flow_0lmpsds" sourceRef="take-in-review" targetRef="in-review" />
       <bpmn:sequenceFlow id="Flow_0nldt9v" sourceRef="in-review" targetRef="task-in-review" />
     </bpmn:subProcess>
     <bpmn:sequenceFlow id="Flow_03qjh60" sourceRef="ready-for-review" targetRef="review" />
@@ -97,7 +97,7 @@
       <bpmn:terminateEventDefinition id="TerminateEventDefinition_1iu6qj6" />
     </bpmn:endEvent>
   </bpmn:process>
-  <bpmn:message id="Message_1woxlc9" name="take-on-review-message" />
+  <bpmn:message id="Message_1woxlc9" name="take-in-review-message" />
   <bpmn:message id="Message_03i9lfy" name="send-for-review-message" />
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="review-process">
@@ -197,7 +197,7 @@
           <dc:Bounds x="928" y="206" width="64" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_17h4329_di" bpmnElement="take-on-review">
+      <bpmndi:BPMNShape id="Activity_17h4329_di" bpmnElement="take-in-review">
         <dc:Bounds x="520" y="140" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_0rgr7e2_di" bpmnElement="in-review">

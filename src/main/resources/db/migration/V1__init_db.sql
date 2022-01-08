@@ -34,8 +34,8 @@ CREATE TABLE member_review (
     id BIGSERIAL PRIMARY KEY,
     review_id INTEGER NOT NULL,
     reviewer_id INTEGER NOT NULL,
-    start_review TIMESTAMP,
-    end_review TIMESTAMP,
+    start_time TIMESTAMP,
+    end_time TIMESTAMP,
 
     CONSTRAINT fk_review FOREIGN KEY (review_id) REFERENCES review(id),
     CONSTRAINT fk_reviewer FOREIGN KEY (reviewer_id) REFERENCES member(id)

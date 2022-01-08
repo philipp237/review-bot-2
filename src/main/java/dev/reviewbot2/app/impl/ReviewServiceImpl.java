@@ -2,6 +2,7 @@ package dev.reviewbot2.app.impl;
 
 import dev.reviewbot2.app.api.ReviewService;
 import dev.reviewbot2.domain.review.Review;
+import dev.reviewbot2.domain.task.Task;
 import dev.reviewbot2.repository.ReviewRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -35,5 +36,10 @@ public class ReviewServiceImpl implements ReviewService {
         }
 
         return reviews;
+    }
+
+    @Override
+    public Review getReviewByTask(Task task) {
+        return reviewRepository.getReviewByTask(task);
     }
 }

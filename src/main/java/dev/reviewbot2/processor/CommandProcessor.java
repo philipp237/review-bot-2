@@ -25,6 +25,10 @@ public class CommandProcessor {
                 return updateService.takeInReview(update);
             case ACCEPT_REVIEW:
                 return updateService.acceptReview(update);
+            case APPROVE:
+                return updateService.completeReview(update, true);
+            case DECLINE:
+                return updateService.completeReview(update, false);
         }
         return null;
     }

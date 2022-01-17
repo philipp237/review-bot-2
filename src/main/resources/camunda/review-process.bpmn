@@ -8,58 +8,19 @@
       <bpmn:incoming>Flow_1luamp4</bpmn:incoming>
       <bpmn:incoming>Flow_1cjk6kx</bpmn:incoming>
       <bpmn:incoming>Flow_029x501</bpmn:incoming>
-      <bpmn:outgoing>Flow_03qjh60</bpmn:outgoing>
+      <bpmn:outgoing>Flow_1xnzlx6</bpmn:outgoing>
     </bpmn:intermediateThrowEvent>
     <bpmn:startEvent id="start-event" name="Получение данных о задаче">
       <bpmn:outgoing>Flow_1luamp4</bpmn:outgoing>
     </bpmn:startEvent>
     <bpmn:sequenceFlow id="Flow_1luamp4" sourceRef="start-event" targetRef="ready-for-review" />
-    <bpmn:subProcess id="review" name="Ревью" default="Flow_01qbjgu">
-      <bpmn:incoming>Flow_03qjh60</bpmn:incoming>
-      <bpmn:outgoing>Flow_01qbjgu</bpmn:outgoing>
-      <bpmn:startEvent id="send-notification" name="Отправка уведомлений ревьюерам">
-        <bpmn:outgoing>Flow_1lm810w</bpmn:outgoing>
-      </bpmn:startEvent>
-      <bpmn:userTask id="task-in-review" name="Проведение ревью">
-        <bpmn:incoming>Flow_0nldt9v</bpmn:incoming>
-        <bpmn:outgoing>Flow_0g927mk</bpmn:outgoing>
-      </bpmn:userTask>
-      <bpmn:endEvent id="end-review" name="Завершение ревью">
-        <bpmn:incoming>Flow_0g927mk</bpmn:incoming>
-      </bpmn:endEvent>
-      <bpmn:sequenceFlow id="Flow_0g927mk" sourceRef="task-in-review" targetRef="end-review" />
-      <bpmn:receiveTask id="take-in-review" name="Задача взята в ревью" messageRef="Message_1woxlc9">
-        <bpmn:incoming>Flow_1lm810w</bpmn:incoming>
-        <bpmn:outgoing>Flow_0lmpsds</bpmn:outgoing>
-      </bpmn:receiveTask>
-      <bpmn:sequenceFlow id="Flow_1lm810w" sourceRef="send-notification" targetRef="take-in-review" />
-      <bpmn:intermediateThrowEvent id="in-review" name="Задача в ревью">
-        <bpmn:extensionElements>
-          <camunda:executionListener delegateExpression="${updateStatusDelegate}" event="start" />
-        </bpmn:extensionElements>
-        <bpmn:incoming>Flow_0lmpsds</bpmn:incoming>
-        <bpmn:outgoing>Flow_0nldt9v</bpmn:outgoing>
-      </bpmn:intermediateThrowEvent>
-      <bpmn:sequenceFlow id="Flow_0lmpsds" sourceRef="take-in-review" targetRef="in-review" />
-      <bpmn:sequenceFlow id="Flow_0nldt9v" sourceRef="in-review" targetRef="task-in-review" />
-    </bpmn:subProcess>
-    <bpmn:sequenceFlow id="Flow_03qjh60" sourceRef="ready-for-review" targetRef="review" />
-    <bpmn:exclusiveGateway id="Gateway_1aa2ni8" default="Flow_0a9urc7">
-      <bpmn:incoming>Flow_01qbjgu</bpmn:incoming>
-      <bpmn:outgoing>Flow_1k3xs06</bpmn:outgoing>
-      <bpmn:outgoing>Flow_0a9urc7</bpmn:outgoing>
-    </bpmn:exclusiveGateway>
-    <bpmn:sequenceFlow id="Flow_01qbjgu" sourceRef="review" targetRef="Gateway_1aa2ni8" />
     <bpmn:intermediateThrowEvent id="in-progress" name="Задача на доработке">
       <bpmn:extensionElements>
         <camunda:executionListener delegateExpression="${updateStatusDelegate}" event="start" />
       </bpmn:extensionElements>
-      <bpmn:incoming>Flow_1k3xs06</bpmn:incoming>
+      <bpmn:incoming>Flow_0tdxi5f</bpmn:incoming>
       <bpmn:outgoing>Flow_1sgbemm</bpmn:outgoing>
     </bpmn:intermediateThrowEvent>
-    <bpmn:sequenceFlow id="Flow_1k3xs06" sourceRef="Gateway_1aa2ni8" targetRef="in-progress">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${approved==false}</bpmn:conditionExpression>
-    </bpmn:sequenceFlow>
     <bpmn:receiveTask id="send-for-review" name="Задача отправлена на повторное ревью" messageRef="Message_03i9lfy">
       <bpmn:incoming>Flow_1sgbemm</bpmn:incoming>
       <bpmn:outgoing>Flow_1cjk6kx</bpmn:outgoing>
@@ -79,15 +40,9 @@
       <bpmn:outgoing>Flow_0r4wi53</bpmn:outgoing>
     </bpmn:receiveTask>
     <bpmn:sequenceFlow id="Flow_0r4wi53" sourceRef="closing-task" targetRef="closed" />
-    <bpmn:task id="review-stage-check" name="Проверка стадии ревью" default="Flow_1bka3ha">
-      <bpmn:incoming>Flow_0a9urc7</bpmn:incoming>
-      <bpmn:outgoing>Flow_1bka3ha</bpmn:outgoing>
-      <bpmn:outgoing>Flow_029x501</bpmn:outgoing>
-    </bpmn:task>
     <bpmn:sequenceFlow id="Flow_1bka3ha" sourceRef="review-stage-check" targetRef="approved" />
-    <bpmn:sequenceFlow id="Flow_0a9urc7" sourceRef="Gateway_1aa2ni8" targetRef="review-stage-check" />
     <bpmn:sequenceFlow id="Flow_029x501" name="На следующую стадию" sourceRef="review-stage-check" targetRef="ready-for-review">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${last-stage==false}</bpmn:conditionExpression>
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${lastStage==false}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:endEvent id="closed" name="Задача закрыта">
       <bpmn:extensionElements>
@@ -96,145 +51,162 @@
       <bpmn:incoming>Flow_0r4wi53</bpmn:incoming>
       <bpmn:terminateEventDefinition id="TerminateEventDefinition_1iu6qj6" />
     </bpmn:endEvent>
+    <bpmn:receiveTask id="take-in-review" name="Задача взята в ревью" messageRef="Message_1woxlc9">
+      <bpmn:incoming>Flow_0qdavhw</bpmn:incoming>
+      <bpmn:outgoing>Flow_0lmpsds</bpmn:outgoing>
+    </bpmn:receiveTask>
+    <bpmn:intermediateThrowEvent id="in-review" name="Задача в ревью">
+      <bpmn:extensionElements>
+        <camunda:executionListener delegateExpression="${updateStatusDelegate}" event="start" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0lmpsds</bpmn:incoming>
+      <bpmn:outgoing>Flow_0nldt9v</bpmn:outgoing>
+    </bpmn:intermediateThrowEvent>
+    <bpmn:receiveTask id="complete-review" name="Проведение ревью" default="Flow_1vjdzlt" messageRef="Message_1hqoj53">
+      <bpmn:incoming>Flow_0nldt9v</bpmn:incoming>
+      <bpmn:outgoing>Flow_0tdxi5f</bpmn:outgoing>
+      <bpmn:outgoing>Flow_1vjdzlt</bpmn:outgoing>
+    </bpmn:receiveTask>
+    <bpmn:sequenceFlow id="Flow_0lmpsds" sourceRef="take-in-review" targetRef="in-review" />
+    <bpmn:sequenceFlow id="Flow_0nldt9v" sourceRef="in-review" targetRef="complete-review" />
+    <bpmn:sequenceFlow id="Flow_1xnzlx6" sourceRef="ready-for-review" targetRef="send-notification" />
+    <bpmn:sequenceFlow id="Flow_0qdavhw" sourceRef="send-notification" targetRef="take-in-review" />
+    <bpmn:sequenceFlow id="Flow_0tdxi5f" name="Задача отправлена на доработку" sourceRef="complete-review" targetRef="in-progress">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${needsRework==true}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_1vjdzlt" name="Задача утверждена" sourceRef="complete-review" targetRef="review-stage-check" />
+    <bpmn:serviceTask id="send-notification" name="Отправка уведомлений ревьюерам" camunda:delegateExpression="${sendNotificationDelegate}">
+      <bpmn:incoming>Flow_1xnzlx6</bpmn:incoming>
+      <bpmn:outgoing>Flow_0qdavhw</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="review-stage-check" name="Проверка стадии ревью" default="Flow_1bka3ha" camunda:delegateExpression="${checkReviewStageDelegate}">
+      <bpmn:incoming>Flow_1vjdzlt</bpmn:incoming>
+      <bpmn:outgoing>Flow_1bka3ha</bpmn:outgoing>
+      <bpmn:outgoing>Flow_029x501</bpmn:outgoing>
+    </bpmn:serviceTask>
   </bpmn:process>
   <bpmn:message id="Message_1woxlc9" name="take-in-review-message" />
   <bpmn:message id="Message_03i9lfy" name="send-for-review-message" />
+  <bpmn:message id="Message_1hqoj53" name="complete-review-message" />
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="review-process">
-      <bpmndi:BPMNEdge id="Flow_029x501_di" bpmnElement="Flow_029x501">
-        <di:waypoint x="1240" y="220" />
-        <di:waypoint x="1240" y="470" />
-        <di:waypoint x="310" y="470" />
-        <di:waypoint x="310" y="198" />
+      <bpmndi:BPMNEdge id="Flow_1vjdzlt_di" bpmnElement="Flow_1vjdzlt">
+        <di:waypoint x="930" y="120" />
+        <di:waypoint x="1060" y="120" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="738" y="436" width="79" height="27" />
+          <dc:Bounds x="966" y="86" width="60" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0a9urc7_di" bpmnElement="Flow_0a9urc7">
-        <di:waypoint x="1125" y="180" />
-        <di:waypoint x="1190" y="180" />
+      <bpmndi:BPMNEdge id="Flow_0tdxi5f_di" bpmnElement="Flow_0tdxi5f">
+        <di:waypoint x="880" y="160" />
+        <di:waypoint x="880" y="262" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="792" y="190" width="75" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0qdavhw_di" bpmnElement="Flow_0qdavhw">
+        <di:waypoint x="500" y="120" />
+        <di:waypoint x="570" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1xnzlx6_di" bpmnElement="Flow_1xnzlx6">
+        <di:waypoint x="328" y="120" />
+        <di:waypoint x="400" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0nldt9v_di" bpmnElement="Flow_0nldt9v">
+        <di:waypoint x="768" y="120" />
+        <di:waypoint x="830" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0lmpsds_di" bpmnElement="Flow_0lmpsds">
+        <di:waypoint x="670" y="120" />
+        <di:waypoint x="732" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_029x501_di" bpmnElement="Flow_029x501">
+        <di:waypoint x="1110" y="160" />
+        <di:waypoint x="1110" y="410" />
+        <di:waypoint x="310" y="410" />
+        <di:waypoint x="310" y="138" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="680" y="376" width="79" height="27" />
+        </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1bka3ha_di" bpmnElement="Flow_1bka3ha">
-        <di:waypoint x="1290" y="180" />
-        <di:waypoint x="1362" y="180" />
+        <di:waypoint x="1160" y="120" />
+        <di:waypoint x="1232" y="120" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0r4wi53_di" bpmnElement="Flow_0r4wi53">
-        <di:waypoint x="1560" y="180" />
-        <di:waypoint x="1622" y="180" />
+        <di:waypoint x="1430" y="120" />
+        <di:waypoint x="1492" y="120" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_00moknf_di" bpmnElement="Flow_00moknf">
-        <di:waypoint x="1398" y="180" />
-        <di:waypoint x="1460" y="180" />
+        <di:waypoint x="1268" y="120" />
+        <di:waypoint x="1330" y="120" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1cjk6kx_di" bpmnElement="Flow_1cjk6kx">
-        <di:waypoint x="650" y="370" />
-        <di:waypoint x="310" y="370" />
-        <di:waypoint x="310" y="198" />
+        <di:waypoint x="570" y="280" />
+        <di:waypoint x="310" y="280" />
+        <di:waypoint x="310" y="138" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1sgbemm_di" bpmnElement="Flow_1sgbemm">
-        <di:waypoint x="1082" y="370" />
-        <di:waypoint x="750" y="370" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1k3xs06_di" bpmnElement="Flow_1k3xs06">
-        <di:waypoint x="1100" y="205" />
-        <di:waypoint x="1100" y="352" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_01qbjgu_di" bpmnElement="Flow_01qbjgu">
-        <di:waypoint x="1010" y="180" />
-        <di:waypoint x="1075" y="180" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_03qjh60_di" bpmnElement="Flow_03qjh60">
-        <di:waypoint x="328" y="180" />
-        <di:waypoint x="390" y="180" />
+        <di:waypoint x="862" y="280" />
+        <di:waypoint x="670" y="280" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1luamp4_di" bpmnElement="Flow_1luamp4">
-        <di:waypoint x="218" y="180" />
-        <di:waypoint x="292" y="180" />
+        <di:waypoint x="218" y="120" />
+        <di:waypoint x="292" y="120" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Event_0r1wbu3_di" bpmnElement="ready-for-review">
-        <dc:Bounds x="292" y="162" width="36" height="36" />
+        <dc:Bounds x="292" y="102" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="271" y="143" width="78" height="14" />
+          <dc:Bounds x="271" y="83" width="78" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="start-event">
-        <dc:Bounds x="182" y="162" width="36" height="36" />
+        <dc:Bounds x="182" y="102" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="157" y="206" width="85" height="27" />
+          <dc:Bounds x="157" y="146" width="85" height="27" />
         </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_12011ye_di" bpmnElement="review" isExpanded="true">
-        <dc:Bounds x="390" y="80" width="620" height="200" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="Flow_0nldt9v_di" bpmnElement="Flow_0nldt9v">
-        <di:waypoint x="718" y="180" />
-        <di:waypoint x="780" y="180" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0lmpsds_di" bpmnElement="Flow_0lmpsds">
-        <di:waypoint x="620" y="180" />
-        <di:waypoint x="682" y="180" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1lm810w_di" bpmnElement="Flow_1lm810w">
-        <di:waypoint x="466" y="180" />
-        <di:waypoint x="520" y="180" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0g927mk_di" bpmnElement="Flow_0g927mk">
-        <di:waypoint x="880" y="180" />
-        <di:waypoint x="942" y="180" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNShape id="Event_05b28c2_di" bpmnElement="send-notification">
-        <dc:Bounds x="430" y="162" width="36" height="36" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="416" y="210" width="68" height="40" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_1xdpepf_di" bpmnElement="task-in-review">
-        <dc:Bounds x="780" y="140" width="100" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_0i0hl7s_di" bpmnElement="end-review">
-        <dc:Bounds x="942" y="162" width="36" height="36" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="928" y="206" width="64" height="27" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_17h4329_di" bpmnElement="take-in-review">
-        <dc:Bounds x="520" y="140" width="100" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_0rgr7e2_di" bpmnElement="in-review">
-        <dc:Bounds x="682" y="162" width="36" height="36" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="659" y="205" width="82" height="14" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Gateway_1aa2ni8_di" bpmnElement="Gateway_1aa2ni8" isMarkerVisible="true">
-        <dc:Bounds x="1075" y="155" width="50" height="50" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_110864v_di" bpmnElement="in-progress">
-        <dc:Bounds x="1082" y="352" width="36" height="36" />
+        <dc:Bounds x="862" y="262" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="1073" y="396" width="53" height="27" />
+          <dc:Bounds x="853" y="306" width="53" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_1q1hsw1_di" bpmnElement="send-for-review">
-        <dc:Bounds x="650" y="330" width="100" height="80" />
+        <dc:Bounds x="570" y="240" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_09jian7_di" bpmnElement="approved">
-        <dc:Bounds x="1362" y="162" width="36" height="36" />
+        <dc:Bounds x="1232" y="102" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="1350" y="206" width="60" height="27" />
+          <dc:Bounds x="1220" y="146" width="60" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_045fn6v_di" bpmnElement="closing-task">
-        <dc:Bounds x="1460" y="140" width="100" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_0pl9g4w_di" bpmnElement="review-stage-check">
-        <dc:Bounds x="1190" y="140" width="100" height="80" />
+        <dc:Bounds x="1330" y="80" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_124l0gi_di" bpmnElement="closed">
-        <dc:Bounds x="1622" y="162" width="36" height="36" />
+        <dc:Bounds x="1492" y="102" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="1599" y="208" width="81" height="14" />
+          <dc:Bounds x="1469" y="148" width="81" height="14" />
         </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_17h4329_di" bpmnElement="take-in-review">
+        <dc:Bounds x="570" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0rgr7e2_di" bpmnElement="in-review">
+        <dc:Bounds x="732" y="102" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="709" y="145" width="82" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0fi4b4n_di" bpmnElement="complete-review">
+        <dc:Bounds x="830" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0g632f9_di" bpmnElement="send-notification">
+        <dc:Bounds x="400" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0244d8o_di" bpmnElement="review-stage-check">
+        <dc:Bounds x="1060" y="80" width="100" height="80" />
       </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>

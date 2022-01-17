@@ -2,7 +2,9 @@ package dev.reviewbot2;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.reviewbot2.app.api.*;
+import dev.reviewbot2.app.impl.camunda.ProcessAccessor;
 import dev.reviewbot2.domain.member.Member;
+import dev.reviewbot2.domain.task.Task;
 import dev.reviewbot2.domain.task.TaskType;
 import dev.reviewbot2.processor.CommandProcessor;
 import dev.reviewbot2.processor.MessageProcessor;
@@ -24,6 +26,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -34,8 +37,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static dev.reviewbot2.domain.task.TaskType.DESIGN;
-import static dev.reviewbot2.processor.Command.ACCEPT_REVIEW;
-import static dev.reviewbot2.processor.Command.TAKE_IN_REVIEW;
+import static dev.reviewbot2.domain.task.TaskType.IMPLEMENTATION;
+import static dev.reviewbot2.processor.Command.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest("ReveiwBot2Application")
@@ -138,6 +141,18 @@ public abstract class AbstractIntegrationTest extends AbstractTest {
         return performUpdateReceived(update);
     }
 
+    protected SendMessage performApprove(String chatId, Long taskId) throws Exception {
+        Update update = getUpdateWithCallbackQuery("/" + APPROVE + "#" + taskId, chatId);
+
+        return performUpdateReceived(update);
+    }
+
+    protected SendMessage performDecline(String chatId, Long taskId) throws Exception {
+        Update update = getUpdateWithCallbackQuery("/" + DECLINE + "#" + taskId, chatId);
+
+        return performUpdateReceived(update);
+    }
+
     protected SendMessage performUpdateReceived(Update update) throws Exception {
         MvcResult result = mockMvc.perform(
             MockMvcRequestBuilders.post("/")
@@ -159,10 +174,10 @@ public abstract class AbstractIntegrationTest extends AbstractTest {
 
     protected String getUuidFromProcess() throws InterruptedException {
         Thread.sleep(100);
-        return historyService.createHistoricProcessInstanceQuery()
-            .processDefinitionName(PROCESS_NAME)
+        return runtimeService.createVariableInstanceQuery()
+            .variableName("taskUuid")
             .singleResult()
-            .getBusinessKey();
+            .getValue().toString();
     }
 
     // ================================================================================================================

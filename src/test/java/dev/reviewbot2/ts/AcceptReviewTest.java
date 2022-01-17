@@ -23,9 +23,6 @@ import static org.mockito.Mockito.verify;
 public class AcceptReviewTest extends AbstractUnitTest {
     private AcceptReviewTransactionScript acceptReview;
 
-    @Captor
-    ArgumentCaptor<MemberReview> memberReviewArgumentCaptor;
-
     @BeforeEach
     void setUp() {
         closeable = MockitoAnnotations.openMocks(this);
@@ -40,10 +37,10 @@ public class AcceptReviewTest extends AbstractUnitTest {
 
     @Test
     void execute() throws TelegramApiException {
-        Review review = getReview(IMPLEMENTATION, 1, UUID_1, TASK_NAME_1, 1);
-        Update update = getUpdateWithCallbackQuery("/" + ACCEPT_REVIEW + "#" + review.getTask().getId(), REVIEWER_CHAT_ID);
+        Review review = getReview(IMPLEMENTATION, 1, UUID_1, TASK_NAME_1, TASK_ID_1);
+        Update update = getUpdateWithCallbackQuery("/" + ACCEPT_REVIEW + "#" + review.getTask().getId(), REVIEWER_1_CHAT_ID);
 
-        memberServiceMock.mockGetMemberByChatId(getMember(REVIEWER_CHAT_ID, 1, false, false));
+        memberServiceMock.mockGetMemberByChatId(getMember(REVIEWER_1_CHAT_ID, 1, false, false));
         taskServiceMock.mockGetTaskById(review.getTask());
         reviewServiceMock.mockGetReviewByTask(review);
         memberReviewServiceMock.mockSave();

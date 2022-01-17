@@ -9,4 +9,5 @@ import java.util.List;
 
 public interface MemberReviewRepository extends JpaRepository<MemberReview, Long> {
     List<MemberReview> getAllByReviewAndReviewer(Review review, Member member);
+    MemberReview getByReviewAndEndTimeIsNull(Review review);
 }

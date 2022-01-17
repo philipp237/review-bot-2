@@ -12,3 +12,6 @@ bot:
 jira:
   link: ${JIRA_LINK}
   dashboards: ${JIRA_DASHBOARDS}
+
+settings:
+  number-of-review-stages: ${NUMBER_OF_REVIEW_STAGES}

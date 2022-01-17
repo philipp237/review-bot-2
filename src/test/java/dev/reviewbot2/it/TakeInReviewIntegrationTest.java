@@ -27,17 +27,17 @@ public class TakeInReviewIntegrationTest extends AbstractIntegrationTest {
         Task task = taskRepository.getByUuid(uuid);
         Long taskId = task.getId();
 
-        performTakeInReview(REVIEWER_CHAT_ID, taskType, 1, taskId);
-        SendMessage acceptReview = performAcceptReview(REVIEWER_CHAT_ID, taskId);
+        performTakeInReview(REVIEWER_1_CHAT_ID, taskType, 1, taskId);
+        SendMessage acceptReview = performAcceptReview(REVIEWER_1_CHAT_ID, taskId);
 
         task = taskRepository.getByUuid(uuid);
         Review review = reviewRepository.getReviewByTask(task);
-        Member reviewer = memberRepository.getMemberByChatId(REVIEWER_CHAT_ID);
+        Member reviewer = memberRepository.getMemberByChatId(REVIEWER_1_CHAT_ID);
         List<MemberReview> memberReviews = memberReviewRepository.getAllByReviewAndReviewer(review, reviewer);
 
         assertEquals(TASK_NAME_1, task.getName());
         assertEquals(IN_REVIEW, task.getStatus());
-        assertEquals(REVIEWER_CHAT_ID, acceptReview.getChatId());
+        assertEquals(REVIEWER_1_CHAT_ID, acceptReview.getChatId());
         assertEquals(1, review.getReviewStage());
         assertEquals(1, memberReviews.size());
     }

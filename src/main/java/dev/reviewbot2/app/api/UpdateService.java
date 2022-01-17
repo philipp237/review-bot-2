@@ -40,4 +40,13 @@ public interface UpdateService {
      * @return - сообщение о взятии задачи в ревью
      */
     SendMessage acceptReview(Update update) throws TelegramApiException;
+
+    /**
+     * Завершить ревью
+     *
+     * @param udpate - обновление, в котором содержится сообщение с командой подтверждения завершения ревью
+     * @param isApproved - резолюция окончания ревью
+     * @return - сообщение о завершении ревью
+     */
+    SendMessage completeReview(Update udpate, boolean isApproved) throws TelegramApiException;
 }

@@ -17,5 +17,15 @@ public enum Command {
     /**
      * Подтвердить взятие задачи в ревью
      */
-    ACCEPT_REVIEW
+    ACCEPT_REVIEW,
+
+    /**
+     * Подтвердить задачу
+     */
+    APPROVE,
+
+    /**
+     * Отправить задачу на доработку
+     */
+    DECLINE
 }

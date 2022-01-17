@@ -3,6 +3,7 @@ package dev.reviewbot2.mock;
 import dev.reviewbot2.app.impl.camunda.ProcessAccessor;
 import lombok.RequiredArgsConstructor;
 
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doNothing;
@@ -17,5 +18,9 @@ public class ProcessAccessorMock {
 
     public void mockTakeInReview() {
         doNothing().when(processAccessor).takeInReview(anyString());
+    }
+
+    public void mockCompleteReview() {
+        doNothing().when(processAccessor).completeReview(anyString(), anyBoolean());
     }
 }

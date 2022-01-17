@@ -1,21 +1,23 @@
 package dev.reviewbot2;
 
 import dev.reviewbot2.domain.member.Member;
+import dev.reviewbot2.domain.review.MemberReview;
 import dev.reviewbot2.domain.review.Review;
 import dev.reviewbot2.domain.task.Task;
 import dev.reviewbot2.domain.task.TaskType;
 import org.telegram.telegrambots.meta.api.objects.*;
 
-import java.time.Instant;
 import java.util.List;
 
 import static dev.reviewbot2.domain.task.TaskStatus.READY_FOR_REVIEW;
+import static java.time.Instant.now;
 
 public class AbstractTest {
     protected static final int MESSAGE_ID = 51632862;
     protected static final int UPDATE_ID = 42368635;
     protected static final String MEMBER_CHAT_ID = "57164325";
-    protected static final String REVIEWER_CHAT_ID = "27621396";
+    protected static final String REVIEWER_1_CHAT_ID = "27621396";
+    protected static final String REVIEWER_2_CHAT_ID = "56247114";
     protected static final String LOGIN = "test_login";
     protected static final String BOT_NAME = "test_bot_name";
     protected static final String BOT_TOKEN = "test_bot_token";
@@ -31,6 +33,8 @@ public class AbstractTest {
     protected static final String TASK_NAME_2 = DASHBOARD.get(0) + "-2222";
     protected static final String TASK_NAME_3 = DASHBOARD.get(0) + "-3333";
     protected static final String TASK_NAME_4 = DASHBOARD.get(0) + "-4444";
+
+    protected static final long TASK_ID_1 = 1L;
 
     protected Update getUpdateWithoutMessage() {
         Update update = new Update();
@@ -95,7 +99,7 @@ public class AbstractTest {
             .uuid(uuid)
             .name(taskName)
             .link(JIRA_LINK + taskName)
-            .creationTime(Instant.now())
+            .creationTime(now())
             .taskType(taskType)
             .status(READY_FOR_REVIEW)
             .author(getMember(MEMBER_CHAT_ID, 0, false, false))
@@ -104,8 +108,17 @@ public class AbstractTest {
 
     protected Review getReview(TaskType taskType, int reviewStage, String uuid, String taskName, long taskId) {
         return Review.builder()
+            .id(1L)
             .reviewStage(reviewStage)
             .task(getTask(taskType, uuid, taskName, taskId))
+            .build();
+    }
+
+    protected MemberReview getMemberReview(Review review, Member member) {
+        return MemberReview.builder()
+            .startTime(now())
+            .reviewer(member)
+            .review(review)
             .build();
     }
 }

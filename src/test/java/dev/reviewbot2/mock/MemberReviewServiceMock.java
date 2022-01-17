@@ -14,4 +14,8 @@ public class MemberReviewServiceMock {
     public void mockSave() {
         doReturn(new MemberReview()).when(memberReviewService).save(any());
     }
+
+    public void mockGetActiveReview(MemberReview memberReview) {
+        doReturn(memberReview).when(memberReviewService).getActiveReview(any());
+    }
 }

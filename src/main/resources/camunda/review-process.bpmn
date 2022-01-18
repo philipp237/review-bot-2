@@ -21,12 +21,12 @@
       <bpmn:incoming>Flow_0tdxi5f</bpmn:incoming>
       <bpmn:outgoing>Flow_1sgbemm</bpmn:outgoing>
     </bpmn:intermediateThrowEvent>
-    <bpmn:receiveTask id="send-for-review" name="Задача отправлена на повторное ревью" messageRef="Message_03i9lfy">
+    <bpmn:receiveTask id="submit-for-review" name="Задача отправлена на повторное ревью" messageRef="Message_03i9lfy">
       <bpmn:incoming>Flow_1sgbemm</bpmn:incoming>
       <bpmn:outgoing>Flow_1cjk6kx</bpmn:outgoing>
     </bpmn:receiveTask>
-    <bpmn:sequenceFlow id="Flow_1sgbemm" sourceRef="in-progress" targetRef="send-for-review" />
-    <bpmn:sequenceFlow id="Flow_1cjk6kx" sourceRef="send-for-review" targetRef="ready-for-review" />
+    <bpmn:sequenceFlow id="Flow_1sgbemm" sourceRef="in-progress" targetRef="submit-for-review" />
+    <bpmn:sequenceFlow id="Flow_1cjk6kx" sourceRef="submit-for-review" targetRef="ready-for-review" />
     <bpmn:intermediateThrowEvent id="approved" name="Задача утверждена">
       <bpmn:extensionElements>
         <camunda:executionListener delegateExpression="${updateStatusDelegate}" event="start" />
@@ -86,7 +86,7 @@
     </bpmn:serviceTask>
   </bpmn:process>
   <bpmn:message id="Message_1woxlc9" name="take-in-review-message" />
-  <bpmn:message id="Message_03i9lfy" name="send-for-review-message" />
+  <bpmn:message id="Message_03i9lfy" name="submit-for-review-message" />
   <bpmn:message id="Message_1hqoj53" name="complete-review-message" />
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="review-process">
@@ -172,7 +172,7 @@
           <dc:Bounds x="853" y="306" width="53" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_1q1hsw1_di" bpmnElement="send-for-review">
+      <bpmndi:BPMNShape id="Activity_1q1hsw1_di" bpmnElement="submit-for-review">
         <dc:Bounds x="570" y="240" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_09jian7_di" bpmnElement="approved">

@@ -153,6 +153,12 @@ public abstract class AbstractIntegrationTest extends AbstractTest {
         return performUpdateReceived(update);
     }
 
+    protected SendMessage performSubmit(String chatId, Long taskId) throws Exception {
+        Update update = getUpdateWithCallbackQuery("/" + SUBMIT + "#" + taskId, chatId);
+
+        return performUpdateReceived(update);
+    }
+
     protected SendMessage performUpdateReceived(Update update) throws Exception {
         MvcResult result = mockMvc.perform(
             MockMvcRequestBuilders.post("/")

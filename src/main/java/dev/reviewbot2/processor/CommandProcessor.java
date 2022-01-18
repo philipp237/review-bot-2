@@ -29,6 +29,8 @@ public class CommandProcessor {
                 return updateService.completeReview(update, true);
             case DECLINE:
                 return updateService.completeReview(update, false);
+            case SUBMIT:
+                return updateService.submitForReview(update);
         }
         return null;
     }

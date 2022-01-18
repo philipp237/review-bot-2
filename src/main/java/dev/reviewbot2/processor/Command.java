@@ -27,5 +27,10 @@ public enum Command {
     /**
      * Отправить задачу на доработку
      */
-    DECLINE
+    DECLINE,
+
+    /**
+     * Отправить задачу на ревью
+     */
+    SUBMIT
 }

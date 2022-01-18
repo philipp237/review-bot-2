@@ -6,7 +6,6 @@ import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.MessageCorrelationBuilder;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
@@ -17,6 +16,7 @@ public class ProcessAccessor {
     private final String PROCESS_ID = "review-process";
     private final String TAKE_IN_REVIEW_MESSAGE = "take-in-review-message";
     private final String COMPLETE_REVIEW_MESSAGE = "complete-review-message";
+    private final String SUBMIT_FOR_REVIEW_MESSAGE = "submit-for-review-message";
     private final String VAR_TASK_UUID = "taskUuid";
     private final String VAR_NEEDS_REWORK = "needsRework";
     private final String VAR_LAST_STAGE = "lastStage";
@@ -45,6 +45,11 @@ public class ProcessAccessor {
         correlateProcess(runtimeService.createMessageCorrelation(COMPLETE_REVIEW_MESSAGE)
             .processInstanceVariableEquals(VAR_TASK_UUID, taskUuid)
             .setVariable(VAR_NEEDS_REWORK, !isApproved));
+    }
+
+    public void submitForReview(String taskUuid) {
+        correlateProcess(runtimeService.createMessageCorrelation(SUBMIT_FOR_REVIEW_MESSAGE)
+            .processInstanceVariableEquals(VAR_TASK_UUID, taskUuid));
     }
 
     public void checkReviewStage(String executionId, boolean isLastStage) {

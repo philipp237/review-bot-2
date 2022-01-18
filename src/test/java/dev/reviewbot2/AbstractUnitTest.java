@@ -8,6 +8,7 @@ import dev.reviewbot2.app.impl.camunda.ProcessAccessor;
 import dev.reviewbot2.config.Config;
 import dev.reviewbot2.domain.review.MemberReview;
 import dev.reviewbot2.domain.review.Review;
+import dev.reviewbot2.domain.task.Task;
 import dev.reviewbot2.mock.*;
 import org.junit.jupiter.api.AfterEach;
 import org.mockito.ArgumentCaptor;
@@ -34,6 +35,8 @@ public abstract class AbstractUnitTest extends AbstractTest {
     protected ArgumentCaptor<Review> reviewArgumentCaptor;
     @Captor
     protected ArgumentCaptor<MemberReview> memberReviewArgumentCaptor;
+    @Captor
+    protected ArgumentCaptor<Task> taskArgumentCaptor;
 
     protected MemberServiceMock memberServiceMock;
     protected TaskServiceMock taskServiceMock;

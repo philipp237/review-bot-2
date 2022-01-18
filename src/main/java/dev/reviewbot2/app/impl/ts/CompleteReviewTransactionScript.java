@@ -56,11 +56,6 @@ public class CompleteReviewTransactionScript {
     //  Implementation
     // ================================================================================================================
 
-    private Long getTaskIdFromText(String text) {
-        String taskId = text.split("#")[1];
-        return Long.parseLong(taskId);
-    }
-
     private void validateReviewer(Member reviewer, MemberReview memberReview) throws TelegramApiException {
         if (!reviewer.equals(memberReview.getReviewer())) {
             throw new TelegramApiException(String.format("Member %s can't complete review authored by %s",

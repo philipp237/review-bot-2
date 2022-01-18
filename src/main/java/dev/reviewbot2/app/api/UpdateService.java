@@ -1,5 +1,6 @@
 package dev.reviewbot2.app.api;
 
+import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -49,4 +50,12 @@ public interface UpdateService {
      * @return - сообщение о завершении ревью
      */
     SendMessage completeReview(Update udpate, boolean isApproved) throws TelegramApiException;
+
+    /**
+     * Отправить задачу на ревью
+     *
+     * @param update - обновление, в котором содержится сообщение с командой отправки задачи на ревью
+     * @return - сообщение об отправке задачи на ревью
+     */
+    SendMessage submitForReview(Update update) throws TelegramApiException;
 }

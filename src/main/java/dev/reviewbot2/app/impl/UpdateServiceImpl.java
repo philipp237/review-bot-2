@@ -1,10 +1,7 @@
 package dev.reviewbot2.app.impl;
 
 import dev.reviewbot2.app.api.UpdateService;
-import dev.reviewbot2.app.impl.ts.AcceptReviewTransactionScript;
-import dev.reviewbot2.app.impl.ts.CompleteReviewTransactionScript;
-import dev.reviewbot2.app.impl.ts.CreateTaskTransactionScript;
-import dev.reviewbot2.app.impl.ts.TakeInReviewTransactionScript;
+import dev.reviewbot2.app.impl.ts.*;
 import dev.reviewbot2.config.Config;
 import dev.reviewbot2.domain.task.TaskType;
 import dev.reviewbot2.webhook.WebhookRestClient;
@@ -30,6 +27,7 @@ public class UpdateServiceImpl implements UpdateService {
     private final TakeInReviewTransactionScript takeInReview;
     private final AcceptReviewTransactionScript acceptReview;
     private final CompleteReviewTransactionScript completeReview;
+    private final SubmitForReviewTransactionScript submitForReview;
 
     @Override
     public void deletePreviousMessage(Update update) throws TelegramApiException {
@@ -73,6 +71,11 @@ public class UpdateServiceImpl implements UpdateService {
     @Override
     public SendMessage completeReview(Update update, boolean isApproved) throws TelegramApiException {
         return completeReview.execute(update, isApproved);
+    }
+
+    @Override
+    public SendMessage submitForReview(Update update) throws TelegramApiException {
+        return submitForReview.execute(update);
     }
 
     // ================================================================================================================

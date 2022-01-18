@@ -16,7 +16,7 @@ import static dev.reviewbot2.domain.task.TaskType.IMPLEMENTATION;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class AcceptReviewIntegrationTest extends AbstractIntegrationTest {
+public class ReviewProcessIntegrationTest extends AbstractIntegrationTest {
 
     @Test
     void approveReview() throws Exception {
@@ -65,7 +65,7 @@ public class AcceptReviewIntegrationTest extends AbstractIntegrationTest {
     }
 
     @Test
-    void declineReview() throws Exception {
+    void declineAndResubmitReview() throws Exception {
         TaskType taskType = IMPLEMENTATION;
 
         performCreateTask(MEMBER_CHAT_ID, taskType);
@@ -90,5 +90,20 @@ public class AcceptReviewIntegrationTest extends AbstractIntegrationTest {
         assertEquals(REVIEWER_1_CHAT_ID, declineReview.getChatId());
         assertEquals(1, review.getReviewStage());
         assertEquals(1, memberReviews.size());
+
+        performSubmit(MEMBER_CHAT_ID, taskId);
+
+        task = taskRepository.getByUuid(uuid);
+
+        assertEquals(READY_FOR_REVIEW, task.getStatus());
+
+        Thread.sleep(100);
+
+        performTakeInReview(REVIEWER_1_CHAT_ID, taskType, 1, taskId);
+        performAcceptReview(REVIEWER_1_CHAT_ID, taskId);
+
+        task = taskRepository.getByUuid(uuid);
+
+        assertEquals(IN_REVIEW, task.getStatus());
     }
 }

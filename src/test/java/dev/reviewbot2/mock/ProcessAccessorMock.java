@@ -23,4 +23,8 @@ public class ProcessAccessorMock {
     public void mockCompleteReview() {
         doNothing().when(processAccessor).completeReview(anyString(), anyBoolean());
     }
+
+    public void mockSubmitForReview() {
+        doNothing().when(processAccessor).submitForReview(anyString());
+    }
 }

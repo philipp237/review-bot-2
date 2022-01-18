@@ -75,6 +75,11 @@ public class Utils {
         return formatter.format(dateTime);
     }
 
+    public static Long getTaskIdFromText(String text) {
+        String taskId = text.split("#")[1];
+        return Long.parseLong(taskId);
+    }
+
     // ================================================================================================================
     //  Implementation
     // ================================================================================================================

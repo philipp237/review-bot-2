@@ -36,7 +36,12 @@ public enum TaskStatus {
     /**
      * Задача закрыта
      */
-    CLOSED("closed");
+    CLOSED("closed"),
+
+    /**
+     * Задача закрыта принудительно
+     */
+    FORCE_CLOSED("force-closed");
 
     private String activityId;
 

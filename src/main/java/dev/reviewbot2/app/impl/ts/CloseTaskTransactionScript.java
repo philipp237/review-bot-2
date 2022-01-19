@@ -44,13 +44,11 @@ public class CloseTaskTransactionScript {
 
         validateAuthor(member, task);
 
-        task.setStatus(CLOSED);
         task.setCloseTime(now());
         taskService.save(task);
 
-        processAccessor.closeTask(task.getUuid());
-
         if (!lastTaskStatus.equals(APPROVED)) {
+            processAccessor.forceCloseTask(task.getUuid());
             log.info("{} force closed task with uuid={}", member.getLogin(), task.getUuid());
             List<Member> team = memberService.getAllMembers();
             for (Member eachMemberOfTeam : team) {
@@ -60,6 +58,7 @@ public class CloseTaskTransactionScript {
             return sendMessage(chatId, "Задача принудительно закрыта");
         }
 
+        processAccessor.closeTask(task.getUuid());
         log.info("{} closed task with uuid={}", member.getLogin(), task.getUuid());
         return sendMessage(chatId, "Задача закрыта");
     }
@@ -67,7 +66,6 @@ public class CloseTaskTransactionScript {
     // ================================================================================================================
     //  Implementation
     // ================================================================================================================
-
 
     private void validateAuthor(Member member, Task task) throws TelegramApiException {
         if (!member.getChatId().equals(task.getAuthor().getChatId())) {

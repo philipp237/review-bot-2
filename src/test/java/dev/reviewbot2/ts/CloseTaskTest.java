@@ -10,17 +10,18 @@ import dev.reviewbot2.mock.TaskServiceMock;
 import dev.reviewbot2.mock.WebhookRestClientMock;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.List;
 
-import static dev.reviewbot2.domain.task.TaskStatus.*;
+import static dev.reviewbot2.domain.task.TaskStatus.APPROVED;
+import static dev.reviewbot2.domain.task.TaskStatus.IN_REVIEW;
 import static dev.reviewbot2.domain.task.TaskType.IMPLEMENTATION;
 import static dev.reviewbot2.processor.Command.CLOSE;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -52,9 +53,8 @@ public class CloseTaskTest extends AbstractUnitTest {
 
         closeTask.execute(update);
 
-        verify(taskService, Mockito.times(1)).save(taskArgumentCaptor.capture());
+        verify(taskService, times(1)).save(taskArgumentCaptor.capture());
 
-        assertEquals(CLOSED, taskArgumentCaptor.getValue().getStatus());
         assertNotNull(taskArgumentCaptor.getValue().getCloseTime());
     }
 
@@ -78,10 +78,9 @@ public class CloseTaskTest extends AbstractUnitTest {
 
         closeTask.execute(update);
 
-        verify(taskService, Mockito.times(1)).save(taskArgumentCaptor.capture());
+        verify(taskService, times(1)).save(taskArgumentCaptor.capture());
         verify(webhookRestClient, times(otherMembers.size())).sendMessage(any());
 
-        assertEquals(CLOSED, taskArgumentCaptor.getValue().getStatus());
         assertNotNull(taskArgumentCaptor.getValue().getCloseTime());
     }
 

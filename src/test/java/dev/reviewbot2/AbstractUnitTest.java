@@ -10,6 +10,7 @@ import dev.reviewbot2.domain.review.MemberReview;
 import dev.reviewbot2.domain.review.Review;
 import dev.reviewbot2.domain.task.Task;
 import dev.reviewbot2.mock.*;
+import dev.reviewbot2.webhook.WebhookRestClient;
 import org.junit.jupiter.api.AfterEach;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
@@ -30,6 +31,8 @@ public abstract class AbstractUnitTest extends AbstractTest {
     protected ProcessAccessor processAccessor;
     @Mock
     protected MemberReviewService memberReviewService;
+    @Mock
+    protected WebhookRestClient webhookRestClient;
 
     @Captor
     protected ArgumentCaptor<Review> reviewArgumentCaptor;
@@ -43,6 +46,7 @@ public abstract class AbstractUnitTest extends AbstractTest {
     protected ReviewServiceMock reviewServiceMock;
     protected ProcessAccessorMock processAccessorMock;
     protected MemberReviewServiceMock memberReviewServiceMock;
+    protected WebhookRestClientMock webhookRestClientMock;
 
     public AbstractUnitTest() {
         Config config = new Config();

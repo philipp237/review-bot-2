@@ -2,6 +2,8 @@ package dev.reviewbot2.app.api;
 
 import dev.reviewbot2.domain.member.Member;
 
+import java.util.List;
+
 public interface MemberService {
     /**
      * Существует ли пользователь с указанным id чата
@@ -18,4 +20,11 @@ public interface MemberService {
      * @return - пользователь
      */
     Member getMemberByChatId(String chatId);
+
+    /**
+     * Получить всех пользователей
+     *
+     * @return - список из всех пользователей
+     */
+    List<Member> getAllMembers();
 }

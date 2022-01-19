@@ -4,6 +4,8 @@ import dev.reviewbot2.app.api.MemberService;
 import dev.reviewbot2.domain.member.Member;
 import lombok.RequiredArgsConstructor;
 
+import java.util.List;
+
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
 
@@ -17,5 +19,9 @@ public class MemberServiceMock {
 
     public void mockGetMemberByChatId(Member member) {
         doReturn(member).when(memberService).getMemberByChatId(anyString());
+    }
+
+    public void mockGetAllMembers(List<Member> members) {
+        doReturn(members).when(memberService).getAllMembers();
     }
 }

@@ -32,5 +32,10 @@ public enum Command {
     /**
      * Отправить задачу на ревью
      */
-    SUBMIT
+    SUBMIT,
+
+    /**
+     * Закрыть задачу
+     */
+    CLOSE
 }

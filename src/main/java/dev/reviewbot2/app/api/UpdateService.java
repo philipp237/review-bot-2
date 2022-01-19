@@ -58,4 +58,12 @@ public interface UpdateService {
      * @return - сообщение об отправке задачи на ревью
      */
     SendMessage submitForReview(Update update) throws TelegramApiException;
+
+    /**
+     * Закрыть задачу
+     *
+     * @param update - обновление, в котором содержится сообщение с командой закрытия задачи
+     * @return - сообщение о закрытии задачи
+     */
+    SendMessage closeTask(Update update) throws TelegramApiException;
 }

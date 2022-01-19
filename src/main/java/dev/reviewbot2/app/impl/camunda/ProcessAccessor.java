@@ -17,6 +17,7 @@ public class ProcessAccessor {
     private final String TAKE_IN_REVIEW_MESSAGE = "take-in-review-message";
     private final String COMPLETE_REVIEW_MESSAGE = "complete-review-message";
     private final String SUBMIT_FOR_REVIEW_MESSAGE = "submit-for-review-message";
+    private final String CLOSE_TASK_MESSAGE = "close-task-message";
     private final String VAR_TASK_UUID = "taskUuid";
     private final String VAR_NEEDS_REWORK = "needsRework";
     private final String VAR_LAST_STAGE = "lastStage";
@@ -49,6 +50,11 @@ public class ProcessAccessor {
 
     public void submitForReview(String taskUuid) {
         correlateProcess(runtimeService.createMessageCorrelation(SUBMIT_FOR_REVIEW_MESSAGE)
+            .processInstanceVariableEquals(VAR_TASK_UUID, taskUuid));
+    }
+
+    public void closeTask(String taskUuid) {
+        correlateProcess(runtimeService.createMessageCorrelation(CLOSE_TASK_MESSAGE)
             .processInstanceVariableEquals(VAR_TASK_UUID, taskUuid));
     }
 

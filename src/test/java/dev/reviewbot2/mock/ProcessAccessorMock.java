@@ -27,4 +27,8 @@ public class ProcessAccessorMock {
     public void mockSubmitForReview() {
         doNothing().when(processAccessor).submitForReview(anyString());
     }
+
+    public void mockCloseTask() {
+        doNothing().when(processAccessor).closeTask(anyString());
+    }
 }

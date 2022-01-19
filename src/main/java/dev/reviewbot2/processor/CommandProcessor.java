@@ -31,6 +31,8 @@ public class CommandProcessor {
                 return updateService.completeReview(update, false);
             case SUBMIT:
                 return updateService.submitForReview(update);
+            case CLOSE:
+                return updateService.closeTask(update);
         }
         return null;
     }

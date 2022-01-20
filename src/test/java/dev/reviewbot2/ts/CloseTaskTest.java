@@ -7,7 +7,6 @@ import dev.reviewbot2.domain.task.Task;
 import dev.reviewbot2.mock.MemberServiceMock;
 import dev.reviewbot2.mock.ProcessAccessorMock;
 import dev.reviewbot2.mock.TaskServiceMock;
-import dev.reviewbot2.mock.WebhookRestClientMock;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
@@ -32,11 +31,10 @@ public class CloseTaskTest extends AbstractUnitTest {
     @BeforeEach
     void setUp() {
         closeable = MockitoAnnotations.openMocks(this);
-        this.closeTask = new CloseTaskTransactionScript(taskService, memberService, processAccessor, webhookRestClient);
+        this.closeTask = new CloseTaskTransactionScript(taskService, memberService, processAccessor);
         this.taskServiceMock = new TaskServiceMock(taskService);
         this.memberServiceMock = new MemberServiceMock(memberService);
         this.processAccessorMock = new ProcessAccessorMock(processAccessor);
-        this.webhookRestClientMock = new WebhookRestClientMock(webhookRestClient);
     }
 
     @Test
@@ -73,13 +71,11 @@ public class CloseTaskTest extends AbstractUnitTest {
         taskServiceMock.mockGetTaskById(task);
         taskServiceMock.mockSave(task);
         processAccessorMock.mockCloseTask();
-        webhookRestClientMock.mockSendMessage();
         memberServiceMock.mockGetAllMembers(otherMembers);
 
         closeTask.execute(update);
 
         verify(taskService, times(1)).save(taskArgumentCaptor.capture());
-        verify(webhookRestClient, times(otherMembers.size())).sendMessage(any());
 
         assertNotNull(taskArgumentCaptor.getValue().getCloseTime());
     }

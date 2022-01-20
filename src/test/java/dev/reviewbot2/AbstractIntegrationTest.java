@@ -2,9 +2,7 @@ package dev.reviewbot2;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.reviewbot2.app.api.*;
-import dev.reviewbot2.app.impl.camunda.ProcessAccessor;
 import dev.reviewbot2.domain.member.Member;
-import dev.reviewbot2.domain.task.Task;
 import dev.reviewbot2.domain.task.TaskType;
 import dev.reviewbot2.processor.CommandProcessor;
 import dev.reviewbot2.processor.MessageProcessor;
@@ -21,24 +19,27 @@ import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.junit.jupiter.api.BeforeEach;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static dev.reviewbot2.domain.task.TaskType.DESIGN;
-import static dev.reviewbot2.domain.task.TaskType.IMPLEMENTATION;
 import static dev.reviewbot2.processor.Command.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest("ReveiwBot2Application")
@@ -85,8 +86,11 @@ public abstract class AbstractIntegrationTest extends AbstractTest {
     @Autowired
     protected RepositoryService repositoryService;
 
+    @Captor
+    protected ArgumentCaptor<SendMessage> sendMessageArgumentCaptor;
+
     @MockBean
-    WebhookRestClient webhookRestClient;
+    protected WebhookRestClient webhookRestClient;
 
     @BeforeEach
     void clearDB() {
@@ -190,6 +194,10 @@ public abstract class AbstractIntegrationTest extends AbstractTest {
             .variableName("taskUuid")
             .singleResult()
             .getValue().toString();
+    }
+
+    protected void mockSendMessage() throws TelegramApiException {
+        Mockito.doNothing().when(webhookRestClient).sendMessage(any());
     }
 
     // ================================================================================================================

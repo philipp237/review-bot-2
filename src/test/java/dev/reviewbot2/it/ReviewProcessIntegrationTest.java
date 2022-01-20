@@ -15,14 +15,23 @@ import static dev.reviewbot2.domain.task.TaskStatus.*;
 import static dev.reviewbot2.domain.task.TaskType.IMPLEMENTATION;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 public class ReviewProcessIntegrationTest extends AbstractIntegrationTest {
 
     @Test
     void approveReview() throws Exception {
+        addMembersToDBForNotificationCheck();
         TaskType taskType = IMPLEMENTATION;
 
         performCreateTask(MEMBER_CHAT_ID, taskType);
+
+        Thread.sleep(100);
+
+        verify(webhookRestClient, times(1)).sendMessage(sendMessageArgumentCaptor.capture());
+        assertEquals(String.format("Задача %s готова к ревью", TASK_NAME_1), sendMessageArgumentCaptor.getValue().getText());
+        assertEquals(REVIEWER_1_CHAT_ID, sendMessageArgumentCaptor.getValue().getChatId());
 
         String uuid = getUuidFromProcess();
         Task task = taskRepository.getByUuid(uuid);
@@ -33,6 +42,10 @@ public class ReviewProcessIntegrationTest extends AbstractIntegrationTest {
         SendMessage approveReview = performApprove(REVIEWER_1_CHAT_ID, taskId);
 
         Thread.sleep(100);
+
+        verify(webhookRestClient, times(3)).sendMessage(sendMessageArgumentCaptor.capture());
+        assertEquals(String.format("Задача %s готова к ревью", TASK_NAME_1), sendMessageArgumentCaptor.getValue().getText());
+        assertEquals(REVIEWER_2_CHAT_ID, sendMessageArgumentCaptor.getValue().getChatId());
 
         task = taskRepository.getByUuid(uuid);
         Review review = reviewRepository.getReviewByTask(task);
@@ -48,6 +61,8 @@ public class ReviewProcessIntegrationTest extends AbstractIntegrationTest {
         performTakeInReview(REVIEWER_2_CHAT_ID, taskType, 2, taskId);
         performAcceptReview(REVIEWER_2_CHAT_ID, taskId);
         approveReview = performApprove(REVIEWER_2_CHAT_ID, taskId);
+
+        Thread.sleep(100);
 
         task = taskRepository.getByUuid(uuid);
         review = reviewRepository.getReviewByTask(task);
@@ -66,9 +81,16 @@ public class ReviewProcessIntegrationTest extends AbstractIntegrationTest {
 
     @Test
     void declineAndResubmitReview() throws Exception {
+        addMembersToDBForNotificationCheck();
         TaskType taskType = IMPLEMENTATION;
 
         performCreateTask(MEMBER_CHAT_ID, taskType);
+
+        Thread.sleep(100);
+
+        verify(webhookRestClient, times(1)).sendMessage(sendMessageArgumentCaptor.capture());
+        assertEquals(String.format("Задача %s готова к ревью", TASK_NAME_1), sendMessageArgumentCaptor.getValue().getText());
+        assertEquals(REVIEWER_1_CHAT_ID, sendMessageArgumentCaptor.getValue().getChatId());
 
         String uuid = getUuidFromProcess();
         Task task = taskRepository.getByUuid(uuid);
@@ -93,6 +115,12 @@ public class ReviewProcessIntegrationTest extends AbstractIntegrationTest {
 
         performSubmit(MEMBER_CHAT_ID, taskId);
 
+        Thread.sleep(100);
+
+        verify(webhookRestClient, times(4)).sendMessage(sendMessageArgumentCaptor.capture());
+        assertEquals(String.format("Задача %s готова к ревью", TASK_NAME_1), sendMessageArgumentCaptor.getValue().getText());
+        assertEquals(REVIEWER_1_CHAT_ID, sendMessageArgumentCaptor.getValue().getChatId());
+
         task = taskRepository.getByUuid(uuid);
 
         assertEquals(READY_FOR_REVIEW, task.getStatus());
@@ -105,5 +133,15 @@ public class ReviewProcessIntegrationTest extends AbstractIntegrationTest {
         task = taskRepository.getByUuid(uuid);
 
         assertEquals(IN_REVIEW, task.getStatus());
+    }
+
+    // ================================================================================================================
+    //  Implementation
+    // ================================================================================================================
+
+    private void addMembersToDBForNotificationCheck() {
+        getMemberFromDB(MEMBER_CHAT_ID, 1, false, false);
+        getMemberFromDB(REVIEWER_1_CHAT_ID, 1, false, false);
+        getMemberFromDB(REVIEWER_2_CHAT_ID, 2, true, false);
     }
 }

@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 @Slf4j
 @Component
@@ -16,7 +17,7 @@ public class UpdateStatusDelegate implements JavaDelegate {
     private final UpdateTaskStatusTransactionScript updateTaskStatus;
 
     @Override
-    public void execute(DelegateExecution execution) {
+    public void execute(DelegateExecution execution) throws TelegramApiException {
         String taskUuid = processAccessor.getTaskUuid(execution);
         updateTaskStatus.execute(execution, taskUuid);
     }

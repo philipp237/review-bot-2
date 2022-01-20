@@ -9,6 +9,7 @@ import dev.reviewbot2.domain.member.Member;
 import dev.reviewbot2.domain.review.MemberReview;
 import dev.reviewbot2.domain.review.Review;
 import dev.reviewbot2.domain.task.Task;
+import dev.reviewbot2.webhook.WebhookRestClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;

@@ -4,11 +4,12 @@ import dev.reviewbot2.AbstractIntegrationTest;
 import dev.reviewbot2.domain.task.Task;
 import dev.reviewbot2.domain.task.TaskType;
 import org.junit.jupiter.api.Test;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.mockito.Mockito;
 
 import static dev.reviewbot2.domain.task.TaskStatus.*;
 import static dev.reviewbot2.domain.task.TaskType.IMPLEMENTATION;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.*;
 
 public class CloseTaskIntegrationTest extends AbstractIntegrationTest {
 
@@ -42,6 +43,7 @@ public class CloseTaskIntegrationTest extends AbstractIntegrationTest {
 
     @Test
     void forceCloseTask() throws Exception {
+        mockSendMessage();
         TaskType taskType = IMPLEMENTATION;
 
         performCreateTask(MEMBER_CHAT_ID, taskType);
@@ -60,6 +62,9 @@ public class CloseTaskIntegrationTest extends AbstractIntegrationTest {
         assertEquals(READY_FOR_REVIEW, task.getStatus());
 
         performClose(MEMBER_CHAT_ID, taskId);
+
+        verify(webhookRestClient, times(3)).sendMessage(sendMessageArgumentCaptor.capture());
+        assertEquals(String.format("@%s принудительно закрыл задачу %s", LOGIN, TASK_NAME_1), sendMessageArgumentCaptor.getValue().getText());
 
         task = taskRepository.getByUuid(uuid);
         assertEquals(FORCE_CLOSED, task.getStatus());

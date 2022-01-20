@@ -27,4 +27,12 @@ public interface MemberService {
      * @return - список из всех пользователей
      */
     List<Member> getAllMembers();
+
+    /**
+     * Получить пользователей из заданной группы ревью
+     *
+     * @param reviewGroup - группа ревью
+     * @return - список пользователей из заданной группы ревью
+     */
+    List<Member> getMemberByReviewGroup(int reviewGroup);
 }

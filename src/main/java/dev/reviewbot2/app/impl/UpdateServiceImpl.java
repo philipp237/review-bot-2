@@ -3,7 +3,9 @@ package dev.reviewbot2.app.impl;
 import dev.reviewbot2.app.api.UpdateService;
 import dev.reviewbot2.app.impl.ts.*;
 import dev.reviewbot2.config.Config;
+import dev.reviewbot2.domain.review.MemberReview;
 import dev.reviewbot2.domain.task.TaskType;
+import dev.reviewbot2.processor.Command;
 import dev.reviewbot2.webhook.WebhookRestClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +16,9 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import java.util.List;
+
+import static dev.reviewbot2.processor.Command.*;
 import static dev.reviewbot2.processor.Utils.*;
 
 @Slf4j
@@ -29,6 +34,7 @@ public class UpdateServiceImpl implements UpdateService {
     private final CompleteReviewTransactionScript completeReview;
     private final SubmitForReviewTransactionScript submitForReview;
     private final CloseTaskTransactionScript closeTask;
+    private final GetMemberReviewsTransactionScript getMemberReviews;
 
     @Override
     public void deletePreviousMessage(Update update) throws TelegramApiException {
@@ -84,6 +90,28 @@ public class UpdateServiceImpl implements UpdateService {
         return closeTask.execute(update);
     }
 
+    @Override
+    public SendMessage start(Update update) throws TelegramApiException {
+        String chatId = getChatId(update);
+
+        List<Command> availableCommandsFromStart = List.of(CREATE_TASK, TAKE_IN_REVIEW, MY_REVIEWS, MY_TASKS);
+        InlineKeyboardMarkup keyboard = getKeyboard(availableCommandsFromStart.size());
+        fillKeyboardWithCommands(keyboard, availableCommandsFromStart);
+        return sendMessage(chatId, "Выбери действие:", keyboard);
+    }
+
+    @Override
+    public SendMessage createTask(Update update) throws TelegramApiException {
+        String chatId = getChatId(update);
+
+        return sendMessage(chatId, "Вставь ссылку на задачу");
+    }
+
+    @Override
+    public SendMessage getMemberReviews(Update update) throws TelegramApiException {
+        return getMemberReviews.execute(update);
+    }
+
     // ================================================================================================================
     //  Implementation
     // ================================================================================================================
@@ -122,6 +150,15 @@ public class UpdateServiceImpl implements UpdateService {
 
         for (TaskType taskType : TaskType.values()) {
             keyboard.getKeyboard().get(i).add(getButton(taskType.getName(), "/" + taskName + "#" + taskType.toString()));
+            i++;
+        }
+    }
+
+    private void fillKeyboardWithCommands(InlineKeyboardMarkup keyboard, List<Command> commands) {
+        int i = 0;
+
+        for (Command command : commands) {
+            keyboard.getKeyboard().get(i).add(getButton(command.getButtonText(), "/" + command));
             i++;
         }
     }

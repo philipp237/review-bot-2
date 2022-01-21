@@ -19,8 +19,7 @@ public class CommandProcessor {
 
         switch (command) {
             case START:
-                //TODO Реализовать в последнюю очередь
-                return null;
+                return updateService.start(update);
             case TAKE_IN_REVIEW:
                 return updateService.takeInReview(update);
             case ACCEPT_REVIEW:
@@ -33,9 +32,17 @@ public class CommandProcessor {
                 return updateService.submitForReview(update);
             case CLOSE:
                 return updateService.closeTask(update);
+            case CREATE_TASK:
+                return updateService.createTask(update);
+            case MY_REVIEWS:
+                return updateService.getMemberReviews(update);
         }
         return null;
     }
+
+    // ================================================================================================================
+    //  Implementation
+    // ================================================================================================================
 
     private Command parseCommand(String textFromUpdate) throws TelegramApiException {
         String parsedCommand = textFromUpdate.split("#")[0];

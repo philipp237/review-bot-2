@@ -9,6 +9,7 @@ import dev.reviewbot2.domain.member.Member;
 import dev.reviewbot2.domain.review.MemberReview;
 import dev.reviewbot2.domain.review.Review;
 import dev.reviewbot2.domain.task.Task;
+import dev.reviewbot2.domain.task.TaskStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -21,6 +22,7 @@ import javax.transaction.Transactional;
 import java.util.Collections;
 import java.util.List;
 
+import static dev.reviewbot2.domain.task.TaskStatus.READY_FOR_REVIEW;
 import static dev.reviewbot2.processor.Utils.*;
 import static java.time.Instant.now;
 import static java.util.Collections.singletonList;
@@ -48,6 +50,10 @@ public class AcceptReviewTransactionScript {
         Task task = taskService.getTaskById(taskId);
         Review review = reviewService.getReviewByTask(task);
 
+        if (!task.getStatus().equals(READY_FOR_REVIEW)) {
+            return sendMessage(chatId,"Кто-то успел взять задачу на ревью раньше тебя ¯\\_(ツ)_/¯");
+        }
+
         MemberReview memberReview = MemberReview.builder()
             .reviewer(reviewer)
             .review(review)
@@ -68,6 +74,10 @@ public class AcceptReviewTransactionScript {
 
         return sendMessage(chatId, String.format(TASK_TAKEN_IN_REIVEW, task.getName(), task.getLink()));
     }
+
+    // ================================================================================================================
+    //  Implementation
+    // ================================================================================================================
 
     private Long getTaskIdFromText(String text) {
         String[] parsedText = text.split("#");

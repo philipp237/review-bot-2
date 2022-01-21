@@ -1,6 +1,10 @@
 package dev.reviewbot2.app.api;
 
+import dev.reviewbot2.domain.member.Member;
+import dev.reviewbot2.domain.review.MemberReview;
 import dev.reviewbot2.domain.task.Task;
+
+import java.util.List;
 
 public interface TaskService {
 
@@ -27,4 +31,6 @@ public interface TaskService {
      * @return задача с заданным id
      */
     Task getTaskById(Long id);
+
+    List<Task> getTaskInMemberReview(Member member);
 }

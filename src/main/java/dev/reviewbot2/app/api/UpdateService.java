@@ -66,4 +66,28 @@ public interface UpdateService {
      * @return - сообщение о закрытии задачи
      */
     SendMessage closeTask(Update update) throws TelegramApiException;
+
+    /**
+     * Возвращает список доступных действий
+     *
+     * @param update - обновление, в котором содержится сообщение с командой вызова возможных действий
+     * @return - сообщение со списком возможных действий
+     */
+    SendMessage start(Update update) throws TelegramApiException;
+
+    /**
+     * Отправляет сообщение с подсказкой о создании задачи
+     *
+     * @param update - обновление, в котором содержится сообщение о создании задачи
+     * @return - сообщение с подсказкой о создании задачи
+     */
+    SendMessage createTask(Update update) throws TelegramApiException;
+
+    /**
+     * Получить список ревью пользователя
+     *
+     * @param update - обновление, в котором содержится сообщение с командой получения своего списка ревью
+     * @return - сообщение со списком ревью пользователя
+     */
+    SendMessage getMemberReviews(Update update) throws TelegramApiException;
 }

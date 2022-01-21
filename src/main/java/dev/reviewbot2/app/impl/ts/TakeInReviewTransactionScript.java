@@ -6,6 +6,7 @@ import dev.reviewbot2.app.api.TaskService;
 import dev.reviewbot2.domain.member.Member;
 import dev.reviewbot2.domain.review.Review;
 import dev.reviewbot2.domain.task.Task;
+import dev.reviewbot2.domain.task.TaskStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -17,6 +18,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import javax.transaction.Transactional;
 import java.util.List;
 
+import static dev.reviewbot2.domain.task.TaskStatus.READY_FOR_REVIEW;
 import static dev.reviewbot2.domain.task.TaskType.DESIGN;
 import static dev.reviewbot2.processor.Command.ACCEPT_REVIEW;
 import static dev.reviewbot2.processor.Command.TAKE_IN_REVIEW;
@@ -65,7 +67,7 @@ public class TakeInReviewTransactionScript {
 
         String text = getText(task);
         InlineKeyboardMarkup keyboard = getKeyboard(2);
-        fillKeyboardWithTakeInReviewActions(keyboard, taskId);
+        fillKeyboardWithTakeInReviewActions(keyboard, task);
 
         return sendMessage(chatId, text, keyboard);
     }
@@ -75,7 +77,7 @@ public class TakeInReviewTransactionScript {
         stringBuilder.append(task.getName());
         stringBuilder.append("\n").append(task.getLink());
         if (task.getAuthor().getLogin() == null) {
-            stringBuilder.append("Логин автора неизвестен");
+            stringBuilder.append("\nЛогин автора неизвестен");
         } else {
             stringBuilder.append("\nАвтор: @").append(task.getAuthor().getLogin());
         }
@@ -99,9 +101,11 @@ public class TakeInReviewTransactionScript {
         }
     }
 
-    private void fillKeyboardWithTakeInReviewActions(InlineKeyboardMarkup keyboard, Long taskId) {
+    private void fillKeyboardWithTakeInReviewActions(InlineKeyboardMarkup keyboard, Task task) {
         keyboard.getKeyboard().get(0).add(getButton("Назад", "/" + TAKE_IN_REVIEW));
-        keyboard.getKeyboard().get(1).add(getButton("Взять в ревью", "/" + ACCEPT_REVIEW + "#" + taskId));
+        if (task.getStatus().equals(READY_FOR_REVIEW)) {
+            keyboard.getKeyboard().get(1).add(getButton("Взять в ревью", "/" + ACCEPT_REVIEW + "#" + task.getId()));
+        }
     }
 
     private Long parseTextToGetTaskId(String text) {

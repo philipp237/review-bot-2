@@ -33,8 +33,18 @@ public class SubmitForReviewTransactionScript {
 
         Long taskId = getTaskIdFromText(text);
         Task task = taskService.getTaskById(taskId);
+        Member member = memberService.getMemberByChatId(chatId);
 
-        validateTask(task, chatId);
+        if (!member.equals(task.getAuthor())) {
+            log.info("{} unsuccessfully tries to submit not his own task for review. Only author can submit task for review",
+                member.getLogin());
+            return sendMessage(chatId, "Ты не можешь отправить на ревью задачу, которую не создавал");
+        }
+        if (!task.getStatus().equals(IN_PROGRESS)) {
+            log.info("{} unsuccessfully tries to submit task with status {} for review",
+                member.getLogin(), task.getStatus());
+            return sendMessage(chatId, "Задача не на доработке, ее нельзя отправить в ревью");
+        }
 
         task.setStatus(READY_FOR_REVIEW);
 
@@ -44,23 +54,5 @@ public class SubmitForReviewTransactionScript {
         log.info("{} submitted task with uuid={} for review", task.getAuthor(), task.getUuid());
 
         return sendMessage(chatId, "Задача отправлена на ревью");
-    }
-
-    // ================================================================================================================
-    //  Implementation
-    // ============================================================ ====================================================
-
-    private void validateTask(Task task, String chatId) throws TelegramApiException {
-        Member member = memberService.getMemberByChatId(chatId);
-        if (!member.equals(task.getAuthor())) {
-            throw new TelegramApiException(String.format("%s unsuccessfully tries to submit not his own task for review. " +
-                    "Only author can submit task for review",
-                member.getLogin()));
-        }
-        if (!task.getStatus().equals(IN_PROGRESS)) {
-            throw new TelegramApiException(String.format("%s unsuccessfully tries to submit task with status %s for review. " +
-                    "Status must be %s",
-                member.getLogin(), task.getStatus().toString(), IN_PROGRESS.toString()));
-        }
     }
 }

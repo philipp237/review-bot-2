@@ -36,7 +36,10 @@ public class CloseTaskTransactionScript {
         Task task = taskService.getTaskById(taskId);
         TaskStatus lastTaskStatus = task.getStatus();
 
-        validateAuthor(member, task);
+        if (!member.getChatId().equals(task.getAuthor().getChatId())) {
+            log.info("{} tries to close task with uuid={} not owned by him/her", member.getLogin(), task.getUuid());
+            return sendMessage(chatId, "Ты не можешь закрыть задачу, которую не заводил");
+        }
 
         task.setCloseTime(now());
         taskService.save(task);
@@ -49,16 +52,5 @@ public class CloseTaskTransactionScript {
         processAccessor.closeTask(task.getUuid());
         log.info("{} closed task with uuid={}", member.getLogin(), task.getUuid());
         return sendMessage(chatId, "Задача закрыта");
-    }
-
-    // ================================================================================================================
-    //  Implementation
-    // ================================================================================================================
-
-    private void validateAuthor(Member member, Task task) throws TelegramApiException {
-        if (!member.getChatId().equals(task.getAuthor().getChatId())) {
-            throw new TelegramApiException(String.format("%s unsuccessfully tries to close not his own task with uuid=%s",
-                member.getLogin(), task.getUuid()));
-        }
     }
 }

@@ -15,9 +15,6 @@ import static java.time.Instant.now;
 public class AbstractTest {
     protected static final int MESSAGE_ID = 51632862;
     protected static final int UPDATE_ID = 42368635;
-    protected static final String MEMBER_CHAT_ID = "57164325";
-    protected static final String REVIEWER_1_CHAT_ID = "27621396";
-    protected static final String REVIEWER_2_CHAT_ID = "56247114";
     protected static final String LOGIN = "test_login";
     protected static final String BOT_NAME = "test_bot_name";
     protected static final String BOT_TOKEN = "test_bot_token";
@@ -33,6 +30,10 @@ public class AbstractTest {
     protected static final String TASK_NAME_2 = DASHBOARD.get(0) + "-2222";
     protected static final String TASK_NAME_3 = DASHBOARD.get(0) + "-3333";
     protected static final String TASK_NAME_4 = DASHBOARD.get(0) + "-4444";
+
+    protected static final String MEMBER_1_CHAT_ID = "57164325";
+    protected static final String MEMBER_2_CHAT_ID = "27621396";
+    protected static final String MEMBER_3_CHAT_ID = "56247114";
 
     protected static final long TASK_ID_1 = 1L;
 
@@ -93,7 +94,7 @@ public class AbstractTest {
             .build();
     }
 
-    protected Task getTask(TaskType taskType, String uuid, String taskName, long taskId) {
+    protected Task getTask(TaskType taskType, String uuid, String taskName, long taskId, String chatId) {
         return Task.builder()
             .id(taskId)
             .uuid(uuid)
@@ -102,15 +103,15 @@ public class AbstractTest {
             .creationTime(now())
             .taskType(taskType)
             .status(READY_FOR_REVIEW)
-            .author(getMember(MEMBER_CHAT_ID, 0, false, false))
+            .author(getMember(chatId, 0, false, false))
             .build();
     }
 
-    protected Review getReview(TaskType taskType, int reviewStage, String uuid, String taskName, long taskId) {
+    protected Review getReview(TaskType taskType, int reviewStage, String uuid, String taskName, long taskId, String chatId) {
         return Review.builder()
             .id(1L)
             .reviewStage(reviewStage)
-            .task(getTask(taskType, uuid, taskName, taskId))
+            .task(getTask(taskType, uuid, taskName, taskId, chatId))
             .build();
     }
 

@@ -1,7 +1,6 @@
 package dev.reviewbot2;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import dev.reviewbot2.app.api.*;
 import dev.reviewbot2.domain.member.Member;
 import dev.reviewbot2.domain.task.TaskType;
 import dev.reviewbot2.processor.CommandProcessor;
@@ -37,7 +36,6 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static dev.reviewbot2.domain.task.TaskType.DESIGN;
 import static dev.reviewbot2.processor.Command.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -45,7 +43,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest("ReveiwBot2Application")
 @AutoConfigureMockMvc
 public abstract class AbstractIntegrationTest extends AbstractTest {
-    protected final String PROCESS_NAME = "review-process";
 
     @Autowired
     private MockMvc mockMvc;
@@ -67,17 +64,6 @@ public abstract class AbstractIntegrationTest extends AbstractTest {
     protected ReviewRepository reviewRepository;
     @Autowired
     protected MemberReviewRepository memberReviewRepository;
-
-    @Autowired
-    private UpdateService updateService;
-    @Autowired
-    private MemberService memberService;
-    @Autowired
-    private TaskService taskService;
-    @Autowired
-    private ReviewService reviewService;
-    @Autowired
-    private MemberReviewService memberReviewService;
 
     @Autowired
     protected HistoryService historyService;
@@ -127,14 +113,14 @@ public abstract class AbstractIntegrationTest extends AbstractTest {
 
     protected SendMessage performCreateTask(String chatId, TaskType taskType) throws Exception {
         Update update = getUpdateWithMessage(JIRA_LINK + TASK_NAME_1 + "#" + taskType, chatId);
-        Member member = getMemberFromDB(chatId, 0, false, false);
+        Member member = getMemberFromDB(chatId);
 
         return performUpdateReceived(update);
     }
 
     protected SendMessage performTakeInReview(String chatId, TaskType taskType, int reviewGroup, Long taskId) throws Exception {
         Update update = getUpdateWithCallbackQuery("/" + TAKE_IN_REVIEW + "#" + taskId, chatId);
-        Member reviewer = getMemberFromDB(chatId, reviewGroup, DESIGN.equals(taskType), false);
+        Member reviewer = getMemberFromDB(chatId);
 
         return performUpdateReceived(update);
     }
@@ -181,11 +167,12 @@ public abstract class AbstractIntegrationTest extends AbstractTest {
         return objectMapper.readValue(content, SendMessage.class);
     }
 
-    protected Member getMemberFromDB(String chatId, int reviewGroup, boolean canReviewDesign, boolean isOmni) {
-        if (memberRepository.existsByChatId(chatId)) {
-            return memberRepository.getMemberByChatId(chatId);
-        }
-        return memberRepository.save(getMember(chatId, reviewGroup, canReviewDesign, isOmni));
+    protected void addMembersToDB(String chatId, int reviewGroup, boolean canReviewDesign, boolean isOmni) {
+        memberRepository.save(getMember(chatId, reviewGroup, canReviewDesign, isOmni));
+    }
+
+    protected Member getMemberFromDB(String chatId) {
+        return memberRepository.getMemberByChatId(chatId);
     }
 
     protected String getUuidFromProcess() throws InterruptedException {

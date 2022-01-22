@@ -8,22 +8,27 @@ import dev.reviewbot2.domain.review.Review;
 import dev.reviewbot2.mock.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.MockitoAnnotations;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import static dev.reviewbot2.domain.task.TaskStatus.IN_REVIEW;
+import static dev.reviewbot2.domain.task.TaskStatus.READY_FOR_REVIEW;
 import static dev.reviewbot2.domain.task.TaskType.IMPLEMENTATION;
-import static dev.reviewbot2.processor.Command.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static dev.reviewbot2.processor.Command.APPROVE;
+import static dev.reviewbot2.processor.Command.DECLINE;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.MockitoAnnotations.openMocks;
 
 public class CompleteReviewTest extends AbstractUnitTest {
     private CompleteReviewTransactionScript completeReview;
 
     @BeforeEach
     void setUp() {
-        closeable = MockitoAnnotations.openMocks(this);
+        closeable = openMocks(this);
         this.completeReview =
             new CompleteReviewTransactionScript(memberService, taskService, reviewService, memberReviewService, processAccessor);
         this.memberServiceMock = new MemberServiceMock(memberService);
@@ -35,43 +40,70 @@ public class CompleteReviewTest extends AbstractUnitTest {
 
     @Test
     void execute_happyPath_approved() throws TelegramApiException {
-        Member reviewer = getMember(REVIEWER_1_CHAT_ID, 1, false, false);
-        Review review = getReview(IMPLEMENTATION, 1, UUID_1, TASK_NAME_1, TASK_ID_1);
-        Update update = getUpdateWithCallbackQuery("/" + APPROVE + "#" + review.getTask().getId(), REVIEWER_1_CHAT_ID);
+        String taskUuid = UUID_1;
+        String reviewerChatId = MEMBER_2_CHAT_ID;
+        Member reviewer = getMember(reviewerChatId, 1, false, false);
+        Review review = getReview(IMPLEMENTATION, 1, taskUuid, TASK_NAME_1, TASK_ID_1, MEMBER_1_CHAT_ID);
+        review.getTask().setStatus(IN_REVIEW);
+        Update update = getUpdateWithCallbackQuery("/" + APPROVE + "#" + review.getTask().getId(), reviewerChatId);
 
         mockInnerMethods(review, reviewer);
 
-        completeReview.execute(update, true);
+        SendMessage approveMessage = completeReview.execute(update, true);
 
         verify(memberReviewService, times(1)).save(memberReviewArgumentCaptor.capture());
-        verify(processAccessor, times(1)).completeReview(UUID_1, true);
+        verify(processAccessor, times(1)).completeReview(taskUuid, true);
 
         assertNotNull(memberReviewArgumentCaptor.getValue().getEndTime());
+        assertEquals("Задача одобрена", approveMessage.getText());
     }
 
     @Test
     void execute_happyPath_declined() throws TelegramApiException {
-        Member reviewer = getMember(REVIEWER_1_CHAT_ID, 1, false, false);
-        Review review = getReview(IMPLEMENTATION, 1, UUID_1, TASK_NAME_1, TASK_ID_1);
-        Update update = getUpdateWithCallbackQuery("/" + DECLINE + "#" + review.getTask().getId(), REVIEWER_1_CHAT_ID);
+        Member reviewer = getMember(MEMBER_2_CHAT_ID, 1, false, false);
+        Review review = getReview(IMPLEMENTATION, 1, UUID_1, TASK_NAME_1, TASK_ID_1, MEMBER_1_CHAT_ID);
+        review.getTask().setStatus(IN_REVIEW);
+        Update update = getUpdateWithCallbackQuery("/" + DECLINE + "#" + review.getTask().getId(), MEMBER_2_CHAT_ID);
 
         mockInnerMethods(review, reviewer);
 
-        completeReview.execute(update, false);
+        SendMessage declineMessage = completeReview.execute(update, false);
 
         verify(memberReviewService, times(1)).save(memberReviewArgumentCaptor.capture());
         verify(processAccessor, times(1)).completeReview(UUID_1, false);
 
         assertNotNull(memberReviewArgumentCaptor.getValue().getEndTime());
+        assertEquals("Задача возвращена на доработку", declineMessage.getText());
     }
 
     @Test
-    void execute_validationFailed() throws TelegramApiException {
-        Member reviewer1 = getMember(REVIEWER_1_CHAT_ID, 1, false, false);
-        Member reviewer2 = getMember(REVIEWER_2_CHAT_ID, 1, false, false);
-        Review review = getReview(IMPLEMENTATION, 1, UUID_1, TASK_NAME_1, TASK_ID_1);
+    void execute_validationFailed_invalidStatus() throws TelegramApiException {
+        String reviewerChatId = MEMBER_2_CHAT_ID;
+        Member reviewer = getMember(reviewerChatId, 1, false, false);
+        Review review = getReview(IMPLEMENTATION, 1, UUID_1, TASK_NAME_1, TASK_ID_1, MEMBER_1_CHAT_ID);
+        review.getTask().setStatus(READY_FOR_REVIEW);
+        MemberReview memberReview = getMemberReview(review, reviewer);
+        Update update = getUpdateWithCallbackQuery("/" + DECLINE + "#" + review.getTask().getId(), reviewerChatId);
+
+        memberServiceMock.mockGetMemberByChatId(reviewer);
+        taskServiceMock.mockGetTaskById(review.getTask());
+        reviewServiceMock.mockGetReviewByTask(review);
+        memberReviewServiceMock.mockGetActiveReview(memberReview);
+        memberReviewServiceMock.mockSave();
+        processAccessorMock.mockCompleteReview();
+
+        SendMessage notAuthorMessage = completeReview.execute(update, true);
+        assertEquals("Задача не в ревью", notAuthorMessage.getText());
+    }
+
+    @Test
+    void execute_validationFailed_notSameReviewer() throws TelegramApiException {
+        Member reviewer1 = getMember(MEMBER_2_CHAT_ID, 1, false, false);
+        Member reviewer2 = getMember(MEMBER_3_CHAT_ID, 1, false, false);
+        Review review = getReview(IMPLEMENTATION, 1, UUID_1, TASK_NAME_1, TASK_ID_1, MEMBER_1_CHAT_ID);
+        review.getTask().setStatus(IN_REVIEW);
         MemberReview memberReview = getMemberReview(review, reviewer1);
-        Update update = getUpdateWithCallbackQuery("/" + DECLINE + "#" + review.getTask().getId(), REVIEWER_2_CHAT_ID);
+        Update update = getUpdateWithCallbackQuery("/" + DECLINE + "#" + review.getTask().getId(), MEMBER_3_CHAT_ID);
 
         memberServiceMock.mockGetMemberByChatId(reviewer2);
         taskServiceMock.mockGetTaskById(review.getTask());
@@ -80,7 +112,8 @@ public class CompleteReviewTest extends AbstractUnitTest {
         memberReviewServiceMock.mockSave();
         processAccessorMock.mockCompleteReview();
 
-        assertThrows(TelegramApiException.class, () -> completeReview.execute(update, true));
+        SendMessage invalidStatusMessage = completeReview.execute(update, true);
+        assertEquals("Ты не можешь завершить ревью, которое не проводил", invalidStatusMessage.getText());
     }
 
     // ================================================================================================================

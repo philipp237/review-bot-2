@@ -12,18 +12,20 @@ import dev.reviewbot2.mock.ReviewServiceMock;
 import dev.reviewbot2.mock.TaskServiceMock;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.MockitoAnnotations;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 
+import static dev.reviewbot2.domain.task.TaskType.IMPLEMENTATION;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.MockitoAnnotations.openMocks;
 
 public class CreateTaskTest extends AbstractUnitTest {
     private CreateTaskTransactionScript createTaskTransactionScript;
 
     @BeforeEach
     void setUp() {
-        closeable = MockitoAnnotations.openMocks(this);
+        closeable = openMocks(this);
         this.createTaskTransactionScript = new CreateTaskTransactionScript(memberService, taskService, reviewService, processAccessor);
         this.memberServiceMock = new MemberServiceMock(memberService);
         this.taskServiceMock = new TaskServiceMock(taskService);
@@ -33,18 +35,22 @@ public class CreateTaskTest extends AbstractUnitTest {
 
     @Test
     void execute() {
-        TaskType taskType = TaskType.IMPLEMENTATION;
-        Review review = getReview(taskType, 1, UUID_1, TASK_NAME_1, 1);
+        TaskType taskType = IMPLEMENTATION;
+        String taskName = TASK_NAME_1;
+        String chatId = MEMBER_1_CHAT_ID;
+
+        Review review = getReview(taskType, 1, UUID_1, taskName, TASK_ID_1, chatId);
         Member member = review.getTask().getAuthor();
 
         memberServiceMock.mockGetMemberByChatId(member);
         reviewServiceMock.mockSave();
         processAccessorMock.mockStartProcess();
 
-        createTaskTransactionScript.execute(MEMBER_CHAT_ID, TASK_NAME_1, JIRA_LINK + TASK_NAME_1, taskType);
+        SendMessage createMessageTask = createTaskTransactionScript.execute(chatId, taskName, JIRA_LINK + taskName, taskType);
 
         verify(reviewService, times(1)).save(reviewArgumentCaptor.capture());
         assertReview(review, reviewArgumentCaptor.getValue());
+        assertEquals(String.format("Задача %s создана", taskName), createMessageTask.getText());
     }
 
     // ================================================================================================================

@@ -9,7 +9,6 @@ import dev.reviewbot2.domain.member.Member;
 import dev.reviewbot2.domain.review.MemberReview;
 import dev.reviewbot2.domain.review.Review;
 import dev.reviewbot2.domain.task.Task;
-import dev.reviewbot2.webhook.WebhookRestClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -17,6 +16,7 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import static dev.reviewbot2.domain.task.TaskStatus.IN_REVIEW;
 import static dev.reviewbot2.processor.Utils.*;
 import static java.time.Instant.now;
 
@@ -41,7 +41,16 @@ public class CompleteReviewTransactionScript {
         Review review = reviewService.getReviewByTask(task);
         MemberReview memberReview = memberReviewService.getActiveReview(review);
 
-        validateReviewer(reviewer, memberReview);
+        if (isStatusInvalid(review)) {
+            log.info("Member {} tries to complete review with id={}, but task not in review",
+                reviewer.getLogin(), review.getId());
+            return sendMessage(chatId, "Задача не в ревью");
+        }
+        if (isSameReviewer(reviewer, memberReview)) {
+            log.info("Member {} tries to complete review with id={} authored by {}",
+                reviewer.getLogin(), review.getId(), memberReview.getReviewer().getLogin());
+            return sendMessage(chatId, "Ты не можешь завершить ревью, которое не проводил");
+        }
 
         memberReview.setEndTime(now());
         memberReviewService.save(memberReview);
@@ -57,14 +66,15 @@ public class CompleteReviewTransactionScript {
     //  Implementation
     // ================================================================================================================
 
-    private void validateReviewer(Member reviewer, MemberReview memberReview) throws TelegramApiException {
-        if (!reviewer.equals(memberReview.getReviewer())) {
-            throw new TelegramApiException(String.format("Member %s can't complete review authored by %s",
-                reviewer.getLogin(), memberReview.getReviewer().getLogin()));
-        }
+    private boolean isSameReviewer(Member reviewer, MemberReview memberReview) {
+        return !reviewer.equals(memberReview.getReviewer());
+    }
+
+    private boolean isStatusInvalid(Review review) {
+        return !review.getTask().getStatus().equals(IN_REVIEW);
     }
 
     private String getEndReviewMessage(boolean isApproved) {
-        return isApproved ? "Задача переведена на следующую стадию ревью" : "Задача возвращена на доработку";
+        return isApproved ? "Задача одобрена" : "Задача возвращена на доработку";
     }
 }

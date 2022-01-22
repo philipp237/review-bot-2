@@ -9,7 +9,7 @@ import dev.reviewbot2.mock.ProcessAccessorMock;
 import dev.reviewbot2.mock.TaskServiceMock;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.MockitoAnnotations;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
@@ -19,18 +19,18 @@ import static dev.reviewbot2.domain.task.TaskStatus.APPROVED;
 import static dev.reviewbot2.domain.task.TaskStatus.IN_REVIEW;
 import static dev.reviewbot2.domain.task.TaskType.IMPLEMENTATION;
 import static dev.reviewbot2.processor.Command.CLOSE;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.MockitoAnnotations.openMocks;
 
 public class CloseTaskTest extends AbstractUnitTest {
     private CloseTaskTransactionScript closeTask;
 
     @BeforeEach
     void setUp() {
-        closeable = MockitoAnnotations.openMocks(this);
+        closeable = openMocks(this);
         this.closeTask = new CloseTaskTransactionScript(taskService, memberService, processAccessor);
         this.taskServiceMock = new TaskServiceMock(taskService);
         this.memberServiceMock = new MemberServiceMock(memberService);
@@ -39,33 +39,36 @@ public class CloseTaskTest extends AbstractUnitTest {
 
     @Test
     void execute() throws TelegramApiException {
-        Task task = getTask(IMPLEMENTATION, UUID_1, TASK_NAME_1, TASK_ID_1);
+        String chatId = MEMBER_1_CHAT_ID;
+        Task task = getTask(IMPLEMENTATION, UUID_1, TASK_NAME_1, TASK_ID_1, chatId);
         task.setStatus(APPROVED);
         Member member = task.getAuthor();
-        Update update = getUpdateWithCallbackQuery("/" + CLOSE + "#" + task.getId(), MEMBER_CHAT_ID);
+        Update update = getUpdateWithCallbackQuery("/" + CLOSE + "#" + task.getId(), chatId);
 
         memberServiceMock.mockGetMemberByChatId(member);
         taskServiceMock.mockGetTaskById(task);
         taskServiceMock.mockSave(task);
         processAccessorMock.mockCloseTask();
 
-        closeTask.execute(update);
+        SendMessage closeTaskMessage = closeTask.execute(update);
 
         verify(taskService, times(1)).save(taskArgumentCaptor.capture());
 
         assertNotNull(taskArgumentCaptor.getValue().getCloseTime());
+        assertEquals("Задача закрыта", closeTaskMessage.getText());
     }
 
     @Test
     void execute_forceClose() throws TelegramApiException {
-        Task task = getTask(IMPLEMENTATION, UUID_1, TASK_NAME_1, TASK_ID_1);
+        String chatId = MEMBER_1_CHAT_ID;
+        Task task = getTask(IMPLEMENTATION, UUID_1, TASK_NAME_1, TASK_ID_1, chatId);
         task.setStatus(IN_REVIEW);
         Member member = task.getAuthor();
         List<Member> otherMembers = List.of(
-            getMember(REVIEWER_1_CHAT_ID, 1, false, false),
-            getMember(REVIEWER_2_CHAT_ID, 2, true, false)
+            getMember(MEMBER_2_CHAT_ID, 1, false, false),
+            getMember(MEMBER_3_CHAT_ID, 2, true, false)
         );
-        Update update = getUpdateWithCallbackQuery("/" + CLOSE + "#" + task.getId(), MEMBER_CHAT_ID);
+        Update update = getUpdateWithCallbackQuery("/" + CLOSE + "#" + task.getId(), chatId);
 
         memberServiceMock.mockGetMemberByChatId(member);
         taskServiceMock.mockGetTaskById(task);
@@ -73,23 +76,26 @@ public class CloseTaskTest extends AbstractUnitTest {
         processAccessorMock.mockCloseTask();
         memberServiceMock.mockGetAllMembers(otherMembers);
 
-        closeTask.execute(update);
+        SendMessage closeTaskMessage = closeTask.execute(update);
 
         verify(taskService, times(1)).save(taskArgumentCaptor.capture());
 
         assertNotNull(taskArgumentCaptor.getValue().getCloseTime());
+        assertEquals("Задача принудительно закрыта", closeTaskMessage.getText());
     }
 
     @Test
-    void execute_validationFailed() {
-        Task task = getTask(IMPLEMENTATION, UUID_1, TASK_NAME_1, TASK_ID_1);
+    void execute_validationFailed() throws TelegramApiException {
+        String chatId = MEMBER_1_CHAT_ID;
+        Task task = getTask(IMPLEMENTATION, UUID_1, TASK_NAME_1, TASK_ID_1, chatId);
         task.setStatus(APPROVED);
-        Member member = getMember(REVIEWER_1_CHAT_ID, 1, false, false);
-        Update update = getUpdateWithCallbackQuery("/" + CLOSE + "#" + task.getId(), MEMBER_CHAT_ID);
+        Member member = getMember(MEMBER_2_CHAT_ID, 1, false, false);
+        Update update = getUpdateWithCallbackQuery("/" + CLOSE + "#" + task.getId(), chatId);
 
         memberServiceMock.mockGetMemberByChatId(member);
         taskServiceMock.mockGetTaskById(task);
 
-        assertThrows(TelegramApiException.class, () -> closeTask.execute(update));
+        SendMessage notAuthorMessage = closeTask.execute(update);
+        assertEquals("Ты не можешь закрыть задачу, которую не заводил", notAuthorMessage.getText());
     }
 }

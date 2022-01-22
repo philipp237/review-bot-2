@@ -13,6 +13,7 @@ import dev.reviewbot2.domain.task.TaskStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -22,10 +23,12 @@ import javax.transaction.Transactional;
 import java.util.Collections;
 import java.util.List;
 
+import static dev.reviewbot2.domain.task.TaskStatus.IN_REVIEW;
 import static dev.reviewbot2.domain.task.TaskStatus.READY_FOR_REVIEW;
 import static dev.reviewbot2.processor.Utils.*;
 import static java.time.Instant.now;
 import static java.util.Collections.singletonList;
+import static org.springframework.util.CollectionUtils.isEmpty;
 
 @Slf4j
 @Component
@@ -50,8 +53,14 @@ public class AcceptReviewTransactionScript {
         Task task = taskService.getTaskById(taskId);
         Review review = reviewService.getReviewByTask(task);
 
-        if (!task.getStatus().equals(READY_FOR_REVIEW)) {
+        if (task.getStatus().equals(IN_REVIEW)) {
+            log.info("{} tries to take task with uuid={} in review, but it's already in review",
+                reviewer.getLogin(), task.getUuid());
             return sendMessage(chatId,"Кто-то успел взять задачу на ревью раньше тебя ¯\\_(ツ)_/¯");
+        } else if (!task.getStatus().equals(READY_FOR_REVIEW)) {
+            log.info("{} tries to take task with uuid={} and status={} in review, but it's not ready for review",
+                reviewer.getLogin(), task.getUuid(), task.getStatus());
+            return sendMessage(chatId,"Задачу нельзя взять в ревью");
         }
 
         MemberReview memberReview = MemberReview.builder()
@@ -60,7 +69,7 @@ public class AcceptReviewTransactionScript {
             .startTime(now())
             .build();
 
-        if (review.getMemberReviews() != null) {
+        if (!isEmpty(review.getMemberReviews())) {
             review.getMemberReviews().add(memberReview);
         } else {
             review.setMemberReviews(singletonList(memberReview));

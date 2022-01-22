@@ -108,6 +108,9 @@ public class UpdateTaskStatusTransactionScript {
         String authorLogin = review.getTask().getAuthor().getLogin();
         List<Member> allMembers = memberService.getAllMembers();
         for (Member member : allMembers) {
+            if (member.getChatId().equals(review.getTask().getAuthor().getChatId())) {
+                continue;
+            }
             webhookRestClient.sendMessage(sendMessage(member.getChatId(),
                 String.format("@%s принудительно закрыл задачу %s", authorLogin, review.getTask().getName())));
         }

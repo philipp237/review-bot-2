@@ -10,6 +10,7 @@ import dev.reviewbot2.domain.review.MemberReview;
 import dev.reviewbot2.domain.review.Review;
 import dev.reviewbot2.domain.task.Task;
 import dev.reviewbot2.domain.task.TaskStatus;
+import dev.reviewbot2.domain.task.TaskType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -25,6 +26,7 @@ import java.util.List;
 
 import static dev.reviewbot2.domain.task.TaskStatus.IN_REVIEW;
 import static dev.reviewbot2.domain.task.TaskStatus.READY_FOR_REVIEW;
+import static dev.reviewbot2.domain.task.TaskType.DESIGN;
 import static dev.reviewbot2.processor.Utils.*;
 import static java.time.Instant.now;
 import static java.util.Collections.singletonList;
@@ -52,6 +54,14 @@ public class AcceptReviewTransactionScript {
         Long taskId = getTaskIdFromText(text);
         Task task = taskService.getTaskById(taskId);
         Review review = reviewService.getReviewByTask(task);
+
+        if (task.getTaskType() == DESIGN && !reviewer.isCanReviewDesign()) {
+            log.info("{} unsuccessfully tries to take design task in review", reviewer.getLogin());
+            return sendMessage(chatId, "Ты не можешь ревьюить дизайны");
+        } else if (task.getTaskType() != DESIGN && reviewer.getReviewGroup() != review.getReviewStage()) {
+            log.info("{} unsuccessfully tries to take implementation task in review", reviewer.getLogin());
+            return sendMessage(chatId, "На данной стадии ты не можешь взять задачу в ревью");
+        }
 
         if (task.getStatus().equals(IN_REVIEW)) {
             log.info("{} tries to take task with uuid={} in review, but it's already in review",

@@ -39,7 +39,7 @@ public class TakeInReviewTransactionScript {
 
         Member reviewer = memberService.getMemberByChatId(chatId);
         if (reviewer.getReviewGroup() == 0) {
-            log.warn("{} unsuccessfully tries to take task in review", reviewer.getLogin());
+            log.info("{} unsuccessfully tries to take task in review", reviewer.getLogin());
             return sendMessage(chatId, "Ты не можешь ревьюить задачи");
         }
 

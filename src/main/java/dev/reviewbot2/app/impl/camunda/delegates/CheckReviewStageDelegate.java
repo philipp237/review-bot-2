@@ -5,6 +5,7 @@ import dev.reviewbot2.app.api.TaskService;
 import dev.reviewbot2.app.impl.camunda.ProcessAccessor;
 import dev.reviewbot2.domain.review.Review;
 import dev.reviewbot2.domain.task.Task;
+import dev.reviewbot2.domain.task.TaskType;
 import lombok.RequiredArgsConstructor;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
@@ -30,7 +31,13 @@ public class CheckReviewStageDelegate implements JavaDelegate {
         Task task = taskService.getTaskByUuid(taskUuid);
         Review review = reviewService.getReviewByTask(task);
 
-        boolean isLastStage = review.getReviewStage() == numberOfReviewStages;
+        boolean isLastStage;
+
+        if (task.getTaskType() == TaskType.DESIGN) {
+            isLastStage = true;
+        } else {
+            isLastStage = review.getReviewStage() == numberOfReviewStages;
+        }
 
         if (!isLastStage) {
             review.setReviewStage(review.getReviewStage() + 1);

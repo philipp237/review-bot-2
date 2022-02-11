@@ -15,7 +15,7 @@
     <description>Review Bot for NTB/NTP team</description>
 
     <properties>
-        <java.version>11</java.version>
+        <java.version>1.8</java.version>
         <telegrambots.version>5.2.0</telegrambots.version>
         <camunda.version>7.15.0</camunda.version>
     </properties>

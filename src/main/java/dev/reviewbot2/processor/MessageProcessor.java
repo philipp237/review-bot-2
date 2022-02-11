@@ -52,7 +52,7 @@ public class MessageProcessor {
         String login = getLoginFromUpdate(update);
 
         boolean chatIdExists = memberService.isChatIdExists(chatId);
-        boolean loginExists = memberService.isLoginExists(login);
+        boolean loginExists = config.BOT_NAME.equals(login) || memberService.isLoginExists(login);
         if (!chatIdExists && !loginExists) {
             log.warn("{} has no authorities", getLoginFromUpdate(update));
         }

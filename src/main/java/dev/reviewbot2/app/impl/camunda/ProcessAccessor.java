@@ -2,13 +2,12 @@ package dev.reviewbot2.app.impl.camunda;
 
 import lombok.RequiredArgsConstructor;
 import org.camunda.bpm.engine.RuntimeService;
-import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.MessageCorrelationBuilder;
 import org.springframework.stereotype.Component;
 
-import java.util.Map;
+import java.util.HashMap;
 
 @Component
 @RequiredArgsConstructor
@@ -26,11 +25,12 @@ public class ProcessAccessor {
     private final RuntimeService runtimeService;
 
     public void startProcess(String uuid) {
-        runtimeService.startProcessInstanceByKey(PROCESS_ID, Map.of(
-            VAR_TASK_UUID, uuid,
-            VAR_NEEDS_REWORK, "",
-            VAR_LAST_STAGE, ""
-        ));
+        runtimeService.startProcessInstanceByKey(PROCESS_ID, new HashMap<String, Object>() {{
+                put(VAR_TASK_UUID, uuid);
+                put(VAR_NEEDS_REWORK, "");
+                put(VAR_LAST_STAGE, "");
+            }}
+        );
     }
 
     public String getTaskUuid(DelegateExecution execution) {

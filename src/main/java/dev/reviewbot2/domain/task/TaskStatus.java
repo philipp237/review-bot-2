@@ -2,6 +2,7 @@ package dev.reviewbot2.domain.task;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.Arrays;
 
@@ -45,10 +46,10 @@ public enum TaskStatus {
 
     private String activityId;
 
-    public static TaskStatus getTaskStatusFromActivityId(String activityId) {
+    public static TaskStatus getTaskStatusFromActivityId(String activityId) throws TelegramApiException {
         return stream(TaskStatus.values())
             .filter(taskStatus -> activityId.equals(taskStatus.getActivityId()))
             .findAny()
-            .orElseThrow();
+            .orElseThrow(TelegramApiException::new);
     }
 }

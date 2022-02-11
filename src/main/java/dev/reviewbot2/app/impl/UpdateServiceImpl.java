@@ -3,7 +3,6 @@ package dev.reviewbot2.app.impl;
 import dev.reviewbot2.app.api.UpdateService;
 import dev.reviewbot2.app.impl.ts.*;
 import dev.reviewbot2.config.Config;
-import dev.reviewbot2.domain.review.MemberReview;
 import dev.reviewbot2.domain.task.TaskType;
 import dev.reviewbot2.processor.Command;
 import dev.reviewbot2.webhook.WebhookRestClient;
@@ -17,9 +16,11 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 import static dev.reviewbot2.processor.Command.*;
 import static dev.reviewbot2.processor.Utils.*;
+import static java.util.stream.Collectors.toList;
 
 @Slf4j
 @Component
@@ -94,7 +95,8 @@ public class UpdateServiceImpl implements UpdateService {
     public SendMessage start(Update update) throws TelegramApiException {
         String chatId = getChatId(update);
 
-        List<Command> availableCommandsFromStart = List.of(CREATE_TASK, TAKE_IN_REVIEW, MY_REVIEWS, MY_TASKS);
+        List<Command> availableCommandsFromStart = Stream.of(CREATE_TASK, TAKE_IN_REVIEW, MY_REVIEWS, MY_TASKS)
+            .collect(toList());
         InlineKeyboardMarkup keyboard = getKeyboard(availableCommandsFromStart.size());
         fillKeyboardWithCommands(keyboard, availableCommandsFromStart);
         return sendMessage(chatId, "Выбери действие:", keyboard);

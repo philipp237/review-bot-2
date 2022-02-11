@@ -20,17 +20,17 @@ public class AbstractTest {
     protected static final String BOT_NAME = "test_bot_name";
     protected static final String BOT_TOKEN = "test_bot_token";
     protected static final String JIRA_LINK = "https://test.com/";
-    protected static final List<String> DASHBOARD = singletonList("TEST1");
+    protected static final String DASHBOARD = "TEST1";
 
     protected static final String UUID_1 = "29e286b2-5aa9-11ec-bf63-0242ac130002";
     protected static final String UUID_2 = "1258ce35-b1a9-494b-b1e0-76cc64e8f0c5";
     protected static final String UUID_3 = "0385cd13-44e3-4bf5-901e-15ce4f58f6dd";
     protected static final String UUID_4 = "b0a7165f-7c6e-419e-bdb3-8bebf7bf3ee9";
 
-    protected static final String TASK_NAME_1 = DASHBOARD.get(0) + "-1111";
-    protected static final String TASK_NAME_2 = DASHBOARD.get(0) + "-2222";
-    protected static final String TASK_NAME_3 = DASHBOARD.get(0) + "-3333";
-    protected static final String TASK_NAME_4 = DASHBOARD.get(0) + "-4444";
+    protected static final String TASK_NAME_1 = DASHBOARD + "-1111";
+    protected static final String TASK_NAME_2 = DASHBOARD + "-2222";
+    protected static final String TASK_NAME_3 = DASHBOARD + "-3333";
+    protected static final String TASK_NAME_4 = DASHBOARD + "-4444";
 
     protected static final String MEMBER_1_CHAT_ID = "57164325";
     protected static final String MEMBER_2_CHAT_ID = "27621396";

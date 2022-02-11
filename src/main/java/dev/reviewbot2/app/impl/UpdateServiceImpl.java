@@ -154,7 +154,7 @@ public class UpdateServiceImpl implements UpdateService {
     }
 
     private void validateTaskName(String taskName) throws TelegramApiException {
-        if (config.DASHBOARDS.stream().noneMatch(taskName::contains)) {
+        if (config.getDASHBOARDS().stream().noneMatch(taskName::contains)) {
             throw new TelegramApiException("Incorrect task name " + taskName);
         }
     }

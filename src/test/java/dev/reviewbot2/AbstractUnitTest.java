@@ -49,7 +49,7 @@ public abstract class AbstractUnitTest extends AbstractTest {
         config.BOT_NAME = BOT_NAME;
         config.BOT_TOKEN = BOT_TOKEN;
         config.JIRA_LINK = JIRA_LINK;
-        config.DASHBOARDS = DASHBOARD;
+        config.setDASHBOARDS(DASHBOARD);
         this.config = config;
     }
 

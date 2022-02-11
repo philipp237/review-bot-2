@@ -98,4 +98,12 @@ public interface UpdateService {
      * @param login - новый логин пользователя
      */
     void updateMemberLogin(String chatId, String login);
+
+    /**
+     * Обновить идентификатор чата пользователя
+     *
+     * @param chatId - идентификатор чата
+     * @param login - новый логин пользователя
+     */
+    void updateChatId(String chatId, String login);
 }

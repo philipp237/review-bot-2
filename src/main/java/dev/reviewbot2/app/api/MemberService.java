@@ -30,6 +30,14 @@ public interface MemberService {
     Member getMemberByChatId(String chatId);
 
     /**
+     * Получить пользователя по его логину
+     *
+     * @param login - логин пользователя
+     * @return - пользователь
+     */
+    Member getMemberByLogin(String login);
+
+    /**
      * Получить всех пользователей
      *
      * @return - список из всех пользователей
@@ -43,4 +51,12 @@ public interface MemberService {
      * @return - список пользователей из заданной группы ревью
      */
     List<Member> getMemberByReviewGroup(int reviewGroup);
+
+    /**
+     * Сохранить пользователя
+     *
+     * @param member - пользователь
+     * @return - пользователь
+     */
+    Member save(Member member);
 }

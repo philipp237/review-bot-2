@@ -120,6 +120,11 @@ public class UpdateServiceImpl implements UpdateService {
         updateLogin.execute(chatId, login);
     }
 
+    @Override
+    public void updateChatId(String chatId, String login) {
+
+    }
+
     // ================================================================================================================
     //  Implementation
     // ================================================================================================================

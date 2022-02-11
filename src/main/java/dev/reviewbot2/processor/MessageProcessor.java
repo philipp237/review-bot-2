@@ -61,6 +61,10 @@ public class MessageProcessor {
             updateService.updateMemberLogin(chatId, login);
         }
 
+        if (!chatIdExists && loginExists) {
+
+        }
+
         return chatIdExists;
     }
 }

@@ -31,6 +31,11 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
+    public Member getMemberByLogin(String login) {
+        return memberRepository.getMemberByLogin(login);
+    }
+
+    @Override
     public List<Member> getAllMembers() {
         return memberRepository.findAll();
     }
@@ -38,5 +43,10 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public List<Member> getMemberByReviewGroup(int reviewGroup) {
         return memberRepository.getAllByReviewGroup(reviewGroup);
+    }
+
+    @Override
+    public Member save(Member member) {
+        return memberRepository.save(member);
     }
 }

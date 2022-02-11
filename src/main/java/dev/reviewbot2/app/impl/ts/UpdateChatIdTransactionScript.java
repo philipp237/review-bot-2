@@ -6,21 +6,17 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import javax.transaction.Transactional;
-
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class UpdateLoginTransactionScript {
+public class UpdateChatIdTransactionScript {
     private final MemberService memberService;
 
-    @Transactional
     public void execute(String chatId, String login) {
-        Member member = memberService.getMemberByChatId(chatId);
-        String oldLogin = member.getLogin();
-        member.setLogin(login);
+        Member member = memberService.getMemberByLogin(login);
+        member.setChatId(chatId);
         memberService.save(member);
 
-        log.info("{} changed login to {}", oldLogin, login);
+        log.info("Chat id for {} was updated to {}", login, chatId);
     }
 }

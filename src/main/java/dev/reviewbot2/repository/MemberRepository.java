@@ -11,5 +11,6 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     boolean existsByChatId(String chatId);
     boolean existsByLogin(String login);
     Member getMemberByChatId(String chatId);
+    Member getMemberByLogin(String login);
     List<Member> getAllByReviewGroup(int reviewGroup);
 }

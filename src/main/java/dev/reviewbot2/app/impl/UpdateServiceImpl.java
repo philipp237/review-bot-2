@@ -37,6 +37,7 @@ public class UpdateServiceImpl implements UpdateService {
     private final CloseTaskTransactionScript closeTask;
     private final GetMemberReviewsTransactionScript getMemberReviews;
     private final UpdateLoginTransactionScript updateLogin;
+    private final UpdateChatIdTransactionScript updateChatId;
 
     @Override
     public void deletePreviousMessage(Update update) throws TelegramApiException {
@@ -122,7 +123,7 @@ public class UpdateServiceImpl implements UpdateService {
 
     @Override
     public void updateChatId(String chatId, String login) {
-
+        updateChatId.execute(chatId, login);
     }
 
     // ================================================================================================================

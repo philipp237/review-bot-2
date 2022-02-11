@@ -14,11 +14,13 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 import static dev.reviewbot2.domain.task.TaskStatus.APPROVED;
 import static dev.reviewbot2.domain.task.TaskStatus.IN_REVIEW;
 import static dev.reviewbot2.domain.task.TaskType.IMPLEMENTATION;
 import static dev.reviewbot2.processor.Command.CLOSE;
+import static java.util.stream.Collectors.toList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.times;
@@ -64,10 +66,10 @@ public class CloseTaskTest extends AbstractUnitTest {
         Task task = getTask(IMPLEMENTATION, UUID_1, TASK_NAME_1, TASK_ID_1, chatId);
         task.setStatus(IN_REVIEW);
         Member member = task.getAuthor();
-        List<Member> otherMembers = List.of(
+        List<Member> otherMembers = Stream.of(
             getMember(MEMBER_2_CHAT_ID, 1, false, false),
             getMember(MEMBER_3_CHAT_ID, 2, true, false)
-        );
+        ).collect(toList());
         Update update = getUpdateWithCallbackQuery("/" + CLOSE + "#" + task.getId(), chatId);
 
         memberServiceMock.mockGetMemberByChatId(member);

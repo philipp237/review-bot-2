@@ -15,11 +15,14 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static dev.reviewbot2.domain.task.TaskType.DESIGN;
 import static dev.reviewbot2.domain.task.TaskType.IMPLEMENTATION;
 import static dev.reviewbot2.processor.Command.ACCEPT_REVIEW;
 import static dev.reviewbot2.processor.Command.TAKE_IN_REVIEW;
+import static java.util.stream.Collectors.toList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.MockitoAnnotations.openMocks;
 
@@ -61,7 +64,7 @@ public class TakeInReviewTest extends AbstractUnitTest {
     void execute_firstGroupReviewer_reviewList() throws TelegramApiException {
         Member reviewer = getMember(MEMBER_2_CHAT_ID, 1, false, false);
         Update update = getUpdateWithCallbackQuery("/" + TAKE_IN_REVIEW, MEMBER_2_CHAT_ID);
-        List<Review> reviews = List.of(review1, review2);
+        List<Review> reviews = Stream.of(review1, review2).collect(toList());
 
         memberServiceMock.mockGetMemberByChatId(reviewer);
         reviewServiceMock.mockGetReview(reviews);
@@ -96,7 +99,7 @@ public class TakeInReviewTest extends AbstractUnitTest {
     void execute_secondGroupReviewerAndDesign_reviewList() throws TelegramApiException {
         Member reviewer = getMember(MEMBER_2_CHAT_ID, 2, true, false);
         Update update = getUpdateWithCallbackQuery("/" + TAKE_IN_REVIEW, MEMBER_2_CHAT_ID);
-        List<Review> reviews = List.of(review3, review4);
+        List<Review> reviews = Stream.of(review3, review4).collect(toList());
 
         memberServiceMock.mockGetMemberByChatId(reviewer);
         reviewServiceMock.mockGetReview(reviews);

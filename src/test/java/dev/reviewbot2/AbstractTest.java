@@ -11,6 +11,7 @@ import java.util.List;
 
 import static dev.reviewbot2.domain.task.TaskStatus.READY_FOR_REVIEW;
 import static java.time.Instant.now;
+import static java.util.Collections.singletonList;
 
 public class AbstractTest {
     protected static final int MESSAGE_ID = 51632862;
@@ -19,7 +20,7 @@ public class AbstractTest {
     protected static final String BOT_NAME = "test_bot_name";
     protected static final String BOT_TOKEN = "test_bot_token";
     protected static final String JIRA_LINK = "https://test.com/";
-    protected static final List<String> DASHBOARD = List.of("TEST1");
+    protected static final List<String> DASHBOARD = singletonList("TEST1");
 
     protected static final String UUID_1 = "29e286b2-5aa9-11ec-bf63-0242ac130002";
     protected static final String UUID_2 = "1258ce35-b1a9-494b-b1e0-76cc64e8f0c5";

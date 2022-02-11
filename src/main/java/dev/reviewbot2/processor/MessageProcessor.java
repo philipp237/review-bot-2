@@ -3,9 +3,7 @@ package dev.reviewbot2.processor;
 import dev.reviewbot2.app.api.MemberService;
 import dev.reviewbot2.app.api.UpdateService;
 import dev.reviewbot2.config.Config;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
@@ -50,10 +48,19 @@ public class MessageProcessor {
     }
 
     private boolean hasAuthorities(Update update) throws TelegramApiException {
-        boolean hasAuthorities = memberService.isExists(getChatId(update));
-        if (!hasAuthorities) {
+        String chatId = getChatId(update);
+        String login = getLoginFromUpdate(update);
+
+        boolean chatIdExists = memberService.isChatIdExists(chatId);
+        boolean loginExists = memberService.isLoginExists(login);
+        if (!chatIdExists && !loginExists) {
             log.warn("{} has no authorities", getLoginFromUpdate(update));
         }
-        return hasAuthorities;
+
+        if (chatIdExists && !loginExists) {
+            updateService.updateMemberLogin(chatId, login);
+        }
+
+        return chatIdExists;
     }
 }

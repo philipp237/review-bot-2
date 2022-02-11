@@ -14,7 +14,7 @@ public class MemberServiceMock {
     private final MemberService memberService;
 
     public void mockIsExistsByChatId(boolean expectedResult) {
-        doReturn(expectedResult).when(memberService).isExists(anyString());
+        doReturn(expectedResult).when(memberService).isChatIdExists(anyString());
     }
 
     public void mockGetMemberByChatId(Member member) {

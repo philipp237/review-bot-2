@@ -90,4 +90,12 @@ public interface UpdateService {
      * @return - сообщение со списком ревью пользователя
      */
     SendMessage getMemberReviews(Update update) throws TelegramApiException;
+
+    /**
+     * Обновить логин пользователя
+     *
+     * @param chatId - идентификатор чата
+     * @param login - новый логин пользователя
+     */
+    void updateMemberLogin(String chatId, String login);
 }

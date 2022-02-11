@@ -16,8 +16,13 @@ public class MemberServiceImpl implements MemberService {
     private final MemberRepository memberRepository;
 
     @Override
-    public boolean isExists(String chatId) {
+    public boolean isChatIdExists(String chatId) {
         return memberRepository.existsByChatId(chatId);
+    }
+
+    @Override
+    public boolean isLoginExists(String login) {
+        return memberRepository.existsByLogin(login);
     }
 
     @Override

@@ -11,7 +11,15 @@ public interface MemberService {
      * @param chatId - id чата
      * @return true - если существует, false - если нет
      */
-    boolean isExists(String chatId);
+    boolean isChatIdExists(String chatId);
+
+    /**
+     * Существует ли пользователь с указанным логином
+     *
+     * @param login - логин пользователя
+     * @return true - если существует, false - если нет
+     */
+    boolean isLoginExists(String login);
 
     /**
      * Получить пользователя по id чата

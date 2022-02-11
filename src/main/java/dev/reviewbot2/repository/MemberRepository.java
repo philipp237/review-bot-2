@@ -9,6 +9,7 @@ import java.util.List;
 @Repository
 public interface MemberRepository extends JpaRepository<Member, Long> {
     boolean existsByChatId(String chatId);
+    boolean existsByLogin(String login);
     Member getMemberByChatId(String chatId);
     List<Member> getAllByReviewGroup(int reviewGroup);
 }

@@ -5,9 +5,7 @@ import dev.reviewbot2.domain.member.Member;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
+import javax.persistence.*;
 import java.time.Instant;
 
 /**
@@ -53,11 +51,13 @@ public class Task extends DomainObject {
     /**
      * Тип задачи
      */
+    @Enumerated(EnumType.STRING)
     private TaskType taskType;
 
     /**
      * Статус задачи
      */
+    @Enumerated(EnumType.STRING)
     private TaskStatus status;
 
     /**

@@ -58,6 +58,7 @@ public class UpdateServiceImpl implements UpdateService {
 
         if (link.contains("#")) {
             TaskType taskType = getTaskTypeFromLink(link);
+            link = link.split("#")[0];
             return createTask.execute(chatId, taskName, link, taskType);
         }
 

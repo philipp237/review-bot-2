@@ -27,12 +27,12 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     public List<Review> getReviewsForTaskReadyForReview(int reviewStage, boolean isDesignReviewer) {
-        List<Review> reviews = new ArrayList<>(reviewRepository.getReviews(READY_FOR_REVIEW.toString(),
-            IMPLEMENTATION.toString(), singletonList(reviewStage)));
+        List<Review> reviews = new ArrayList<>(reviewRepository.getReviews(READY_FOR_REVIEW,
+            IMPLEMENTATION, singletonList(reviewStage)));
 
         if (isDesignReviewer) {
-            reviews.addAll(reviewRepository.getReviews(READY_FOR_REVIEW.toString(),
-                DESIGN.toString(), singletonList(1)));
+            reviews.addAll(reviewRepository.getReviews(READY_FOR_REVIEW,
+                DESIGN, singletonList(1)));
         }
 
         return reviews;

@@ -15,3 +15,9 @@ jira:
 
 settings:
   number-of-review-stages: ${NUMBER_OF_REVIEW_STAGES}
+
+logging:
+  level:
+    org:
+      springframework:
+        web: ${LOGGING_LEVEL}

@@ -62,7 +62,7 @@ public class UpdateServiceImpl implements UpdateService {
         }
 
         InlineKeyboardMarkup keyboard = getKeyboard(TaskType.values().length);
-        fillKeyboardWithTaskTypes(keyboard, taskName);
+        fillKeyboardWithTaskTypes(keyboard, link);
 
         String TASK_TYPE_CHOOSE_HINT = "Выберите тип задачи";
         return sendMessage(chatId, TASK_TYPE_CHOOSE_HINT, keyboard);
@@ -159,11 +159,11 @@ public class UpdateServiceImpl implements UpdateService {
         }
     }
 
-    private void fillKeyboardWithTaskTypes(InlineKeyboardMarkup keyboard, String taskName) {
+    private void fillKeyboardWithTaskTypes(InlineKeyboardMarkup keyboard, String link) {
         int i = 0;
 
         for (TaskType taskType : TaskType.values()) {
-            keyboard.getKeyboard().get(i).add(getButton(taskType.getName(), "/" + taskName + "#" + taskType.toString()));
+            keyboard.getKeyboard().get(i).add(getButton(taskType.getName(), link + "#" + taskType.toString()));
             i++;
         }
     }

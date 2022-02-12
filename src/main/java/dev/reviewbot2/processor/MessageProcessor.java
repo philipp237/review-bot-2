@@ -35,7 +35,7 @@ public class MessageProcessor {
 
     private BotApiMethod<?> processRequest(Update update) throws TelegramApiException {
         if (update.hasCallbackQuery()) {
-//            updateService.deletePreviousMessage(update);
+            updateService.deletePreviousMessage(update);
         }
         String messageText = getTextFromUpdate(update);
         if (messageText.startsWith(config.JIRA_LINK)) {

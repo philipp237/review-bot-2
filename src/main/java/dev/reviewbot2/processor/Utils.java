@@ -34,6 +34,9 @@ public class Utils {
     }
 
     public static String getTextFromUpdate(Update update) throws TelegramApiException {
+        if (update.hasCallbackQuery()) {
+            return update.getCallbackQuery().getData();
+        }
         return getMessageFromUpdate(update).getText();
     }
 

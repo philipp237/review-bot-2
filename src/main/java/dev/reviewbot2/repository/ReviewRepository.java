@@ -10,14 +10,14 @@ import java.util.List;
 
 public interface ReviewRepository extends JpaRepository<Review, Long> {
 
-    @Query(value = "SELECT r FROM review r " +
-        "INNER JOIN task t ON t.id = r.task_id " +
+    @Query(value = "SELECT r FROM Review r " +
+        "INNER JOIN Task t ON t = r.task " +
         "WHERE t.status = :status " +
-        "AND t.task_type = :task_type " +
-        "AND r.review_stage IN :review_stages", nativeQuery = true)
+        "AND t.taskType = :taskType " +
+        "AND r.reviewStage IN :reviewStages")
     List<Review> getReviews(@Param("status") String status,
-                            @Param("task_type") String taskType,
-                            @Param("review_stages") List<Integer> reviewStages);
+                            @Param("taskType") String taskType,
+                            @Param("reviewStages") List<Integer> reviewStages);
 
     Review getReviewByTask(Task task);
 }

@@ -85,7 +85,6 @@ public class AcceptReviewTransactionScript {
             review.setMemberReviews(singletonList(memberReview));
         }
 
-        memberReviewService.save(memberReview);
         reviewService.save(review);
 
         log.info("{} took task {} in review", reviewer.getLogin(), task.getName());

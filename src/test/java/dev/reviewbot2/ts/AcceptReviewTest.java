@@ -26,7 +26,7 @@ public class AcceptReviewTest extends AbstractUnitTest {
     void setUp() {
         closeable = openMocks(this);
         this.acceptReview =
-             new AcceptReviewTransactionScript(memberService, taskService, reviewService, memberReviewService, processAccessor);
+             new AcceptReviewTransactionScript(memberService, taskService, reviewService, processAccessor);
         this.memberServiceMock = new MemberServiceMock(memberService);
         this.taskServiceMock = new TaskServiceMock(taskService);
         this.reviewServiceMock = new ReviewServiceMock(reviewService);

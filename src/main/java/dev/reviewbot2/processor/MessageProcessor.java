@@ -23,6 +23,7 @@ public class MessageProcessor {
 
     public BotApiMethod<?> processMessage(Update update) throws TelegramApiException {
         if (updateHasMessage(update) && hasAuthorities(update)) {
+            log.info("Message {} was received by {}", getTextFromUpdate(update), getLoginFromUpdate(update));
             return processRequest(update);
         } else {
             return null;

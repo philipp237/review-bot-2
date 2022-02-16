@@ -17,18 +17,13 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import javax.transaction.Transactional;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Stream;
 
 import static dev.reviewbot2.domain.task.TaskStatus.IN_REVIEW;
 import static dev.reviewbot2.domain.task.TaskStatus.READY_FOR_REVIEW;
 import static dev.reviewbot2.domain.task.TaskType.DESIGN;
 import static dev.reviewbot2.processor.Utils.*;
 import static java.time.Instant.now;
-import static java.util.Arrays.asList;
-import static java.util.Collections.singletonList;
-import static org.springframework.util.CollectionUtils.isEmpty;
 
 @Slf4j
 @Component
@@ -76,15 +71,12 @@ public class AcceptReviewTransactionScript {
             .startTime(now())
             .build();
 
-        List<MemberReview> memberReviews;
-        memberReviews = review.getMemberReviews();
-
-        if (!isEmpty(memberReviews)) {
-            memberReviews.add(memberReview);
-            review.setMemberReviews(memberReviews);
-        } else {
-            review.setMemberReviews(asList(memberReview));
+        List<MemberReview> memberReviews = new ArrayList<>();
+        if (review.getMemberReviews().size() != 0) {
+            memberReviews.addAll(review.getMemberReviews());
         }
+        memberReviews.add(memberReview);
+        review.setMemberReviews(memberReviews);
 
         reviewService.save(review);
 

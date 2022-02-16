@@ -32,6 +32,6 @@ public class Review extends DomainObject {
     /**
      * Ревью отдельным участником команды
      */
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "reviewer")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "reviewer", cascade = CascadeType.MERGE)
     private List<MemberReview> memberReviews;
 }

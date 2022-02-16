@@ -60,7 +60,8 @@ public class AbstractTest {
 
     protected CallbackQuery getCallbackQuery(String text, String chatId) {
         CallbackQuery callbackQuery = new CallbackQuery();
-        callbackQuery.setMessage(getMessage(text, chatId));
+        callbackQuery.setData(text);
+        callbackQuery.setMessage(getMessage(null, chatId));
         return callbackQuery;
     }
 

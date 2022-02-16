@@ -2,6 +2,7 @@ package dev.reviewbot2;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.reviewbot2.domain.member.Member;
+import dev.reviewbot2.domain.task.Task;
 import dev.reviewbot2.domain.task.TaskType;
 import dev.reviewbot2.processor.CommandProcessor;
 import dev.reviewbot2.processor.MessageProcessor;
@@ -167,7 +168,7 @@ public abstract class AbstractIntegrationTest extends AbstractTest {
         return objectMapper.readValue(content, SendMessage.class);
     }
 
-    protected void addMembersToDB(String chatId, int reviewGroup, boolean canReviewDesign, boolean isOmni) {
+    protected void addMemberToDB(String chatId, int reviewGroup, boolean canReviewDesign, boolean isOmni) {
         memberRepository.save(getMember(chatId, reviewGroup, canReviewDesign, isOmni));
     }
 

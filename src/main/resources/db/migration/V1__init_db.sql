@@ -32,8 +32,8 @@ CREATE TABLE review (
 
 CREATE TABLE member_review (
     id BIGSERIAL PRIMARY KEY,
-    review_id INTEGER NOT NULL,
-    reviewer_id INTEGER NOT NULL,
+    review_id INTEGER,
+    reviewer_id INTEGER,
     start_time TIMESTAMP,
     end_time TIMESTAMP,
 

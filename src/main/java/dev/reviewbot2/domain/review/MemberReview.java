@@ -4,6 +4,7 @@ import dev.reviewbot2.domain.DomainObject;
 import dev.reviewbot2.domain.member.Member;
 import lombok.*;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -40,7 +41,7 @@ public class MemberReview extends DomainObject {
     /**
      * Ревью
      */
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "review_id")
     private Review review;
 }

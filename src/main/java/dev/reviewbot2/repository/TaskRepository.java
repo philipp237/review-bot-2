@@ -17,7 +17,7 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
         "WHERE r.review_stage = :reviewGroup " +
         "AND t.status NOT IN ('CLOSED', 'FORCE_CLOSED', 'APPROVED') " +
         "AND mr.reviewer_id = :id " +
-        "GROUP BY t.id",
+        "GROUP BY t.id, r.id",
         nativeQuery = true)
     List<Task> getTaskInMemberReview(long id, int reviewGroup);
 }

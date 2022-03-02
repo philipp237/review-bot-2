@@ -52,9 +52,9 @@ public class AcceptReviewTest extends AbstractUnitTest {
 
         SendMessage acceptReviewMessage = acceptReview.execute(update);
 
-        verify(memberReviewService, times(1)).save(memberReviewArgumentCaptor.capture());
+        verify(reviewService, times(1)).save(reviewArgumentCaptor.capture());
 
-        assertEquals(review, memberReviewArgumentCaptor.getValue().getReview());
+        assertEquals(review, reviewArgumentCaptor.getValue());
         assertEquals(String.format("Задача %s взята в ревью\n%s\n", taskName, JIRA_LINK + taskName),
             acceptReviewMessage.getText());
     }

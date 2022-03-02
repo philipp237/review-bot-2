@@ -11,6 +11,7 @@ import dev.reviewbot2.domain.task.Task;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -24,6 +25,7 @@ import static dev.reviewbot2.domain.task.TaskStatus.READY_FOR_REVIEW;
 import static dev.reviewbot2.domain.task.TaskType.DESIGN;
 import static dev.reviewbot2.processor.Utils.*;
 import static java.time.Instant.now;
+import static org.springframework.util.CollectionUtils.isEmpty;
 
 @Slf4j
 @Component
@@ -72,7 +74,7 @@ public class AcceptReviewTransactionScript {
             .build();
 
         List<MemberReview> memberReviews = new ArrayList<>();
-        if (review.getMemberReviews().size() != 0) {
+        if (!isEmpty(review.getMemberReviews())) {
             memberReviews.addAll(review.getMemberReviews());
         }
         memberReviews.add(memberReview);

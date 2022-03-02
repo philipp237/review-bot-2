@@ -7,11 +7,8 @@ import dev.reviewbot2.domain.task.Task;
 import dev.reviewbot2.domain.task.TaskType;
 import org.telegram.telegrambots.meta.api.objects.*;
 
-import java.util.List;
-
 import static dev.reviewbot2.domain.task.TaskStatus.READY_FOR_REVIEW;
 import static java.time.Instant.now;
-import static java.util.Collections.singletonList;
 
 public class AbstractTest {
     protected static final int MESSAGE_ID = 51632862;

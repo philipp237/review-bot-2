@@ -4,13 +4,11 @@ import dev.reviewbot2.AbstractIntegrationTest;
 import dev.reviewbot2.domain.member.Member;
 import dev.reviewbot2.domain.task.Task;
 import dev.reviewbot2.domain.task.TaskStatus;
-import dev.reviewbot2.domain.task.TaskType;
 import org.junit.jupiter.api.Test;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import java.util.List;
-
 import static dev.reviewbot2.domain.task.TaskStatus.*;
+import static dev.reviewbot2.domain.task.TaskType.IMPLEMENTATION;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class ProcessIntegrationTest extends AbstractIntegrationTest {
@@ -54,7 +52,7 @@ class ProcessIntegrationTest extends AbstractIntegrationTest {
     // ================================================================================================================
 
     private String memberCreatesTask(String authorChatId) throws Exception {
-        performCreateTask(authorChatId, TaskType.IMPLEMENTATION);
+        performCreateTask(authorChatId, IMPLEMENTATION);
         String uuid = getUuidFromProcess();
         Thread.sleep(100);
         assertEquals(READY_FOR_REVIEW, getTask(uuid).getStatus());
@@ -63,25 +61,29 @@ class ProcessIntegrationTest extends AbstractIntegrationTest {
     }
 
     private void reviewerTakesTaskInReview(String reviewerChatId, String uuid) throws Exception {
-        performAcceptReview(reviewerChatId, TASK_ID_1);
+        Long taskId = getTask(uuid).getId();
+        performAcceptReview(reviewerChatId, taskId);
         Thread.sleep(100);
         assertEquals(IN_REVIEW, getTask(uuid).getStatus());
     }
 
     private void reviewerDeclinesTask(String reviewerChatId, String uuid) throws Exception {
-        performDecline(reviewerChatId, TASK_ID_1);
+        Long taskId = getTask(uuid).getId();
+        performDecline(reviewerChatId, taskId);
         Thread.sleep(100);
         assertEquals(IN_PROGRESS, getTask(uuid).getStatus());
     }
 
     private void authorSubmitsTaskForReview(String authorChatId, String uuid) throws Exception {
-        performSubmit(authorChatId, TASK_ID_1);
+        Long taskId = getTask(uuid).getId();
+        performSubmit(authorChatId, taskId);
         Thread.sleep(100);
         assertEquals(READY_FOR_REVIEW, getTask(uuid).getStatus());
     }
 
     private void reviewerApprovesTask(String reviewerChatId, String uuid) throws Exception {
-        performApprove(reviewerChatId, TASK_ID_1);
+        Long taskId = getTask(uuid).getId();
+        performApprove(reviewerChatId, taskId);
 
         Member reviewer = getMemberFromDB(reviewerChatId);
         TaskStatus expectedStatus;
@@ -106,7 +108,7 @@ class ProcessIntegrationTest extends AbstractIntegrationTest {
             expectedStatus = FORCE_CLOSED;
         }
 
-        performClose(authorChatId, TASK_ID_1);
+        performClose(authorChatId, task.getId());
         Thread.sleep(100);
         assertEquals(expectedStatus, getTask(uuid).getStatus());
     }

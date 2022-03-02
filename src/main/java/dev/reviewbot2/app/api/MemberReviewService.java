@@ -11,7 +11,7 @@ public interface MemberReviewService {
     /**
      * Сохранить ревью отдельного пользователя
      *
-     * @param memberReview - ревью отдельного пользователя
+     * @param memberReview ревью отдельного пользователя
      * @return ревью отдельного пользователя
      */
     MemberReview save(MemberReview memberReview);
@@ -19,7 +19,7 @@ public interface MemberReviewService {
     /**
      * Получить ревью последнего ревьюера
      *
-     * @param review - само ревью, для которого будет возвращено ревью последнего ревьюера
+     * @param review само ревью, для которого будет возвращено ревью последнего ревьюера
      * @return ревью отдельного пользователя
      */
     MemberReview getActiveReview(Review review);

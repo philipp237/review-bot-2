@@ -11,7 +11,7 @@ public interface TaskService {
     /**
      * Сохранить задачу
      *
-     * @param task - задача
+     * @param task задача
      * @return задача
      */
     Task save(Task task);
@@ -19,7 +19,7 @@ public interface TaskService {
     /**
      * Найти задачу по ее uuid
      *
-     * @param uuid - uuid задачи
+     * @param uuid uuid задачи
      * @return задача с заданным uuid
      */
     Task getTaskByUuid(String uuid);
@@ -27,7 +27,7 @@ public interface TaskService {
     /**
      * Найти задачу по ее id
      *
-     * @param id - идентификатор задачи
+     * @param id идентификатор задачи
      * @return задача с заданным id
      */
     Task getTaskById(Long id);

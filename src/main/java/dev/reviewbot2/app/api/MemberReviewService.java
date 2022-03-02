@@ -1,10 +1,7 @@
 package dev.reviewbot2.app.api;
 
-import dev.reviewbot2.domain.member.Member;
 import dev.reviewbot2.domain.review.MemberReview;
 import dev.reviewbot2.domain.review.Review;
-
-import java.util.List;
 
 public interface MemberReviewService {
 

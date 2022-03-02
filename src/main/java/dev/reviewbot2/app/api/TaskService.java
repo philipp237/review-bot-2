@@ -1,7 +1,6 @@
 package dev.reviewbot2.app.api;
 
 import dev.reviewbot2.domain.member.Member;
-import dev.reviewbot2.domain.review.MemberReview;
 import dev.reviewbot2.domain.task.Task;
 
 import java.util.List;

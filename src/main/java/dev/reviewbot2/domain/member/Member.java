@@ -13,7 +13,7 @@ import javax.persistence.Entity;
 @Data
 @SuperBuilder
 @NoArgsConstructor
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(callSuper = false, onlyExplicitlyIncluded = true)
 public class Member extends DomainObject {
 
     /**
@@ -24,6 +24,7 @@ public class Member extends DomainObject {
     /**
      * ID чата
      */
+    @EqualsAndHashCode.Include
     private String chatId;
 
     /**
@@ -42,5 +43,5 @@ public class Member extends DomainObject {
     /**
      * Есть ли доступ к админке
      */
-    private boolean isOmni;
+    private Boolean isOmni;
 }

@@ -45,6 +45,13 @@ public interface MemberService {
     List<Member> getAllMembers();
 
     /**
+     * Получить всех пользователей без прав администратора
+     *
+     * @return список из всех пользователей без прав администратора
+     */
+    List<Member> getAllNotOmniMembers();
+
+    /**
      * Получить пользователей из заданной группы ревью
      *
      * @param reviewGroup группа ревью
@@ -59,4 +66,11 @@ public interface MemberService {
      * @return пользователь
      */
     Member save(Member member);
+
+    /**
+     * Получить пользователей с правами администраторов
+     *
+     * @return список пользователей с правами администратора
+     */
+    List<Member> getOmniMembers();
 }

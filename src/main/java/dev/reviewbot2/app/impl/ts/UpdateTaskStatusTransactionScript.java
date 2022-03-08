@@ -72,11 +72,13 @@ public class UpdateTaskStatusTransactionScript {
     private void taskReadyForReviewNotify(Review review) throws TelegramApiException {
         String authorChatId = review.getTask().getAuthor().getChatId();
         int reviewGroupToNotify = review.getReviewStage();
-        List<Member> reviewersToNotify = memberService.getMemberByReviewGroup(reviewGroupToNotify).stream()
+        List<Member> membersToNotify = memberService.getMemberByReviewGroup(reviewGroupToNotify).stream()
             .filter(reviewer -> !reviewer.getChatId().equals(authorChatId))
             .collect(toList());
+        List<Member> omniMembers = memberService.getOmniMembers();
+        membersToNotify.addAll(omniMembers);
 
-        for (Member reviewer : reviewersToNotify) {
+        for (Member reviewer : membersToNotify) {
             webhookRestClient.sendMessage(sendMessage(reviewer.getChatId(),
                 String.format("Задача %s готова к ревью", review.getTask().getName())));
         }
@@ -88,20 +90,39 @@ public class UpdateTaskStatusTransactionScript {
             .filter(memberReview -> isNull(memberReview.getEndTime()))
             .findFirst()
             .get().getReviewer().getLogin();
-        webhookRestClient.sendMessage(sendMessage(authorChatId,
-            String.format("%s взял в ревью задачу %s", reviewerLogin, review.getTask().getName())));
+
+        List<String> membersChatIdsToNotify = memberService.getOmniMembers().stream().map(Member::getChatId).collect(toList());
+        membersChatIdsToNotify.add(authorChatId);
+
+        for (String chatId : membersChatIdsToNotify) {
+            webhookRestClient.sendMessage(sendMessage(chatId,
+                String.format("%s взял в ревью задачу %s", reviewerLogin, review.getTask().getName())));
+        }
+
     }
 
     private void taskInProgressAuthorNotify(Review review) throws TelegramApiException {
         String authorChatId = review.getTask().getAuthor().getChatId();
-        webhookRestClient.sendMessage(sendMessage(authorChatId,
-            String.format("Задача %s вернулась с ревью", review.getTask().getName())));
+
+        List<String> membersChatIdsToNotify = memberService.getOmniMembers().stream().map(Member::getChatId).collect(toList());
+        membersChatIdsToNotify.add(authorChatId);
+
+        for (String chatId : membersChatIdsToNotify) {
+            webhookRestClient.sendMessage(sendMessage(chatId,
+                String.format("Задача %s вернулась с ревью", review.getTask().getName())));
+        }
     }
 
     private void taskApprovedAuthorNotify(Review review) throws TelegramApiException {
         String authorChatId = review.getTask().getAuthor().getChatId();
-        webhookRestClient.sendMessage(sendMessage(authorChatId,
-            String.format("Задача %s одобрена", review.getTask().getName())));
+
+        List<String> membersChatIdsToNotify = memberService.getOmniMembers().stream().map(Member::getChatId).collect(toList());
+        membersChatIdsToNotify.add(authorChatId);
+
+        for (String chatId : membersChatIdsToNotify) {
+            webhookRestClient.sendMessage(sendMessage(chatId,
+                String.format("Задача %s одобрена", review.getTask().getName())));
+        }
     }
 
     private void taskForceClosedNotify(Review review) throws TelegramApiException {

@@ -1,5 +1,6 @@
 package dev.reviewbot2.app.api;
 
+import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -105,4 +106,36 @@ public interface UpdateService {
      * @param login новый логин пользователя
      */
     void updateChatId(String chatId, String login);
+
+    /**
+     * Получить список задач пользователя
+     *
+     * @param update обновление, в котором содержится сообщение с командой получения своих задач
+     * @return список задач пользователя
+     */
+    SendMessage getMemberTasks(Update update) throws TelegramApiException;
+
+    /**
+     * Добавить пользователя в базу данных
+     *
+     * @param update обновление, в котором содержится сообщение с логином пользователя
+     * @return сообщение с подсказкой о добавлении пользователя
+     */
+    SendMessage addMember(Update update) throws TelegramApiException;
+
+    /**
+     * Изменить группу ревью пользователя
+     *
+     * @param update обновление, в котором содержится сообщение с логином и необязательно с группой ревью пользователя
+     * @return сообщение с подсказкой о изменении группы ревью пользователя или с предложением ввести группу ревью
+     */
+    SendMessage updateMember(Update update) throws TelegramApiException;
+
+    /**
+     * Получить информацию о задаче
+     *
+     * @param update обновление, в котором содержится сообщение с командой получения информации о задаче
+     * @return сообщение с информацией о задаче и возможных действиях
+     */
+    SendMessage getTaskInfo(Update update) throws TelegramApiException;
 }

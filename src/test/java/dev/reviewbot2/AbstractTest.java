@@ -34,6 +34,14 @@ public class AbstractTest {
     protected static final String MEMBER_3_CHAT_ID = "56247114";
 
     protected static final long TASK_ID_1 = 1L;
+    protected static final long TASK_ID_2 = 2L;
+    protected static final long TASK_ID_3 = 3L;
+
+    protected static final int NON_REVIEWER = 0;
+    protected static final int FIRST_REVIEW_GROUP = 1;
+    protected static final int SECOND_REVIEW_GROUP = 2;
+
+    protected static final String COMMAND = "/%s#%d";
 
     protected Update getUpdateWithoutMessage() {
         Update update = new Update();

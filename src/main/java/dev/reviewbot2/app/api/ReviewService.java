@@ -30,4 +30,6 @@ public interface ReviewService {
      * @return ревью
      */
     Review getReviewByTask(Task task);
+
+    List<Review> getReviewsByTasks(List<Task> tasks);
 }

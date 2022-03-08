@@ -6,8 +6,7 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doReturn;
 
@@ -25,5 +24,9 @@ public class ReviewServiceMock {
 
     public void mockGetReviewByTask(Review review) {
         doReturn(review).when(reviewService).getReviewByTask(any());
+    }
+
+    public void mockGetReviewsByTasks(List<Review> reviews) {
+        doReturn(reviews).when(reviewService).getReviewsByTasks(anyList());
     }
 }

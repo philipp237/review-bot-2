@@ -15,6 +15,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import static dev.reviewbot2.domain.task.TaskStatus.*;
 import static dev.reviewbot2.domain.task.TaskType.IMPLEMENTATION;
+import static dev.reviewbot2.processor.Command.INFO;
 import static dev.reviewbot2.processor.Command.SUBMIT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.times;
@@ -39,7 +40,7 @@ public class SubmitForReviewTest extends AbstractUnitTest {
         Task task = getTask(IMPLEMENTATION, UUID_1, TASK_NAME_1, TASK_ID_1, chatId);
         task.setStatus(IN_PROGRESS);
         Member member = task.getAuthor();
-        Update update = getUpdateWithCallbackQuery("/" + SUBMIT + "#" + task.getId(), chatId);
+        Update update = getUpdateWithCallbackQuery(String.format(COMMAND, SUBMIT, task.getId()), chatId);
 
         taskServiceMock.mockGetTaskById(task);
         taskServiceMock.mockSave(task);
@@ -59,8 +60,8 @@ public class SubmitForReviewTest extends AbstractUnitTest {
         String chatId = MEMBER_2_CHAT_ID;
         Task task = getTask(IMPLEMENTATION, UUID_1, TASK_NAME_1, TASK_ID_1, MEMBER_1_CHAT_ID);
         task.setStatus(IN_PROGRESS);
-        Member member = getMember(chatId, 0, false, false);
-        Update update = getUpdateWithCallbackQuery("/" + SUBMIT + "#" + task.getId(), chatId);
+        Member member = getMember(chatId, NON_REVIEWER, false, false);
+        Update update = getUpdateWithCallbackQuery(String.format(COMMAND, SUBMIT, task.getId()), chatId);
 
         taskServiceMock.mockGetTaskById(task);
         taskServiceMock.mockSave(task);
@@ -77,7 +78,7 @@ public class SubmitForReviewTest extends AbstractUnitTest {
         Task task = getTask(IMPLEMENTATION, UUID_1, TASK_NAME_1, TASK_ID_1, chatId);
         task.setStatus(IN_REVIEW);
         Member member = task.getAuthor();
-        Update update = getUpdateWithCallbackQuery("/" + SUBMIT + "#" + task.getId(), chatId);
+        Update update = getUpdateWithCallbackQuery(String.format(COMMAND, SUBMIT, task.getId()), chatId);
 
         taskServiceMock.mockGetTaskById(task);
         taskServiceMock.mockSave(task);

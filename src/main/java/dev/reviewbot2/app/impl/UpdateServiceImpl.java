@@ -38,6 +38,10 @@ public class UpdateServiceImpl implements UpdateService {
     private final GetMemberReviewsTransactionScript getMemberReviews;
     private final UpdateLoginTransactionScript updateLogin;
     private final UpdateChatIdTransactionScript updateChatId;
+    private final AddMemberTransactionScript addMember;
+    private final UpdateMemberTransactionScript updateMember;
+    private final GetMemberTasksTransactionScript getMemberTasks;
+    private final GetTaskInfoTransactionScript getTaskInfo;
 
     @Override
     public void deletePreviousMessage(Update update) throws TelegramApiException {
@@ -127,6 +131,26 @@ public class UpdateServiceImpl implements UpdateService {
         updateChatId.execute(chatId, login);
     }
 
+    @Override
+    public SendMessage getMemberTasks(Update update) throws TelegramApiException {
+        return getMemberTasks.execute(update);
+    }
+
+    @Override
+    public SendMessage addMember(Update update) throws TelegramApiException {
+        return addMember.execute(update);
+    }
+
+    @Override
+    public SendMessage updateMember(Update update) throws TelegramApiException {
+        return updateMember.execute(update);
+    }
+
+    @Override
+    public SendMessage getTaskInfo(Update update) throws TelegramApiException {
+        return getTaskInfo.execute(update);
+    }
+
     // ================================================================================================================
     //  Implementation
     // ================================================================================================================
@@ -138,7 +162,7 @@ public class UpdateServiceImpl implements UpdateService {
         return deleteMessageBuilder.build();
     }
 
-    private String getTaskNameFromLink(String link) throws TelegramApiException {
+    private String getTaskNameFromLink(String link) {
         String[] parsedUrl = link.split("/");
         String rowTaskName = parsedUrl[parsedUrl.length - 1];
 

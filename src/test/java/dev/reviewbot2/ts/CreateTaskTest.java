@@ -39,7 +39,7 @@ public class CreateTaskTest extends AbstractUnitTest {
         String taskName = TASK_NAME_1;
         String chatId = MEMBER_1_CHAT_ID;
 
-        Review review = getReview(taskType, 1, UUID_1, taskName, TASK_ID_1, chatId);
+        Review review = getReview(taskType, FIRST_REVIEW_GROUP, UUID_1, taskName, TASK_ID_1, chatId);
         Member member = review.getTask().getAuthor();
 
         memberServiceMock.mockGetMemberByChatId(member);

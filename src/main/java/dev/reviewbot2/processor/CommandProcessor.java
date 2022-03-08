@@ -36,6 +36,14 @@ public class CommandProcessor {
                 return updateService.createTask(update);
             case MY_REVIEWS:
                 return updateService.getMemberReviews(update);
+            case MY_TASKS:
+                return updateService.getMemberTasks(update);
+            case ADD_MEMBER:
+                return updateService.addMember(update);
+            case UPDATE_MEMBER:
+                return updateService.updateMember(update);
+            case INFO:
+                return updateService.getTaskInfo(update);
         }
         return null;
     }

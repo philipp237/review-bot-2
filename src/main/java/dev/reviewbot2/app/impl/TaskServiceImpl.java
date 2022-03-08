@@ -33,4 +33,9 @@ public class TaskServiceImpl implements TaskService {
     public List<Task> getTaskInMemberReview(Member member) {
         return taskRepository.getTaskInMemberReview(member.getId(), member.getReviewGroup());
     }
+
+    @Override
+    public List<Task> getMemberTasks(Member author) {
+        return taskRepository.getTaskByAuthor(author);
+    }
 }

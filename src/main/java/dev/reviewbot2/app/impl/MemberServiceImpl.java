@@ -41,6 +41,11 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
+    public List<Member> getAllNotOmniMembers() {
+        return memberRepository.getMembersByIsOmniFalse();
+    }
+
+    @Override
     public List<Member> getMemberByReviewGroup(int reviewGroup) {
         return memberRepository.getAllByReviewGroup(reviewGroup);
     }
@@ -48,5 +53,10 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public Member save(Member member) {
         return memberRepository.save(member);
+    }
+
+    @Override
+    public List<Member> getOmniMembers() {
+        return memberRepository.getMembersByIsOmniTrue();
     }
 }

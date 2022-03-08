@@ -13,4 +13,6 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     Member getMemberByChatId(String chatId);
     Member getMemberByLogin(String login);
     List<Member> getAllByReviewGroup(int reviewGroup);
+    List<Member> getMembersByIsOmniTrue();
+    List<Member> getMembersByIsOmniFalse();
 }

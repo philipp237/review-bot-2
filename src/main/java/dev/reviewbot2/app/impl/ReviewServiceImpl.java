@@ -42,4 +42,9 @@ public class ReviewServiceImpl implements ReviewService {
     public Review getReviewByTask(Task task) {
         return reviewRepository.getReviewByTask(task);
     }
+
+    @Override
+    public List<Review> getReviewsByTasks(List<Task> tasks) {
+        return reviewRepository.getReviewsByTaskIn(tasks);
+    }
 }

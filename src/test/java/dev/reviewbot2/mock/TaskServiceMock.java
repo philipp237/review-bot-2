@@ -4,6 +4,8 @@ import dev.reviewbot2.app.api.TaskService;
 import dev.reviewbot2.domain.task.Task;
 import lombok.RequiredArgsConstructor;
 
+import java.util.List;
+
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doReturn;
@@ -18,5 +20,9 @@ public class TaskServiceMock {
 
     public void mockGetTaskById(Task task) {
         doReturn(task).when(taskService).getTaskById(anyLong());
+    }
+
+    public void mockGetMemberTasks(List<Task> tasks) {
+        doReturn(tasks).when(taskService).getMemberTasks(any());
     }
 }

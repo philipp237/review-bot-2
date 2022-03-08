@@ -6,6 +6,7 @@ import dev.reviewbot2.app.api.ReviewService;
 import dev.reviewbot2.app.api.TaskService;
 import dev.reviewbot2.app.impl.camunda.ProcessAccessor;
 import dev.reviewbot2.config.Config;
+import dev.reviewbot2.domain.member.Member;
 import dev.reviewbot2.domain.review.MemberReview;
 import dev.reviewbot2.domain.review.Review;
 import dev.reviewbot2.domain.task.Task;
@@ -37,6 +38,8 @@ public abstract class AbstractUnitTest extends AbstractTest {
     protected ArgumentCaptor<MemberReview> memberReviewArgumentCaptor;
     @Captor
     protected ArgumentCaptor<Task> taskArgumentCaptor;
+    @Captor
+    protected ArgumentCaptor<Member> memberArgumentCaptor;
 
     protected MemberServiceMock memberServiceMock;
     protected TaskServiceMock taskServiceMock;

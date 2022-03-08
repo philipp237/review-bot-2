@@ -31,5 +31,19 @@ public interface TaskService {
      */
     Task getTaskById(Long id);
 
+    /**
+     * Получить список задач в ревью у пользователя
+     *
+     * @param member пользователь
+     * @return список задач, для которых пользователь является ревьюером
+     */
     List<Task> getTaskInMemberReview(Member member);
+
+    /**
+     * Получить список незакрытых задач за авторством пользователя
+     *
+     * @param author пользователь - автор задач
+     * @return список незакрытых задач за авторством пользователя
+     */
+    List<Task> getMemberTasks(Member author);
 }

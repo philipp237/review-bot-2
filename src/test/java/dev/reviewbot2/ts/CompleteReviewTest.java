@@ -15,8 +15,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import static dev.reviewbot2.domain.task.TaskStatus.IN_REVIEW;
 import static dev.reviewbot2.domain.task.TaskStatus.READY_FOR_REVIEW;
 import static dev.reviewbot2.domain.task.TaskType.IMPLEMENTATION;
-import static dev.reviewbot2.processor.Command.APPROVE;
-import static dev.reviewbot2.processor.Command.DECLINE;
+import static dev.reviewbot2.processor.Command.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.times;
@@ -42,10 +41,10 @@ public class CompleteReviewTest extends AbstractUnitTest {
     void execute_happyPath_approved() throws TelegramApiException {
         String taskUuid = UUID_1;
         String reviewerChatId = MEMBER_2_CHAT_ID;
-        Member reviewer = getMember(reviewerChatId, 1, false, false);
-        Review review = getReview(IMPLEMENTATION, 1, taskUuid, TASK_NAME_1, TASK_ID_1, MEMBER_1_CHAT_ID);
+        Member reviewer = getMember(reviewerChatId, FIRST_REVIEW_GROUP, false, false);
+        Review review = getReview(IMPLEMENTATION, FIRST_REVIEW_GROUP, taskUuid, TASK_NAME_1, TASK_ID_1, MEMBER_1_CHAT_ID);
         review.getTask().setStatus(IN_REVIEW);
-        Update update = getUpdateWithCallbackQuery("/" + APPROVE + "#" + review.getTask().getId(), reviewerChatId);
+        Update update = getUpdateWithCallbackQuery(String.format(COMMAND, APPROVE, review.getTask().getId()), reviewerChatId);
 
         mockInnerMethods(review, reviewer);
 
@@ -60,10 +59,10 @@ public class CompleteReviewTest extends AbstractUnitTest {
 
     @Test
     void execute_happyPath_declined() throws TelegramApiException {
-        Member reviewer = getMember(MEMBER_2_CHAT_ID, 1, false, false);
-        Review review = getReview(IMPLEMENTATION, 1, UUID_1, TASK_NAME_1, TASK_ID_1, MEMBER_1_CHAT_ID);
+        Member reviewer = getMember(MEMBER_2_CHAT_ID, FIRST_REVIEW_GROUP, false, false);
+        Review review = getReview(IMPLEMENTATION, FIRST_REVIEW_GROUP, UUID_1, TASK_NAME_1, TASK_ID_1, MEMBER_1_CHAT_ID);
         review.getTask().setStatus(IN_REVIEW);
-        Update update = getUpdateWithCallbackQuery("/" + DECLINE + "#" + review.getTask().getId(), MEMBER_2_CHAT_ID);
+        Update update = getUpdateWithCallbackQuery(String.format(COMMAND, DECLINE, review.getTask().getId()), MEMBER_2_CHAT_ID);
 
         mockInnerMethods(review, reviewer);
 
@@ -79,11 +78,11 @@ public class CompleteReviewTest extends AbstractUnitTest {
     @Test
     void execute_validationFailed_invalidStatus() throws TelegramApiException {
         String reviewerChatId = MEMBER_2_CHAT_ID;
-        Member reviewer = getMember(reviewerChatId, 1, false, false);
-        Review review = getReview(IMPLEMENTATION, 1, UUID_1, TASK_NAME_1, TASK_ID_1, MEMBER_1_CHAT_ID);
+        Member reviewer = getMember(reviewerChatId, FIRST_REVIEW_GROUP, false, false);
+        Review review = getReview(IMPLEMENTATION, FIRST_REVIEW_GROUP, UUID_1, TASK_NAME_1, TASK_ID_1, MEMBER_1_CHAT_ID);
         review.getTask().setStatus(READY_FOR_REVIEW);
         MemberReview memberReview = getMemberReview(review, reviewer);
-        Update update = getUpdateWithCallbackQuery("/" + DECLINE + "#" + review.getTask().getId(), reviewerChatId);
+        Update update = getUpdateWithCallbackQuery(String.format(COMMAND, DECLINE, review.getTask().getId()), reviewerChatId);
 
         memberServiceMock.mockGetMemberByChatId(reviewer);
         taskServiceMock.mockGetTaskById(review.getTask());
@@ -98,12 +97,12 @@ public class CompleteReviewTest extends AbstractUnitTest {
 
     @Test
     void execute_validationFailed_notSameReviewer() throws TelegramApiException {
-        Member reviewer1 = getMember(MEMBER_2_CHAT_ID, 1, false, false);
-        Member reviewer2 = getMember(MEMBER_3_CHAT_ID, 1, false, false);
-        Review review = getReview(IMPLEMENTATION, 1, UUID_1, TASK_NAME_1, TASK_ID_1, MEMBER_1_CHAT_ID);
+        Member reviewer1 = getMember(MEMBER_2_CHAT_ID, FIRST_REVIEW_GROUP, false, false);
+        Member reviewer2 = getMember(MEMBER_3_CHAT_ID, FIRST_REVIEW_GROUP, false, false);
+        Review review = getReview(IMPLEMENTATION, FIRST_REVIEW_GROUP, UUID_1, TASK_NAME_1, TASK_ID_1, MEMBER_1_CHAT_ID);
         review.getTask().setStatus(IN_REVIEW);
         MemberReview memberReview = getMemberReview(review, reviewer1);
-        Update update = getUpdateWithCallbackQuery("/" + DECLINE + "#" + review.getTask().getId(), MEMBER_3_CHAT_ID);
+        Update update = getUpdateWithCallbackQuery(String.format(COMMAND, DECLINE, review.getTask().getId()), MEMBER_3_CHAT_ID);
 
         memberServiceMock.mockGetMemberByChatId(reviewer2);
         taskServiceMock.mockGetTaskById(review.getTask());

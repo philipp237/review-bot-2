@@ -1,5 +1,6 @@
 package dev.reviewbot2.repository;
 
+import dev.reviewbot2.domain.member.Member;
 import dev.reviewbot2.domain.task.Task;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -20,4 +21,6 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
         "GROUP BY t.id",
         nativeQuery = true)
     List<Task> getTaskInMemberReview(long id, int reviewGroup);
+
+    List<Task> getTaskByAuthor(Member author);
 }

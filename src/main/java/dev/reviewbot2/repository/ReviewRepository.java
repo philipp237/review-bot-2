@@ -22,4 +22,6 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
                             @Param("reviewStages") List<Integer> reviewStages);
 
     Review getReviewByTask(Task task);
+
+    List<Review> getReviewsByTaskIn(List<Task> tasks);
 }

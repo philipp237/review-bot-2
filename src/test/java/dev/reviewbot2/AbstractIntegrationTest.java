@@ -99,33 +99,33 @@ public abstract class AbstractIntegrationTest extends AbstractTest {
     }
 
     protected SendMessage performTakeInReview(String chatId, TaskType taskType, int reviewGroup, Long taskId) throws Exception {
-        Update update = getUpdateWithCallbackQuery("/" + TAKE_IN_REVIEW + "#" + taskId, chatId);
+        Update update = getUpdateWithCallbackQuery(String.format(COMMAND, TAKE_IN_REVIEW, taskId), chatId);
 
         return performUpdateReceived(update);
     }
 
     protected void performAcceptReview(String chatId, Long taskId) throws Exception {
-        Update update = getUpdateWithCallbackQuery("/" + ACCEPT_REVIEW + "#" + taskId, chatId);
+        Update update = getUpdateWithCallbackQuery(String.format(COMMAND, ACCEPT_REVIEW, taskId), chatId);
         performUpdateReceived(update);
     }
 
     protected void performApprove(String chatId, Long taskId) throws Exception {
-        Update update = getUpdateWithCallbackQuery("/" + APPROVE + "#" + taskId, chatId);
+        Update update = getUpdateWithCallbackQuery(String.format(COMMAND, APPROVE, taskId), chatId);
         performUpdateReceived(update);
     }
 
     protected void performDecline(String chatId, Long taskId) throws Exception {
-        Update update = getUpdateWithCallbackQuery("/" + DECLINE + "#" + taskId, chatId);
+        Update update = getUpdateWithCallbackQuery(String.format(COMMAND, DECLINE, taskId), chatId);
         performUpdateReceived(update);
     }
 
     protected void performSubmit(String chatId, Long taskId) throws Exception {
-        Update update = getUpdateWithCallbackQuery("/" + SUBMIT + "#" + taskId, chatId);
+        Update update = getUpdateWithCallbackQuery(String.format(COMMAND, SUBMIT, taskId), chatId);
         performUpdateReceived(update);
     }
 
     protected void performClose(String chatId, Long taskId) throws Exception {
-        Update update = getUpdateWithCallbackQuery("/" + CLOSE + "#" + taskId, chatId);
+        Update update = getUpdateWithCallbackQuery(String.format(COMMAND, CLOSE, taskId), chatId);
         performUpdateReceived(update);
     }
 

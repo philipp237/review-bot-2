@@ -2,6 +2,7 @@ package dev.reviewbot2.repository;
 
 import dev.reviewbot2.domain.member.Member;
 import dev.reviewbot2.domain.task.Task;
+import dev.reviewbot2.domain.task.TaskStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -22,5 +23,5 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
         nativeQuery = true)
     List<Task> getTaskInMemberReview(long id, int reviewGroup);
 
-    List<Task> getTaskByAuthor(Member author);
+    List<Task> getTaskByAuthorAndStatusNotIn(Member author, List<TaskStatus> statuses);
 }

@@ -3,6 +3,7 @@ package dev.reviewbot2.app.impl;
 import dev.reviewbot2.app.api.TaskService;
 import dev.reviewbot2.domain.member.Member;
 import dev.reviewbot2.domain.task.Task;
+import dev.reviewbot2.domain.task.TaskStatus;
 import dev.reviewbot2.repository.TaskRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -36,6 +37,6 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public List<Task> getMemberTasks(Member author) {
-        return taskRepository.getTaskByAuthor(author);
+        return taskRepository.getTaskByAuthorAndStatusNotIn(author, TaskStatus.getClosedStatuses());
     }
 }

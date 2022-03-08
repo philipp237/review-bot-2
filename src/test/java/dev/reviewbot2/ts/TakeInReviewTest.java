@@ -113,6 +113,21 @@ public class TakeInReviewTest extends AbstractUnitTest {
     }
 
     @Test
+    void execute_emptyReviewList() throws TelegramApiException {
+        String memberChatId = MEMBER_1_CHAT_ID;
+        Member reviewer = getMember(memberChatId, FIRST_REVIEW_GROUP, false, false);
+        Update update = getUpdateWithCallbackQuery("/" + TAKE_IN_REVIEW, memberChatId);
+        List<Review> reviews = Stream.of(review1, review2).collect(toList());
+
+        memberServiceMock.mockGetMemberByChatId(reviewer);
+        reviewServiceMock.mockGetReview(reviews);
+
+        SendMessage sendMessage = takeInReview.execute(update);
+
+        assertEquals("Нет доступных для ревью задач", sendMessage.getText());
+    }
+
+    @Test
     void execute_nonReviewer() throws TelegramApiException {
         Member member = getMember(MEMBER_2_CHAT_ID, NON_REVIEWER, false, false);
         Update update = getUpdateWithCallbackQuery(String.format(COMMAND, TAKE_IN_REVIEW, review1.getTask().getId()), MEMBER_2_CHAT_ID);

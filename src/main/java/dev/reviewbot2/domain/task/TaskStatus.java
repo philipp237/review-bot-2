@@ -5,8 +5,12 @@ import lombok.Getter;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.util.Arrays.*;
+import static java.util.stream.Collectors.toList;
 
 /**
  * Статус задачи
@@ -51,5 +55,9 @@ public enum TaskStatus {
             .filter(taskStatus -> activityId.equals(taskStatus.getActivityId()))
             .findAny()
             .orElseThrow(TelegramApiException::new);
+    }
+
+    public static List<TaskStatus> getClosedStatuses() {
+        return Stream.of(CLOSED, FORCE_CLOSED).collect(toList());
     }
 }

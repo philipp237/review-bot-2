@@ -17,12 +17,14 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static dev.reviewbot2.domain.task.TaskStatus.READY_FOR_REVIEW;
 import static dev.reviewbot2.domain.task.TaskType.DESIGN;
 import static dev.reviewbot2.processor.Command.ACCEPT_REVIEW;
 import static dev.reviewbot2.processor.Command.TAKE_IN_REVIEW;
 import static dev.reviewbot2.processor.Utils.*;
+import static java.util.stream.Collectors.toList;
 
 @Slf4j
 @Component
@@ -49,7 +51,11 @@ public class TakeInReviewTransactionScript {
         }
 
         List<Review> availableReviews =
-            reviewService.getReviewsForTaskReadyForReview(reviewer.getReviewGroup(), reviewer.isCanReviewDesign());
+            getReviewsForTaskReadyForReview(reviewer);
+
+        if (availableReviews.size() == 0) {
+            return sendMessage(chatId, "Нет доступных для ревью задач");
+        }
 
         InlineKeyboardMarkup keyboard = getKeyboard(availableReviews.size());
         fillKeyboardWithTaskForReview(keyboard, availableReviews);
@@ -111,5 +117,13 @@ public class TakeInReviewTransactionScript {
     private Long parseTextToGetTaskId(String text) {
         String[] parsedText = text.split("#");
         return Long.parseLong(parsedText[parsedText.length - 1]);
+    }
+
+    private List<Review> getReviewsForTaskReadyForReview(Member reviewer) {
+        List<Review> reviews =
+            reviewService.getReviewsForTaskReadyForReview(reviewer.getReviewGroup(), reviewer.isCanReviewDesign());
+        return reviews.stream()
+            .filter(review -> !review.getTask().getAuthor().equals(reviewer))
+            .collect(toList());
     }
 }

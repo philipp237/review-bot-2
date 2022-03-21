@@ -15,11 +15,13 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
 import static dev.reviewbot2.domain.task.TaskType.DESIGN;
 import static dev.reviewbot2.domain.task.TaskType.IMPLEMENTATION;
+import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.MockitoAnnotations.openMocks;
@@ -46,7 +48,7 @@ public class GetMemberTasksTest extends AbstractUnitTest {
         long taskId3 = TASK_ID_3;
         Member member = getMember(memberChatId, FIRST_REVIEW_GROUP, false, false);
 
-        Update update = getUpdateWithCallbackQuery("/my_tasks", MEMBER_1_CHAT_ID);
+        Update update = getUpdateWithCallbackQuery("/my_tasks", memberChatId);
 
         List<Review> reviews = Stream.of(
             getReview(IMPLEMENTATION, FIRST_REVIEW_GROUP, UUID_1, TASK_NAME_1, taskId1, memberChatId),
@@ -66,5 +68,24 @@ public class GetMemberTasksTest extends AbstractUnitTest {
         assertEquals(GET_INFO + taskId1, ((InlineKeyboardMarkup) getTaskMessage.getReplyMarkup()).getKeyboard().get(0).get(0).getCallbackData());
         assertEquals(GET_INFO + taskId2, ((InlineKeyboardMarkup) getTaskMessage.getReplyMarkup()).getKeyboard().get(1).get(0).getCallbackData());
         assertEquals(GET_INFO + taskId3, ((InlineKeyboardMarkup) getTaskMessage.getReplyMarkup()).getKeyboard().get(2).get(0).getCallbackData());
+    }
+
+    @Test
+    void happyPath_noTasks() throws TelegramApiException {
+        String memberChatId = MEMBER_1_CHAT_ID;
+        Member member = getMember(memberChatId, FIRST_REVIEW_GROUP, false, false);
+
+        Update update = getUpdateWithCallbackQuery("/my_tasks", memberChatId);
+
+        List<Review> reviews = emptyList();
+        List<Task> tasks = emptyList();
+
+        memberServiceMock.mockGetMemberByChatId(member);
+        taskServiceMock.mockGetMemberTasks(tasks);
+        reviewServiceMock.mockGetReviewsByTasks(reviews);
+
+        SendMessage getTaskMessage = getMemberTasks.execute(update);
+
+        assertEquals("У тебя нет активных задач", getTaskMessage.getText());
     }
 }

@@ -32,6 +32,10 @@ public class GetMemberTasksTransactionScript {
         Member member = memberService.getMemberByChatId(chatId);
         List<Task> tasks = taskService.getMemberTasks(member);
 
+        if (tasks.size() == 0) {
+            return sendMessage(chatId, "У тебя нет активных задач");
+        }
+
         InlineKeyboardMarkup keyboard = getKeyboard(tasks.size());
         fillKeyboardWithTasks(keyboard, tasks);
 

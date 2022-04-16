@@ -3,6 +3,7 @@ package dev.reviewbot2.ts;
 import dev.reviewbot2.AbstractUnitTest;
 import dev.reviewbot2.app.impl.ts.UpdateMemberTransactionScript;
 import dev.reviewbot2.domain.member.Member;
+import dev.reviewbot2.exceptions.NoPermissionException;
 import dev.reviewbot2.mock.MemberServiceMock;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,6 +18,7 @@ import java.util.stream.Stream;
 
 import static dev.reviewbot2.processor.Command.UPDATE_MEMBER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.MockitoAnnotations.openMocks;
@@ -95,7 +97,7 @@ public class UpdateMemberTest extends AbstractUnitTest {
     }
 
     @Test
-    void updateMember_notOmniMember() throws TelegramApiException {
+    void updateMember_notOmniMember() {
         String memberChatId = MEMBER_1_CHAT_ID;
         Member member = getMember(memberChatId, FIRST_REVIEW_GROUP, false, false);
 
@@ -103,8 +105,6 @@ public class UpdateMemberTest extends AbstractUnitTest {
 
         memberServiceMock.mockGetMemberByChatId(member);
 
-        SendMessage addMemberMessage = updateMember.execute(update);
-
-        assertEquals("Нет прав", addMemberMessage.getText());
+        assertThrows(NoPermissionException.class, () -> updateMember.execute(update));
     }
 }

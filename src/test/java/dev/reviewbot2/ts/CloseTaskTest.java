@@ -4,6 +4,7 @@ import dev.reviewbot2.AbstractUnitTest;
 import dev.reviewbot2.app.impl.ts.CloseTaskTransactionScript;
 import dev.reviewbot2.domain.member.Member;
 import dev.reviewbot2.domain.task.Task;
+import dev.reviewbot2.exceptions.NotAuthorException;
 import dev.reviewbot2.mock.MemberServiceMock;
 import dev.reviewbot2.mock.ProcessAccessorMock;
 import dev.reviewbot2.mock.TaskServiceMock;
@@ -22,8 +23,7 @@ import static dev.reviewbot2.domain.task.TaskType.IMPLEMENTATION;
 import static dev.reviewbot2.processor.Command.ACCEPT_REVIEW;
 import static dev.reviewbot2.processor.Command.CLOSE;
 import static java.util.stream.Collectors.toList;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.MockitoAnnotations.openMocks;
@@ -88,7 +88,7 @@ public class CloseTaskTest extends AbstractUnitTest {
     }
 
     @Test
-    void execute_validationFailed() throws TelegramApiException {
+    void execute_validationFailed() {
         String chatId = MEMBER_1_CHAT_ID;
         Task task = getTask(IMPLEMENTATION, UUID_1, TASK_NAME_1, TASK_ID_1, chatId);
         task.setStatus(APPROVED);
@@ -98,7 +98,6 @@ public class CloseTaskTest extends AbstractUnitTest {
         memberServiceMock.mockGetMemberByChatId(member);
         taskServiceMock.mockGetTaskById(task);
 
-        SendMessage notAuthorMessage = closeTask.execute(update);
-        assertEquals("Ты не можешь закрыть задачу, которую не заводил", notAuthorMessage.getText());
+        assertThrows(NotAuthorException.class, () -> closeTask.execute(update));
     }
 }

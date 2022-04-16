@@ -5,6 +5,8 @@ import dev.reviewbot2.app.impl.ts.CompleteReviewTransactionScript;
 import dev.reviewbot2.domain.member.Member;
 import dev.reviewbot2.domain.review.MemberReview;
 import dev.reviewbot2.domain.review.Review;
+import dev.reviewbot2.exceptions.NotRequiredTaskStatusException;
+import dev.reviewbot2.exceptions.NotSameReviewerException;
 import dev.reviewbot2.mock.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,8 +18,7 @@ import static dev.reviewbot2.domain.task.TaskStatus.IN_REVIEW;
 import static dev.reviewbot2.domain.task.TaskStatus.READY_FOR_REVIEW;
 import static dev.reviewbot2.domain.task.TaskType.IMPLEMENTATION;
 import static dev.reviewbot2.processor.Command.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.MockitoAnnotations.openMocks;
@@ -76,7 +77,7 @@ public class CompleteReviewTest extends AbstractUnitTest {
     }
 
     @Test
-    void execute_validationFailed_invalidStatus() throws TelegramApiException {
+    void execute_validationFailed_invalidStatus() {
         String reviewerChatId = MEMBER_2_CHAT_ID;
         Member reviewer = getMember(reviewerChatId, FIRST_REVIEW_GROUP, false, false);
         Review review = getReview(IMPLEMENTATION, FIRST_REVIEW_GROUP, UUID_1, TASK_NAME_1, TASK_ID_1, MEMBER_1_CHAT_ID);
@@ -91,12 +92,11 @@ public class CompleteReviewTest extends AbstractUnitTest {
         memberReviewServiceMock.mockSave();
         processAccessorMock.mockCompleteReview();
 
-        SendMessage notAuthorMessage = completeReview.execute(update, true);
-        assertEquals("Задача не в ревью", notAuthorMessage.getText());
+        assertThrows(NotRequiredTaskStatusException.class, () -> completeReview.execute(update, true));
     }
 
     @Test
-    void execute_validationFailed_notSameReviewer() throws TelegramApiException {
+    void execute_validationFailed_notSameReviewer() {
         Member reviewer1 = getMember(MEMBER_2_CHAT_ID, FIRST_REVIEW_GROUP, false, false);
         Member reviewer2 = getMember(MEMBER_3_CHAT_ID, FIRST_REVIEW_GROUP, false, false);
         Review review = getReview(IMPLEMENTATION, FIRST_REVIEW_GROUP, UUID_1, TASK_NAME_1, TASK_ID_1, MEMBER_1_CHAT_ID);
@@ -111,8 +111,7 @@ public class CompleteReviewTest extends AbstractUnitTest {
         memberReviewServiceMock.mockSave();
         processAccessorMock.mockCompleteReview();
 
-        SendMessage invalidStatusMessage = completeReview.execute(update, true);
-        assertEquals("Ты не можешь завершить ревью, которое не проводил", invalidStatusMessage.getText());
+        assertThrows(NotSameReviewerException.class, () -> completeReview.execute(update, true));
     }
 
     // ================================================================================================================

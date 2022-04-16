@@ -4,6 +4,7 @@ import dev.reviewbot2.AbstractUnitTest;
 import dev.reviewbot2.app.impl.ts.TakeInReviewTransactionScript;
 import dev.reviewbot2.domain.member.Member;
 import dev.reviewbot2.domain.review.Review;
+import dev.reviewbot2.exceptions.NotRequiredReviewGroupException;
 import dev.reviewbot2.mock.MemberServiceMock;
 import dev.reviewbot2.mock.ReviewServiceMock;
 import dev.reviewbot2.mock.TaskServiceMock;
@@ -15,14 +16,15 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static dev.reviewbot2.domain.task.TaskType.DESIGN;
 import static dev.reviewbot2.domain.task.TaskType.IMPLEMENTATION;
-import static dev.reviewbot2.processor.Command.*;
+import static dev.reviewbot2.processor.Command.ACCEPT_REVIEW;
+import static dev.reviewbot2.processor.Command.TAKE_IN_REVIEW;
 import static java.util.stream.Collectors.toList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.MockitoAnnotations.openMocks;
 
 public class TakeInReviewTest extends AbstractUnitTest {
@@ -128,15 +130,13 @@ public class TakeInReviewTest extends AbstractUnitTest {
     }
 
     @Test
-    void execute_nonReviewer() throws TelegramApiException {
+    void execute_nonReviewer() {
         Member member = getMember(MEMBER_2_CHAT_ID, NON_REVIEWER, false, false);
         Update update = getUpdateWithCallbackQuery(String.format(COMMAND, TAKE_IN_REVIEW, review1.getTask().getId()), MEMBER_2_CHAT_ID);
 
         memberServiceMock.mockGetMemberByChatId(member);
         taskServiceMock.mockGetTaskById(review1.getTask());
 
-        SendMessage sendMessage = takeInReview.execute(update);
-
-        assertEquals("Ты не можешь ревьюить задачи", sendMessage.getText());
+        assertThrows(NotRequiredReviewGroupException.class, () -> takeInReview.execute(update));
     }
 }

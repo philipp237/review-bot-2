@@ -37,9 +37,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public abstract class AbstractIntegrationTest extends AbstractTest {
 
     @Autowired
-    private MockMvc mockMvc;
+    protected MockMvc mockMvc;
     @Autowired
-    private ObjectMapper objectMapper;
+    protected ObjectMapper objectMapper;
 
     @Autowired
     protected MemberRepository memberRepository;

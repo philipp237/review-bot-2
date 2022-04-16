@@ -4,6 +4,8 @@ import dev.reviewbot2.AbstractUnitTest;
 import dev.reviewbot2.app.impl.ts.SubmitForReviewTransactionScript;
 import dev.reviewbot2.domain.member.Member;
 import dev.reviewbot2.domain.task.Task;
+import dev.reviewbot2.exceptions.NotAuthorException;
+import dev.reviewbot2.exceptions.NotRequiredTaskStatusException;
 import dev.reviewbot2.mock.MemberServiceMock;
 import dev.reviewbot2.mock.ProcessAccessorMock;
 import dev.reviewbot2.mock.TaskServiceMock;
@@ -15,9 +17,9 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import static dev.reviewbot2.domain.task.TaskStatus.*;
 import static dev.reviewbot2.domain.task.TaskType.IMPLEMENTATION;
-import static dev.reviewbot2.processor.Command.INFO;
 import static dev.reviewbot2.processor.Command.SUBMIT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.MockitoAnnotations.openMocks;
@@ -56,7 +58,7 @@ public class SubmitForReviewTest extends AbstractUnitTest {
     }
 
     @Test
-    void execute_validationError_notAuthor() throws TelegramApiException {
+    void execute_validationError_notAuthor() {
         String chatId = MEMBER_2_CHAT_ID;
         Task task = getTask(IMPLEMENTATION, UUID_1, TASK_NAME_1, TASK_ID_1, MEMBER_1_CHAT_ID);
         task.setStatus(IN_PROGRESS);
@@ -68,12 +70,11 @@ public class SubmitForReviewTest extends AbstractUnitTest {
         memberServiceMock.mockGetMemberByChatId(member);
         processAccessorMock.mockSubmitForReview();
 
-        SendMessage notAuthorMessage = submitForReview.execute(update);
-        assertEquals("Ты не можешь отправить на ревью задачу, которую не создавал", notAuthorMessage.getText());
+        assertThrows(NotAuthorException.class, () -> submitForReview.execute(update));
     }
 
     @Test
-    void execute_validationError_invalidStatus() throws TelegramApiException {
+    void execute_validationError_invalidStatus() {
         String chatId = MEMBER_1_CHAT_ID;
         Task task = getTask(IMPLEMENTATION, UUID_1, TASK_NAME_1, TASK_ID_1, chatId);
         task.setStatus(IN_REVIEW);
@@ -85,7 +86,6 @@ public class SubmitForReviewTest extends AbstractUnitTest {
         memberServiceMock.mockGetMemberByChatId(member);
         processAccessorMock.mockSubmitForReview();
 
-        SendMessage invalidStatusMessage = submitForReview.execute(update);
-        assertEquals("Задача не на доработке, ее нельзя отправить в ревью", invalidStatusMessage.getText());
+        assertThrows(NotRequiredTaskStatusException.class, () -> submitForReview.execute(update));
     }
 }

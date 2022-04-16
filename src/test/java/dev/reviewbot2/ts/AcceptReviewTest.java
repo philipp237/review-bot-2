@@ -3,6 +3,8 @@ package dev.reviewbot2.ts;
 import dev.reviewbot2.AbstractUnitTest;
 import dev.reviewbot2.app.impl.ts.AcceptReviewTransactionScript;
 import dev.reviewbot2.domain.review.Review;
+import dev.reviewbot2.exceptions.NotRequiredTaskStatusException;
+import dev.reviewbot2.exceptions.TaskInReviewException;
 import dev.reviewbot2.mock.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,6 +17,7 @@ import static dev.reviewbot2.domain.task.TaskStatus.IN_REVIEW;
 import static dev.reviewbot2.domain.task.TaskType.IMPLEMENTATION;
 import static dev.reviewbot2.processor.Command.ACCEPT_REVIEW;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.MockitoAnnotations.openMocks;
@@ -57,7 +60,7 @@ public class AcceptReviewTest extends AbstractUnitTest {
     }
 
     @Test
-    void execute_taskAlreadyInReview() throws TelegramApiException {
+    void execute_taskAlreadyInReview() {
         String reviewerChatId = MEMBER_2_CHAT_ID;
         Review review = getReview(IMPLEMENTATION, FIRST_REVIEW_GROUP, UUID_1, TASK_NAME_1, TASK_ID_1, MEMBER_1_CHAT_ID);
         review.getTask().setStatus(IN_REVIEW);
@@ -69,12 +72,11 @@ public class AcceptReviewTest extends AbstractUnitTest {
         memberReviewServiceMock.mockSave();
         processAccessorMock.mockTakeInReview();
 
-        SendMessage taskAlreadyInReview = acceptReview.execute(update);
-        assertEquals("Кто-то успел взять задачу на ревью раньше тебя ¯\\_(ツ)_/¯", taskAlreadyInReview.getText());
+        assertThrows(TaskInReviewException.class, () -> acceptReview.execute(update));
     }
 
     @Test
-    void execute_invalidStatus() throws TelegramApiException {
+    void execute_invalidStatus() {
         String reviewerChatId = MEMBER_2_CHAT_ID;
         Review review = getReview(IMPLEMENTATION, FIRST_REVIEW_GROUP, UUID_1, TASK_NAME_1, TASK_ID_1, MEMBER_1_CHAT_ID);
         review.getTask().setStatus(CLOSED);
@@ -86,7 +88,6 @@ public class AcceptReviewTest extends AbstractUnitTest {
         memberReviewServiceMock.mockSave();
         processAccessorMock.mockTakeInReview();
 
-        SendMessage taskInInvalidStatus = acceptReview.execute(update);
-        assertEquals("Задачу нельзя взять в ревью", taskInInvalidStatus.getText());
+        assertThrows(NotRequiredTaskStatusException.class, () -> acceptReview.execute(update));
     }
 }

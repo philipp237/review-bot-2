@@ -8,10 +8,13 @@ import dev.reviewbot2.domain.member.Member;
 import dev.reviewbot2.domain.review.MemberReview;
 import dev.reviewbot2.domain.review.Review;
 import dev.reviewbot2.domain.task.Task;
+import dev.reviewbot2.exceptions.NotDesignReviewerException;
+import dev.reviewbot2.exceptions.NotRequiredReviewGroupException;
+import dev.reviewbot2.exceptions.TaskInReviewException;
+import dev.reviewbot2.exceptions.NotRequiredTaskStatusException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -49,23 +52,8 @@ public class AcceptReviewTransactionScript {
         Task task = taskService.getTaskById(taskId);
         Review review = reviewService.getReviewByTask(task);
 
-        if (task.getTaskType() == DESIGN && !reviewer.isCanReviewDesign()) {
-            log.info("{} unsuccessfully tries to take design task in review", reviewer.getLogin());
-            return sendMessage(chatId, "Ты не можешь ревьюить дизайны");
-        } else if (task.getTaskType() != DESIGN && reviewer.getReviewGroup() != review.getReviewStage()) {
-            log.info("{} unsuccessfully tries to take implementation task in review", reviewer.getLogin());
-            return sendMessage(chatId, "На данной стадии ты не можешь взять задачу в ревью");
-        }
-
-        if (task.getStatus().equals(IN_REVIEW)) {
-            log.info("{} tries to take task with uuid={} in review, but it's already in review",
-                reviewer.getLogin(), task.getUuid());
-            return sendMessage(chatId,"Кто-то успел взять задачу на ревью раньше тебя ¯\\_(ツ)_/¯");
-        } else if (!task.getStatus().equals(READY_FOR_REVIEW)) {
-            log.info("{} tries to take task with uuid={} and status={} in review, but it's not ready for review",
-                reviewer.getLogin(), task.getUuid(), task.getStatus());
-            return sendMessage(chatId,"Задачу нельзя взять в ревью");
-        }
+        validateReviewer(reviewer, review, update);
+        validateTaskStatus(update, reviewer, task);
 
         MemberReview memberReview = MemberReview.builder()
             .reviewer(reviewer)
@@ -95,5 +83,29 @@ public class AcceptReviewTransactionScript {
     private Long getTaskIdFromText(String text) {
         String[] parsedText = text.split("#");
         return Long.parseLong(parsedText[parsedText.length - 1]);
+    }
+
+    private void validateReviewer(Member reviewer, Review review, Update update) {
+        Task task = review.getTask();
+
+        if (task.getTaskType() == DESIGN && !reviewer.isCanReviewDesign()) {
+            log.info("{} unsuccessfully tries to take design task in review", reviewer.getLogin());
+            throw new NotDesignReviewerException(update);
+        } else if (task.getTaskType() != DESIGN && reviewer.getReviewGroup() != review.getReviewStage()) {
+            log.info("{} unsuccessfully tries to take implementation task in review", reviewer.getLogin());
+            throw new NotRequiredReviewGroupException(update);
+        }
+    }
+
+    private void validateTaskStatus(Update update, Member reviewer, Task task) {
+        if (task.getStatus().equals(IN_REVIEW)) {
+            log.info("{} tries to take task with uuid={} in review, but it's already in review",
+                reviewer.getLogin(), task.getUuid());
+            throw new TaskInReviewException(update);
+        } else if (!task.getStatus().equals(READY_FOR_REVIEW)) {
+            log.info("{} tries to take task with uuid={} and status={} in review, but it's not ready for review",
+                reviewer.getLogin(), task.getUuid(), task.getStatus());
+            throw new NotRequiredTaskStatusException(update);
+        }
     }
 }

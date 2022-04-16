@@ -6,7 +6,7 @@ import dev.reviewbot2.app.api.TaskService;
 import dev.reviewbot2.domain.member.Member;
 import dev.reviewbot2.domain.review.Review;
 import dev.reviewbot2.domain.task.Task;
-import dev.reviewbot2.domain.task.TaskStatus;
+import dev.reviewbot2.exceptions.NotRequiredReviewGroupException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -17,7 +17,6 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import javax.transaction.Transactional;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static dev.reviewbot2.domain.task.TaskStatus.READY_FOR_REVIEW;
 import static dev.reviewbot2.domain.task.TaskType.DESIGN;
@@ -40,10 +39,8 @@ public class TakeInReviewTransactionScript {
         String text = getTextFromUpdate(update);
 
         Member reviewer = memberService.getMemberByChatId(chatId);
-        if (reviewer.getReviewGroup() == 0) {
-            log.info("{} unsuccessfully tries to take task in review", reviewer.getLogin());
-            return sendMessage(chatId, "Ты не можешь ревьюить задачи");
-        }
+
+        validateReviewer(update, reviewer);
 
         if (text.contains("#")) {
             Long taskId = parseTextToGetTaskId(text);
@@ -66,6 +63,13 @@ public class TakeInReviewTransactionScript {
     // ================================================================================================================
     //  Implementation
     // ================================================================================================================
+
+    private void validateReviewer(Update update, Member reviewer) {
+        if (reviewer.getReviewGroup() == 0) {
+            log.info("{} unsuccessfully tries to take task in review", reviewer.getLogin());
+            throw new NotRequiredReviewGroupException(update);
+        }
+    }
 
     private SendMessage getInfoAboutTask(Long taskId, Update update) throws TelegramApiException {
         String chatId = getChatId(update);

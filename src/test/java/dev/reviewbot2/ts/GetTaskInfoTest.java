@@ -4,7 +4,7 @@ import dev.reviewbot2.AbstractUnitTest;
 import dev.reviewbot2.app.impl.ts.GetTaskInfoTransactionScript;
 import dev.reviewbot2.domain.member.Member;
 import dev.reviewbot2.domain.task.Task;
-import dev.reviewbot2.domain.task.TaskStatus;
+import dev.reviewbot2.exceptions.NotAuthorException;
 import dev.reviewbot2.mock.MemberServiceMock;
 import dev.reviewbot2.mock.TaskServiceMock;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,6 +18,7 @@ import static dev.reviewbot2.domain.task.TaskStatus.IN_PROGRESS;
 import static dev.reviewbot2.domain.task.TaskType.IMPLEMENTATION;
 import static dev.reviewbot2.processor.Command.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.MockitoAnnotations.openMocks;
 
 public class GetTaskInfoTest extends AbstractUnitTest {
@@ -93,7 +94,7 @@ public class GetTaskInfoTest extends AbstractUnitTest {
     }
 
     @Test
-    void getTaskInfo_error_notAuthor() throws TelegramApiException {
+    void getTaskInfo_error_notAuthor() {
         String memberChatId = MEMBER_1_CHAT_ID;
         Member member = getMember(memberChatId, FIRST_REVIEW_GROUP, false, false);
         Task task = getTask(IMPLEMENTATION, UUID_1, TASK_NAME_1, TASK_ID_1, MEMBER_2_CHAT_ID);
@@ -104,8 +105,6 @@ public class GetTaskInfoTest extends AbstractUnitTest {
         memberServiceMock.mockGetMemberByChatId(member);
         taskServiceMock.mockGetTaskById(task);
 
-        SendMessage getInfoMessage = getTaskInfo.execute(update);
-
-        assertEquals("Ты не можешь просматривать задачу, которую не создавал", getInfoMessage.getText());
+        assertThrows(NotAuthorException.class, () -> getTaskInfo.execute(update));
     }
 }

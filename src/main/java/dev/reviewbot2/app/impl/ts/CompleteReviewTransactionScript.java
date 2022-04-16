@@ -9,6 +9,8 @@ import dev.reviewbot2.domain.member.Member;
 import dev.reviewbot2.domain.review.MemberReview;
 import dev.reviewbot2.domain.review.Review;
 import dev.reviewbot2.domain.task.Task;
+import dev.reviewbot2.exceptions.NotRequiredTaskStatusException;
+import dev.reviewbot2.exceptions.NotSameReviewerException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -41,16 +43,8 @@ public class CompleteReviewTransactionScript {
         Review review = reviewService.getReviewByTask(task);
         MemberReview memberReview = memberReviewService.getActiveReview(review);
 
-        if (isStatusInvalid(review)) {
-            log.info("Member {} tries to complete review with id={}, but task not in review",
-                reviewer.getLogin(), review.getId());
-            return sendMessage(chatId, "Задача не в ревью");
-        }
-        if (isSameReviewer(reviewer, memberReview)) {
-            log.info("Member {} tries to complete review with id={} authored by {}",
-                reviewer.getLogin(), review.getId(), memberReview.getReviewer().getLogin());
-            return sendMessage(chatId, "Ты не можешь завершить ревью, которое не проводил");
-        }
+        validateStatus(update, reviewer, review);
+        validateReviewer(update, reviewer, review, memberReview);
 
         memberReview.setEndTime(now());
         memberReviewService.save(memberReview);
@@ -65,6 +59,22 @@ public class CompleteReviewTransactionScript {
     // ================================================================================================================
     //  Implementation
     // ================================================================================================================
+
+    private void validateStatus(Update update, Member reviewer, Review review) {
+        if (isStatusInvalid(review)) {
+            log.info("Member {} tries to complete review with id={}, but task not in review",
+                reviewer.getLogin(), review.getId());
+            throw new NotRequiredTaskStatusException(update);
+        }
+    }
+
+    private void validateReviewer(Update update, Member reviewer, Review review, MemberReview memberReview) {
+        if (isSameReviewer(reviewer, memberReview)) {
+            log.info("Member {} tries to complete review with id={} authored by {}",
+                reviewer.getLogin(), review.getId(), memberReview.getReviewer().getLogin());
+            throw new NotSameReviewerException(update);
+        }
+    }
 
     private boolean isSameReviewer(Member reviewer, MemberReview memberReview) {
         return !reviewer.equals(memberReview.getReviewer());

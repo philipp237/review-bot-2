@@ -2,6 +2,7 @@ package dev.reviewbot2.app.impl.ts;
 
 import dev.reviewbot2.app.api.MemberService;
 import dev.reviewbot2.domain.member.Member;
+import dev.reviewbot2.exceptions.NoPermissionException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,9 +32,7 @@ public class UpdateMemberTransactionScript {
 
         Member member = memberService.getMemberByChatId(chatId);
 
-        if (!member.getIsOmni()) {
-            return sendMessage(chatId, "Нет прав");
-        }
+        validateOmni(update, member);
 
         if (text.contains("#")) {
             String[] parsedText = text.split("#");
@@ -65,6 +64,12 @@ public class UpdateMemberTransactionScript {
     // ================================================================================================================
     //  Implementation
     // ================================================================================================================
+
+    private void validateOmni(Update update, Member member) {
+        if (!member.getIsOmni()) {
+            throw new NoPermissionException(update);
+        }
+    }
 
     private int getReviewGroup(String[] parsedText) {
         return Integer.parseInt(parsedText[parsedText.length - 1]);

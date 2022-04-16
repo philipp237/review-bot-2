@@ -6,6 +6,7 @@ import dev.reviewbot2.app.impl.camunda.ProcessAccessor;
 import dev.reviewbot2.domain.member.Member;
 import dev.reviewbot2.domain.task.Task;
 import dev.reviewbot2.domain.task.TaskStatus;
+import dev.reviewbot2.exceptions.NotAuthorException;
 import dev.reviewbot2.processor.Utils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,10 +37,7 @@ public class CloseTaskTransactionScript {
         Task task = taskService.getTaskById(taskId);
         TaskStatus lastTaskStatus = task.getStatus();
 
-        if (!member.getChatId().equals(task.getAuthor().getChatId())) {
-            log.info("{} tries to close task with uuid={} not owned by him/her", member.getLogin(), task.getUuid());
-            return sendMessage(chatId, "Ты не можешь закрыть задачу, которую не заводил");
-        }
+        validateAuthor(update, member, task);
 
         task.setCloseTime(now());
         taskService.save(task);
@@ -52,5 +50,16 @@ public class CloseTaskTransactionScript {
         processAccessor.closeTask(task.getUuid());
         log.info("{} closed task with uuid={}", member.getLogin(), task.getUuid());
         return sendMessage(chatId, "Задача закрыта");
+    }
+
+    // ================================================================================================================
+    //  Implementation
+    // ================================================================================================================
+
+    private void validateAuthor(Update update, Member member, Task task) {
+        if (!member.getChatId().equals(task.getAuthor().getChatId())) {
+            log.info("{} tries to close task with uuid={} not owned by him/her", member.getLogin(), task.getUuid());
+            throw new NotAuthorException(update);
+        }
     }
 }

@@ -4,7 +4,7 @@ import dev.reviewbot2.app.api.MemberService;
 import dev.reviewbot2.app.api.TaskService;
 import dev.reviewbot2.domain.member.Member;
 import dev.reviewbot2.domain.task.Task;
-import dev.reviewbot2.domain.task.TaskStatus;
+import dev.reviewbot2.exceptions.NotAuthorException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -31,11 +31,7 @@ public class GetTaskInfoTransactionScript {
         Task task = taskService.getTaskById(taskId);
         Member member = memberService.getMemberByChatId(chatId);
 
-        if (!task.getAuthor().equals(member) && !member.getIsOmni()) {
-            return sendMessage(chatId, "Ты не можешь просматривать задачу, которую не создавал");
-        }
-
-        TaskStatus status = task.getStatus();
+        validateAuthor(update, task, member);
 
         InlineKeyboardMarkup keyboard = getKeyboard((IN_PROGRESS.equals(task.getStatus()) && (memberIsAuthorOrNonOmni(member, task))) ? 2 : 1);
         fillKeyboardWithActions(keyboard, task, member);
@@ -46,6 +42,12 @@ public class GetTaskInfoTransactionScript {
     // ================================================================================================================
     //  Implementation
     // ================================================================================================================
+
+    private void validateAuthor(Update update, Task task, Member member) {
+        if (!task.getAuthor().equals(member) && !member.getIsOmni()) {
+            throw new NotAuthorException(update);
+        }
+    }
 
     private void fillKeyboardWithActions(InlineKeyboardMarkup keyboard, Task task, Member member) {
         int i = 0;

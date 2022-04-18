@@ -2,7 +2,6 @@ package dev.reviewbot2.processor;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 /**
  * Телеграм-команда

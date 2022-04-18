@@ -4,7 +4,6 @@ import dev.reviewbot2.app.api.UpdateService;
 import dev.reviewbot2.app.impl.ts.*;
 import dev.reviewbot2.config.Config;
 import dev.reviewbot2.domain.task.TaskType;
-import dev.reviewbot2.processor.Command;
 import dev.reviewbot2.webhook.WebhookRestClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,12 +14,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import java.util.List;
-import java.util.stream.Stream;
-
-import static dev.reviewbot2.processor.Command.*;
 import static dev.reviewbot2.processor.Utils.*;
-import static java.util.stream.Collectors.toList;
 
 @Slf4j
 @Component
@@ -42,6 +36,7 @@ public class UpdateServiceImpl implements UpdateService {
     private final UpdateMemberTransactionScript updateMember;
     private final GetMemberTasksTransactionScript getMemberTasks;
     private final GetTaskInfoTransactionScript getTaskInfo;
+    private final GetStartMessageTransactionScript getStartMessage;
 
     @Override
     public void deletePreviousMessage(Update update) throws TelegramApiException {
@@ -100,13 +95,7 @@ public class UpdateServiceImpl implements UpdateService {
 
     @Override
     public SendMessage start(Update update) throws TelegramApiException {
-        String chatId = getChatId(update);
-
-        List<Command> availableCommandsFromStart = Stream.of(CREATE_TASK, TAKE_IN_REVIEW, MY_REVIEWS, MY_TASKS)
-            .collect(toList());
-        InlineKeyboardMarkup keyboard = getKeyboard(availableCommandsFromStart.size());
-        fillKeyboardWithCommands(keyboard, availableCommandsFromStart);
-        return sendMessage(chatId, "Выбери действие:", keyboard);
+        return getStartMessage.execute(update);
     }
 
     @Override
@@ -189,15 +178,6 @@ public class UpdateServiceImpl implements UpdateService {
 
         for (TaskType taskType : TaskType.values()) {
             keyboard.getKeyboard().get(i).add(getButton(taskType.getName(), link + "#" + taskType.toString()));
-            i++;
-        }
-    }
-
-    private void fillKeyboardWithCommands(InlineKeyboardMarkup keyboard, List<Command> commands) {
-        int i = 0;
-
-        for (Command command : commands) {
-            keyboard.getKeyboard().get(i).add(getButton(command.getButtonText(), "/" + command));
             i++;
         }
     }

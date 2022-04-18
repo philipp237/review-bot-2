@@ -57,7 +57,7 @@ public interface MemberService {
      * @param reviewGroup группа ревью
      * @return список пользователей из заданной группы ревью
      */
-    List<Member> getMemberByReviewGroup(int reviewGroup);
+    List<Member> getMembersByReviewGroup(int reviewGroup);
 
     /**
      * Сохранить пользователя

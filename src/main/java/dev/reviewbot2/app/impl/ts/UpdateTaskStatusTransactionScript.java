@@ -20,7 +20,7 @@ import java.util.List;
 import static dev.reviewbot2.domain.task.TaskStatus.getTaskStatusFromActivityId;
 import static dev.reviewbot2.processor.Utils.sendMessage;
 import static java.util.Objects.isNull;
-import static java.util.stream.Collectors.*;
+import static java.util.stream.Collectors.toList;
 
 @Slf4j
 @Component
@@ -72,7 +72,7 @@ public class UpdateTaskStatusTransactionScript {
     private void taskReadyForReviewNotify(Review review) throws TelegramApiException {
         String authorChatId = review.getTask().getAuthor().getChatId();
         int reviewGroupToNotify = review.getReviewStage();
-        List<Member> membersToNotify = memberService.getMemberByReviewGroup(reviewGroupToNotify).stream()
+        List<Member> membersToNotify = memberService.getMembersByReviewGroup(reviewGroupToNotify).stream()
             .filter(reviewer -> !reviewer.getChatId().equals(authorChatId))
             .collect(toList());
         List<Member> omniMembers = memberService.getOmniMembers();

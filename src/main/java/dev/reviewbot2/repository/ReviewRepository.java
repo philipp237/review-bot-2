@@ -24,4 +24,9 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     Review getReviewByTask(Task task);
 
     List<Review> getReviewsByTaskIn(List<Task> tasks);
+
+    @Query(value = "SELECT r FROM Review r " +
+        "INNER JOIN Task t ON t = r.task " +
+        "WHERE t.status = :status")
+    List<Review> getAllReviewsByTaskStatus(@Param("status") TaskStatus status);
 }

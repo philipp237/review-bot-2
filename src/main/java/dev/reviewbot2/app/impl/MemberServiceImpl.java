@@ -46,7 +46,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public List<Member> getMemberByReviewGroup(int reviewGroup) {
+    public List<Member> getMembersByReviewGroup(int reviewGroup) {
         return memberRepository.getAllByReviewGroup(reviewGroup);
     }
 

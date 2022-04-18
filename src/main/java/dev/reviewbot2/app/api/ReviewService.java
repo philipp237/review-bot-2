@@ -24,6 +24,13 @@ public interface ReviewService {
     List<Review> getReviewsForTaskReadyForReview(int reviewStage, boolean isReviewDesigner);
 
     /**
+     * Получить список всех ревью задач, готовых для ревью
+     *
+     * @return список ревью
+     */
+    List<Review> getAllReviewsForTaskReadyForReview();
+
+    /**
      * Получить ревью по задаче
      *
      * @param task задача

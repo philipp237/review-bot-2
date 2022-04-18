@@ -38,6 +38,10 @@ public class ReviewServiceImpl implements ReviewService {
         return reviews;
     }
 
+    public List<Review> getAllReviewsForTaskReadyForReview() {
+        return reviewRepository.getAllReviewsByTaskStatus(READY_FOR_REVIEW);
+    }
+
     @Override
     public Review getReviewByTask(Task task) {
         return reviewRepository.getReviewByTask(task);

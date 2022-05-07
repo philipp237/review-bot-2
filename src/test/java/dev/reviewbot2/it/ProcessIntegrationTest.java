@@ -72,7 +72,7 @@ class ProcessIntegrationTest extends AbstractIntegrationTest {
         String uuid = memberCreatesTask(authorChatId);
 
         Long taskId = getTask(uuid).getId();
-        Update update = getUpdateWithCallbackQuery(String.format(COMMAND, ACCEPT_REVIEW, taskId), notReviewerChatId);
+        Update update = getUpdateWithCallbackQuery(getCommand(ACCEPT_REVIEW, taskId), notReviewerChatId);
         MvcResult result = mockMvc.perform(
             MockMvcRequestBuilders.post("/")
                 .contentType(MediaType.APPLICATION_JSON)

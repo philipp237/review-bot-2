@@ -26,7 +26,7 @@ public class CheckReviewStageDelegate implements JavaDelegate {
 
     @Override
     @Transactional
-    public void execute(DelegateExecution execution) throws Exception {
+    public void execute(DelegateExecution execution) {
         String taskUuid = processAccessor.getTaskUuid(execution);
         Task task = taskService.getTaskByUuid(taskUuid);
         Review review = reviewService.getReviewByTask(task);

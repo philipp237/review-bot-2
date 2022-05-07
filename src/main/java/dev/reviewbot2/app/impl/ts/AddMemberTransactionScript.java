@@ -1,14 +1,15 @@
 package dev.reviewbot2.app.impl.ts;
 
 import dev.reviewbot2.app.api.MemberService;
+import dev.reviewbot2.domain.MessageInfo;
 import dev.reviewbot2.domain.member.Member;
 import dev.reviewbot2.exceptions.NoPermissionException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+
+import javax.transaction.Transactional;
 
 import static dev.reviewbot2.processor.Utils.*;
 
@@ -18,13 +19,14 @@ import static dev.reviewbot2.processor.Utils.*;
 public class AddMemberTransactionScript {
     private final MemberService memberService;
 
-    public SendMessage execute(Update update) throws TelegramApiException {
-        String chatId = getChatId(update);
-        String text = getTextFromUpdate(update);
+    @Transactional
+    public SendMessage execute(MessageInfo messageInfo) {
+        String chatId = messageInfo.getChatId();
+        String text = messageInfo.getText();
 
         Member member = memberService.getMemberByChatId(chatId);
 
-        validateOmni(update, member);
+        validateOmni(messageInfo, member);
 
         if (text.contains("#")) {
             String newMemberLogin = getNewMemberLogin(text);
@@ -53,9 +55,9 @@ public class AddMemberTransactionScript {
         return parsedText[parsedText.length - 1];
     }
 
-    private void validateOmni(Update update, Member member) {
+    private void validateOmni(MessageInfo messageInfo, Member member) {
         if (!member.getIsOmni()) {
-            throw new NoPermissionException(update);
+            throw new NoPermissionException(messageInfo);
         }
     }
 }

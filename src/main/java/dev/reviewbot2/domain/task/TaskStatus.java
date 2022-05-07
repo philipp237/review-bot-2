@@ -4,9 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.Arrays.*;
@@ -48,7 +46,7 @@ public enum TaskStatus {
      */
     FORCE_CLOSED("force-closed");
 
-    private String activityId;
+    private final String activityId;
 
     public static TaskStatus getTaskStatusFromActivityId(String activityId) throws TelegramApiException {
         return stream(TaskStatus.values())

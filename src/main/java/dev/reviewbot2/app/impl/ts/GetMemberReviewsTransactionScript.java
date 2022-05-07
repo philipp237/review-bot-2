@@ -2,14 +2,13 @@ package dev.reviewbot2.app.impl.ts;
 
 import dev.reviewbot2.app.api.MemberService;
 import dev.reviewbot2.app.api.TaskService;
+import dev.reviewbot2.domain.MessageInfo;
 import dev.reviewbot2.domain.member.Member;
 import dev.reviewbot2.domain.task.Task;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import javax.transaction.Transactional;
 import java.util.List;
@@ -25,8 +24,8 @@ public class GetMemberReviewsTransactionScript {
     private final TaskService taskService;
 
     @Transactional
-    public SendMessage execute(Update update) throws TelegramApiException {
-        String chatId = getChatId(update);
+    public SendMessage execute(MessageInfo messageInfo) {
+        String chatId = messageInfo.getChatId();
 
         Member member = memberService.getMemberByChatId(chatId);
         List<Task> taskInMemberReview = taskService.getTaskInMemberReview(member);

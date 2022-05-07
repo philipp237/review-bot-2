@@ -4,6 +4,7 @@ import dev.reviewbot2.app.api.MemberService;
 import dev.reviewbot2.app.api.ReviewService;
 import dev.reviewbot2.app.api.TaskService;
 import dev.reviewbot2.app.impl.camunda.ProcessAccessor;
+import dev.reviewbot2.domain.MessageInfo;
 import dev.reviewbot2.domain.member.Member;
 import dev.reviewbot2.domain.review.MemberReview;
 import dev.reviewbot2.domain.review.Review;
@@ -16,8 +17,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import javax.transaction.Transactional;
 import java.util.ArrayList;
@@ -34,17 +33,15 @@ import static org.springframework.util.CollectionUtils.isEmpty;
 @Component
 @RequiredArgsConstructor
 public class AcceptReviewTransactionScript {
-    private final String TASK_TAKEN_IN_REIVEW = "Задача %s взята в ревью\n%s\n";
-
     private final MemberService memberService;
     private final TaskService taskService;
     private final ReviewService reviewService;
     private final ProcessAccessor processAccessor;
 
     @Transactional
-    public SendMessage execute(Update update) throws TelegramApiException {
-        String chatId = getChatId(update);
-        String text = getTextFromUpdate(update);
+    public SendMessage execute(MessageInfo messageInfo) {
+        String chatId = messageInfo.getChatId();
+        String text = messageInfo.getText();
 
         Member reviewer = memberService.getMemberByChatId(chatId);
 
@@ -52,8 +49,8 @@ public class AcceptReviewTransactionScript {
         Task task = taskService.getTaskById(taskId);
         Review review = reviewService.getReviewByTask(task);
 
-        validateReviewer(reviewer, review, update);
-        validateTaskStatus(update, reviewer, task);
+        validateReviewer(reviewer, review, messageInfo);
+        validateTaskStatus(messageInfo, reviewer, task);
 
         MemberReview memberReview = MemberReview.builder()
             .reviewer(reviewer)
@@ -73,7 +70,7 @@ public class AcceptReviewTransactionScript {
         log.info("{} took task {} in review", reviewer.getLogin(), task.getName());
         processAccessor.takeInReview(task.getUuid());
 
-        return sendMessage(chatId, String.format(TASK_TAKEN_IN_REIVEW, task.getName(), task.getLink()));
+        return sendMessage(chatId, String.format("Задача %s взята в ревью\n%s\n", task.getName(), task.getLink()));
     }
 
     // ================================================================================================================
@@ -85,27 +82,27 @@ public class AcceptReviewTransactionScript {
         return Long.parseLong(parsedText[parsedText.length - 1]);
     }
 
-    private void validateReviewer(Member reviewer, Review review, Update update) {
+    private void validateReviewer(Member reviewer, Review review, MessageInfo messageInfo) {
         Task task = review.getTask();
 
         if (task.getTaskType() == DESIGN && !reviewer.isCanReviewDesign()) {
             log.info("{} unsuccessfully tries to take design task in review", reviewer.getLogin());
-            throw new NotDesignReviewerException(update);
+            throw new NotDesignReviewerException(messageInfo);
         } else if (task.getTaskType() != DESIGN && reviewer.getReviewGroup() != review.getReviewStage()) {
             log.info("{} unsuccessfully tries to take implementation task in review", reviewer.getLogin());
-            throw new NotRequiredReviewGroupException(update);
+            throw new NotRequiredReviewGroupException(messageInfo);
         }
     }
 
-    private void validateTaskStatus(Update update, Member reviewer, Task task) {
+    private void validateTaskStatus(MessageInfo messageInfo, Member reviewer, Task task) {
         if (task.getStatus().equals(IN_REVIEW)) {
             log.info("{} tries to take task with uuid={} in review, but it's already in review",
                 reviewer.getLogin(), task.getUuid());
-            throw new TaskInReviewException(update);
+            throw new TaskInReviewException(messageInfo);
         } else if (!task.getStatus().equals(READY_FOR_REVIEW)) {
             log.info("{} tries to take task with uuid={} and status={} in review, but it's not ready for review",
                 reviewer.getLogin(), task.getUuid(), task.getStatus());
-            throw new NotRequiredTaskStatusException(update);
+            throw new NotRequiredTaskStatusException(messageInfo);
         }
     }
 }

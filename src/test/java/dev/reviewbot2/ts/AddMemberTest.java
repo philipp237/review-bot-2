@@ -2,14 +2,13 @@ package dev.reviewbot2.ts;
 
 import dev.reviewbot2.AbstractUnitTest;
 import dev.reviewbot2.app.impl.ts.AddMemberTransactionScript;
+import dev.reviewbot2.domain.MessageInfo;
 import dev.reviewbot2.domain.member.Member;
 import dev.reviewbot2.exceptions.NoPermissionException;
 import dev.reviewbot2.mock.MemberServiceMock;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import static dev.reviewbot2.processor.Command.ADD_MEMBER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -29,31 +28,31 @@ public class AddMemberTest extends AbstractUnitTest {
     }
 
     @Test
-    void happyPath() throws TelegramApiException {
+    void happyPath() {
         String memberChatId = MEMBER_1_CHAT_ID;
         String newUserLogin = "newUser";
         Member member = getMember(memberChatId, FIRST_REVIEW_GROUP, false, true);
 
-        Update update = getUpdateWithCallbackQuery("/" + ADD_MEMBER + "#" + newUserLogin, memberChatId);
+        MessageInfo messageInfo = getSimpleMessageInfo(memberChatId, "/" + ADD_MEMBER + "#" + newUserLogin);
 
         memberServiceMock.mockGetMemberByChatId(member);
 
-        addMember.execute(update);
+        addMember.execute(messageInfo);
 
         verify(memberService, times(1)).save(memberArgumentCaptor.capture());
         assertEquals(newUserLogin, memberArgumentCaptor.getValue().getLogin());
     }
 
     @Test
-    void happyPath_withoutParameter() throws TelegramApiException {
+    void happyPath_withoutParameter() {
         String memberChatId = MEMBER_1_CHAT_ID;
         Member member = getMember(memberChatId, FIRST_REVIEW_GROUP, false, true);
 
-        Update update = getUpdateWithCallbackQuery("/" + ADD_MEMBER, memberChatId);
+        MessageInfo messageInfo = getSimpleMessageInfo(memberChatId, "/" + ADD_MEMBER);
 
         memberServiceMock.mockGetMemberByChatId(member);
 
-        SendMessage addMemberMessage = addMember.execute(update);
+        SendMessage addMemberMessage = addMember.execute(messageInfo);
 
         assertEquals("Используй команду /add_member#логин_нового_пользователя для добавления " +
             "нового пользователя", addMemberMessage.getText());
@@ -64,10 +63,10 @@ public class AddMemberTest extends AbstractUnitTest {
         String memberChatId = MEMBER_1_CHAT_ID;
         Member member = getMember(memberChatId, FIRST_REVIEW_GROUP, false, false);
 
-        Update update = getUpdateWithCallbackQuery("/" + ADD_MEMBER, memberChatId);
+        MessageInfo messageInfo = getSimpleMessageInfo(memberChatId, "/" + ADD_MEMBER);
 
         memberServiceMock.mockGetMemberByChatId(member);
 
-        assertThrows(NoPermissionException.class, () -> addMember.execute(update));
+        assertThrows(NoPermissionException.class, () -> addMember.execute(messageInfo));
     }
 }

@@ -5,6 +5,7 @@ import dev.reviewbot2.domain.review.MemberReview;
 import dev.reviewbot2.domain.review.Review;
 import dev.reviewbot2.domain.task.Task;
 import dev.reviewbot2.domain.task.TaskType;
+import dev.reviewbot2.processor.Command;
 import org.telegram.telegrambots.meta.api.objects.*;
 
 import static dev.reviewbot2.domain.task.TaskStatus.READY_FOR_REVIEW;
@@ -42,12 +43,6 @@ public class AbstractTest {
     protected static final int SECOND_REVIEW_GROUP = 2;
 
     protected static final String COMMAND = "/%s#%d";
-
-    protected Update getUpdateWithoutMessage() {
-        Update update = new Update();
-        update.setUpdateId(UPDATE_ID);
-        return update;
-    }
 
     protected Update getUpdateWithMessage(String text, String chatId) {
         Update update = new Update();
@@ -128,5 +123,9 @@ public class AbstractTest {
             .reviewer(member)
             .review(review)
             .build();
+    }
+
+    protected String getCommand(Command command, Long taskId) {
+        return String.format(COMMAND, command, taskId);
     }
 }

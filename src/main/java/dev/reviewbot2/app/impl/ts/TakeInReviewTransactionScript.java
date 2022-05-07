@@ -3,6 +3,7 @@ package dev.reviewbot2.app.impl.ts;
 import dev.reviewbot2.app.api.MemberService;
 import dev.reviewbot2.app.api.ReviewService;
 import dev.reviewbot2.app.api.TaskService;
+import dev.reviewbot2.domain.MessageInfo;
 import dev.reviewbot2.domain.member.Member;
 import dev.reviewbot2.domain.review.Review;
 import dev.reviewbot2.domain.task.Task;
@@ -11,9 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import javax.transaction.Transactional;
 import java.util.List;
@@ -34,17 +33,17 @@ public class TakeInReviewTransactionScript {
     private final ReviewService reviewService;
 
     @Transactional
-    public SendMessage execute(Update update) throws TelegramApiException {
-        String chatId = getChatId(update);
-        String text = getTextFromUpdate(update);
+    public SendMessage execute(MessageInfo messageInfo) {
+        String chatId = messageInfo.getChatId();
+        String text = messageInfo.getText();
 
         Member reviewer = memberService.getMemberByChatId(chatId);
 
-        validateReviewer(update, reviewer);
+        validateReviewer(messageInfo, reviewer);
 
         if (text.contains("#")) {
             Long taskId = parseTextToGetTaskId(text);
-            return getInfoAboutTask(taskId, update);
+            return getInfoAboutTask(taskId, messageInfo);
         }
 
         List<Review> availableReviews =
@@ -64,15 +63,15 @@ public class TakeInReviewTransactionScript {
     //  Implementation
     // ================================================================================================================
 
-    private void validateReviewer(Update update, Member reviewer) {
+    private void validateReviewer(MessageInfo messageInfo, Member reviewer) {
         if (reviewer.getReviewGroup() == 0) {
             log.info("{} unsuccessfully tries to take task in review", reviewer.getLogin());
-            throw new NotRequiredReviewGroupException(update);
+            throw new NotRequiredReviewGroupException(messageInfo);
         }
     }
 
-    private SendMessage getInfoAboutTask(Long taskId, Update update) throws TelegramApiException {
-        String chatId = getChatId(update);
+    private SendMessage getInfoAboutTask(Long taskId, MessageInfo messageInfo) {
+        String chatId = messageInfo.getChatId();
         Task task = taskService.getTaskById(taskId);
 
         String text = getText(task);

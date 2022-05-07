@@ -2,6 +2,7 @@ package dev.reviewbot2.ts;
 
 import dev.reviewbot2.AbstractUnitTest;
 import dev.reviewbot2.app.impl.ts.GetMemberTasksTransactionScript;
+import dev.reviewbot2.domain.MessageInfo;
 import dev.reviewbot2.domain.member.Member;
 import dev.reviewbot2.domain.review.Review;
 import dev.reviewbot2.domain.task.Task;
@@ -11,11 +12,8 @@ import dev.reviewbot2.mock.TaskServiceMock;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -41,14 +39,14 @@ public class GetMemberTasksTest extends AbstractUnitTest {
     }
 
     @Test
-    void happyPath() throws TelegramApiException {
+    void happyPath() {
         String memberChatId = MEMBER_1_CHAT_ID;
         long taskId1 = TASK_ID_1;
         long taskId2 = TASK_ID_2;
         long taskId3 = TASK_ID_3;
         Member member = getMember(memberChatId, FIRST_REVIEW_GROUP, false, false);
 
-        Update update = getUpdateWithCallbackQuery("/my_tasks", memberChatId);
+        MessageInfo messageInfo = getSimpleMessageInfo(memberChatId, "/my_tasks");
 
         List<Review> reviews = Stream.of(
             getReview(IMPLEMENTATION, FIRST_REVIEW_GROUP, UUID_1, TASK_NAME_1, taskId1, memberChatId),
@@ -62,7 +60,7 @@ public class GetMemberTasksTest extends AbstractUnitTest {
         taskServiceMock.mockGetMemberTasks(tasks);
         reviewServiceMock.mockGetReviewsByTasks(reviews);
 
-        SendMessage getTaskMessage = getMemberTasks.execute(update);
+        SendMessage getTaskMessage = getMemberTasks.execute(messageInfo);
 
         assertEquals(3, ((InlineKeyboardMarkup) getTaskMessage.getReplyMarkup()).getKeyboard().size());
         assertEquals(GET_INFO + taskId1, ((InlineKeyboardMarkup) getTaskMessage.getReplyMarkup()).getKeyboard().get(0).get(0).getCallbackData());
@@ -71,11 +69,11 @@ public class GetMemberTasksTest extends AbstractUnitTest {
     }
 
     @Test
-    void happyPath_noTasks() throws TelegramApiException {
+    void happyPath_noTasks() {
         String memberChatId = MEMBER_1_CHAT_ID;
         Member member = getMember(memberChatId, FIRST_REVIEW_GROUP, false, false);
 
-        Update update = getUpdateWithCallbackQuery("/my_tasks", memberChatId);
+        MessageInfo messageInfo = getSimpleMessageInfo(memberChatId, "/my_tasks");
 
         List<Review> reviews = emptyList();
         List<Task> tasks = emptyList();
@@ -84,7 +82,7 @@ public class GetMemberTasksTest extends AbstractUnitTest {
         taskServiceMock.mockGetMemberTasks(tasks);
         reviewServiceMock.mockGetReviewsByTasks(reviews);
 
-        SendMessage getTaskMessage = getMemberTasks.execute(update);
+        SendMessage getTaskMessage = getMemberTasks.execute(messageInfo);
 
         assertEquals("У тебя нет активных задач", getTaskMessage.getText());
     }

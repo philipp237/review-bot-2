@@ -1,14 +1,14 @@
 package dev.reviewbot2.exceptions;
 
+import dev.reviewbot2.domain.MessageInfo;
 import lombok.Getter;
-import org.telegram.telegrambots.meta.api.objects.Update;
 
 @Getter
 public class ReviewBotException extends RuntimeException {
-    protected final Update update;
+    protected final MessageInfo messageInfo;
 
-    public ReviewBotException(Update update) {
+    public ReviewBotException(MessageInfo messageInfo) {
         super();
-        this.update = update;
+        this.messageInfo = messageInfo;
     }
 }

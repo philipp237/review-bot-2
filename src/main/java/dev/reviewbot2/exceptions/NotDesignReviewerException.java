@@ -1,10 +1,10 @@
 package dev.reviewbot2.exceptions;
 
-import org.telegram.telegrambots.meta.api.objects.Update;
+import dev.reviewbot2.domain.MessageInfo;
 
 public class NotDesignReviewerException extends ReviewBotException {
 
-    public NotDesignReviewerException(Update update) {
-        super(update);
+    public NotDesignReviewerException(MessageInfo messageInfo) {
+        super(messageInfo);
     }
 }

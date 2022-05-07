@@ -1,8 +1,7 @@
 package dev.reviewbot2.mock;
 
-import dev.reviewbot2.webhook.WebhookRestClient;
+import dev.reviewbot2.adapter.WebhookRestClient;
 import lombok.RequiredArgsConstructor;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
@@ -11,7 +10,7 @@ import static org.mockito.Mockito.doNothing;
 public class WebhookRestClientMock {
     private final WebhookRestClient webhookRestClient;
 
-    public void mockSendMessage() throws TelegramApiException {
+    public void mockSendMessage() {
         doNothing().when(webhookRestClient).sendMessage(any());
     }
 }

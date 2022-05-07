@@ -1,5 +1,6 @@
 package dev.reviewbot2.app.impl.ts;
 
+import dev.reviewbot2.adapter.WebhookRestClient;
 import dev.reviewbot2.app.api.MemberService;
 import dev.reviewbot2.app.api.ReviewService;
 import dev.reviewbot2.app.api.TaskService;
@@ -7,7 +8,6 @@ import dev.reviewbot2.domain.member.Member;
 import dev.reviewbot2.domain.review.Review;
 import dev.reviewbot2.domain.task.Task;
 import dev.reviewbot2.domain.task.TaskStatus;
-import dev.reviewbot2.webhook.WebhookRestClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
@@ -48,7 +48,7 @@ public class UpdateTaskStatusTransactionScript {
     //  Implementation
     // ================================================================================================================
 
-    private void sendNotification(Review review, TaskStatus status) throws TelegramApiException {
+    private void sendNotification(Review review, TaskStatus status) {
         switch (status) {
             case READY_FOR_REVIEW:
                 taskReadyForReviewNotify(review);
@@ -69,7 +69,7 @@ public class UpdateTaskStatusTransactionScript {
         }
     }
 
-    private void taskReadyForReviewNotify(Review review) throws TelegramApiException {
+    private void taskReadyForReviewNotify(Review review) {
         String authorChatId = review.getTask().getAuthor().getChatId();
         int reviewGroupToNotify = review.getReviewStage();
         List<Member> membersToNotify = memberService.getMembersByReviewGroup(reviewGroupToNotify).stream()
@@ -84,7 +84,7 @@ public class UpdateTaskStatusTransactionScript {
         }
     }
 
-    private void taskInReviewAuthorNotify(Review review) throws TelegramApiException {
+    private void taskInReviewAuthorNotify(Review review) {
         String authorChatId = review.getTask().getAuthor().getChatId();
         String reviewerLogin = review.getMemberReviews().stream()
             .filter(memberReview -> isNull(memberReview.getEndTime()))
@@ -101,7 +101,7 @@ public class UpdateTaskStatusTransactionScript {
 
     }
 
-    private void taskInProgressAuthorNotify(Review review) throws TelegramApiException {
+    private void taskInProgressAuthorNotify(Review review) {
         String authorChatId = review.getTask().getAuthor().getChatId();
 
         List<String> membersChatIdsToNotify = memberService.getOmniMembers().stream().map(Member::getChatId).collect(toList());
@@ -113,7 +113,7 @@ public class UpdateTaskStatusTransactionScript {
         }
     }
 
-    private void taskApprovedAuthorNotify(Review review) throws TelegramApiException {
+    private void taskApprovedAuthorNotify(Review review) {
         String authorChatId = review.getTask().getAuthor().getChatId();
 
         List<String> membersChatIdsToNotify = memberService.getOmniMembers().stream().map(Member::getChatId).collect(toList());
@@ -125,7 +125,7 @@ public class UpdateTaskStatusTransactionScript {
         }
     }
 
-    private void taskForceClosedNotify(Review review) throws TelegramApiException {
+    private void taskForceClosedNotify(Review review) {
         String authorLogin = review.getTask().getAuthor().getLogin();
         List<Member> allMembers = memberService.getAllMembers();
         for (Member member : allMembers) {

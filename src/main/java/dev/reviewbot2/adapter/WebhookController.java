@@ -1,4 +1,4 @@
-package dev.reviewbot2.webhook;
+package dev.reviewbot2.adapter;
 
 import dev.reviewbot2.processor.TelegramBot;
 import lombok.AllArgsConstructor;

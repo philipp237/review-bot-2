@@ -1,9 +1,7 @@
 package dev.reviewbot2.app.api;
 
-import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
+import dev.reviewbot2.domain.MessageInfo;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 /**
  * Сервис для взаимодействия с telegram bots api
@@ -13,129 +11,127 @@ public interface UpdateService {
     /**
      * Удаление предыдущего сообщения
      *
-     * @param update обновление, в котором содержится сообщение для удаления
+     * @param messageInfo обновление, в котором содержится сообщение для удаления
      */
-    void deletePreviousMessage(Update update) throws TelegramApiException;
+    void deletePreviousMessage(MessageInfo messageInfo);
 
     /**
      * Обработка ссылки на задачу
      *
-     * @param update обновление, в котором содержится сообщение с ссылкой на задачу
+     * @param messageInfo обновление, в котором содержится сообщение с ссылкой на задачу
      * @return сообщение для отправки
      */
-    SendMessage processTaskLink(Update update) throws TelegramApiException;
+    SendMessage processTaskLink(MessageInfo messageInfo);
 
     /**
      * Взять задачу в ревью
      *
-     * @param update обновление, в котором содержится сообщение с командой взятия задачи в ревью
+     * @param messageInfo обновление, в котором содержится сообщение с командой взятия задачи в ревью
      * @return сообщение с возможными действиями с задачей или список задач для ревью, если не был передан id задачи,
      * которую берут в ревью
      */
-    SendMessage takeInReview(Update update) throws TelegramApiException;
+    SendMessage takeInReview(MessageInfo messageInfo);
 
     /**
      * Подтвердить взятие задачи в ревью
      *
-     * @param update обновление, в котором содержится сообщение с командой подтверждения взятия задачи в ревью
+     * @param messageInfo обновление, в котором содержится сообщение с командой подтверждения взятия задачи в ревью
      * @return сообщение о взятии задачи в ревью
      */
-    SendMessage acceptReview(Update update) throws TelegramApiException;
+    SendMessage acceptReview(MessageInfo messageInfo);
 
     /**
      * Завершить ревью
      *
-     * @param udpate обновление, в котором содержится сообщение с командой подтверждения завершения ревью
+     * @param messageInfo обновление, в котором содержится сообщение с командой подтверждения завершения ревью
      * @param isApproved резолюция окончания ревью
      * @return сообщение о завершении ревью
      */
-    SendMessage completeReview(Update udpate, boolean isApproved) throws TelegramApiException;
+    SendMessage completeReview(MessageInfo messageInfo, boolean isApproved);
 
     /**
      * Отправить задачу на ревью
      *
-     * @param update обновление, в котором содержится сообщение с командой отправки задачи на ревью
+     * @param messageInfo обновление, в котором содержится сообщение с командой отправки задачи на ревью
      * @return сообщение об отправке задачи на ревью
      */
-    SendMessage submitForReview(Update update) throws TelegramApiException;
+    SendMessage submitForReview(MessageInfo messageInfo);
 
     /**
      * Закрыть задачу
      *
-     * @param update обновление, в котором содержится сообщение с командой закрытия задачи
+     * @param messageInfo обновление, в котором содержится сообщение с командой закрытия задачи
      * @return сообщение о закрытии задачи
      */
-    SendMessage closeTask(Update update) throws TelegramApiException;
+    SendMessage closeTask(MessageInfo messageInfo);
 
     /**
      * Возвращает список доступных действий
      *
-     * @param update обновление, в котором содержится сообщение с командой вызова возможных действий
+     * @param messageInfo обновление, в котором содержится сообщение с командой вызова возможных действий
      * @return сообщение со списком возможных действий
      */
-    SendMessage start(Update update) throws TelegramApiException;
+    SendMessage start(MessageInfo messageInfo);
 
     /**
      * Отправляет сообщение с подсказкой о создании задачи
      *
-     * @param update обновление, в котором содержится сообщение о создании задачи
+     * @param messageInfo обновление, в котором содержится сообщение о создании задачи
      * @return сообщение с подсказкой о создании задачи
      */
-    SendMessage createTask(Update update) throws TelegramApiException;
+    SendMessage createTask(MessageInfo messageInfo);
 
     /**
      * Получить список ревью пользователя
      *
-     * @param update обновление, в котором содержится сообщение с командой получения своего списка ревью
+     * @param messageInfo обновление, в котором содержится сообщение с командой получения своего списка ревью
      * @return сообщение со списком ревью пользователя
      */
-    SendMessage getMemberReviews(Update update) throws TelegramApiException;
+    SendMessage getMemberReviews(MessageInfo messageInfo);
 
     /**
      * Обновить логин пользователя
      *
-     * @param chatId идентификатор чата
-     * @param login новый логин пользователя
+     * @param messageInfo cообщение с новым логином пользователя
      */
-    void updateMemberLogin(String chatId, String login);
+    void updateMemberLogin(MessageInfo messageInfo);
 
     /**
      * Обновить идентификатор чата пользователя
      *
-     * @param chatId идентификатор чата
-     * @param login новый логин пользователя
+     * @param messageInfo cообщение с новым ID чата пользователя
      */
-    void updateChatId(String chatId, String login);
+    void updateChatId(MessageInfo messageInfo);
 
     /**
      * Получить список задач пользователя
      *
-     * @param update обновление, в котором содержится сообщение с командой получения своих задач
+     * @param messageInfo обновление, в котором содержится сообщение с командой получения своих задач
      * @return список задач пользователя
      */
-    SendMessage getMemberTasks(Update update) throws TelegramApiException;
+    SendMessage getMemberTasks(MessageInfo messageInfo);
 
     /**
      * Добавить пользователя в базу данных
      *
-     * @param update обновление, в котором содержится сообщение с логином пользователя
+     * @param messageInfo обновление, в котором содержится сообщение с логином пользователя
      * @return сообщение с подсказкой о добавлении пользователя
      */
-    SendMessage addMember(Update update) throws TelegramApiException;
+    SendMessage addMember(MessageInfo messageInfo);
 
     /**
      * Изменить группу ревью пользователя
      *
-     * @param update обновление, в котором содержится сообщение с логином и необязательно с группой ревью пользователя
+     * @param messageInfo обновление, в котором содержится сообщение с логином и необязательно с группой ревью пользователя
      * @return сообщение с подсказкой о изменении группы ревью пользователя или с предложением ввести группу ревью
      */
-    SendMessage updateMember(Update update) throws TelegramApiException;
+    SendMessage updateMember(MessageInfo messageInfo);
 
     /**
      * Получить информацию о задаче
      *
-     * @param update обновление, в котором содержится сообщение с командой получения информации о задаче
+     * @param messageInfo обновление, в котором содержится сообщение с командой получения информации о задаче
      * @return сообщение с информацией о задаче и возможных действиях
      */
-    SendMessage getTaskInfo(Update update) throws TelegramApiException;
+    SendMessage getTaskInfo(MessageInfo messageInfo);
 }

@@ -2,15 +2,14 @@ package dev.reviewbot2.ts;
 
 import dev.reviewbot2.AbstractUnitTest;
 import dev.reviewbot2.app.impl.ts.GetStartMessageTransactionScript;
+import dev.reviewbot2.domain.MessageInfo;
 import dev.reviewbot2.domain.member.Member;
 import dev.reviewbot2.mock.MemberServiceMock;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -49,15 +48,15 @@ public class GetStartMessageTest extends AbstractUnitTest {
     }
 
     @Test
-    void happyPath() throws TelegramApiException {
+    void happyPath() {
         String memberChatId = MEMBER_1_CHAT_ID;
         Member member = getMember(memberChatId, FIRST_REVIEW_GROUP, false, false);
 
-        Update update = getUpdateWithCallbackQuery("/start", memberChatId);
+        MessageInfo messageInfo = getSimpleMessageInfo(memberChatId, "/start");
 
         memberServiceMock.mockGetMemberByChatId(member);
 
-        SendMessage startMessage = getStartMessage.execute(update);
+        SendMessage startMessage = getStartMessage.execute(messageInfo);
 
         List<List<InlineKeyboardButton>> keyboard = ((InlineKeyboardMarkup) startMessage.getReplyMarkup()).getKeyboard();
         assertEquals(4, keyboard.size());
@@ -65,15 +64,15 @@ public class GetStartMessageTest extends AbstractUnitTest {
     }
 
     @Test
-    void happyPath_omni() throws TelegramApiException {
+    void happyPath_omni() {
         String memberChatId = MEMBER_1_CHAT_ID;
         Member member = getMember(memberChatId, FIRST_REVIEW_GROUP, false, true);
 
-        Update update = getUpdateWithCallbackQuery("/start", memberChatId);
+        MessageInfo messageInfo = getSimpleMessageInfo(memberChatId, "/start");
 
         memberServiceMock.mockGetMemberByChatId(member);
 
-        SendMessage startMessage = getStartMessage.execute(update);
+        SendMessage startMessage = getStartMessage.execute(messageInfo);
 
         List<List<InlineKeyboardButton>> keyboard = ((InlineKeyboardMarkup) startMessage.getReplyMarkup()).getKeyboard();
         assertEquals(6, keyboard.size());

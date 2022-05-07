@@ -2,11 +2,8 @@ package dev.reviewbot2.processor;
 
 import lombok.extern.slf4j.Slf4j;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.objects.Message;
-import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.time.Instant;
 import java.time.ZoneId;
@@ -27,29 +24,6 @@ public class Utils {
         sendMessage.text(text);
         sendMessage.replyMarkup(keyboard);
         return sendMessage.build();
-    }
-
-    public static boolean updateHasMessage(Update update) throws TelegramApiException {
-        return getMessageFromUpdate(update) != null;
-    }
-
-    public static String getTextFromUpdate(Update update) throws TelegramApiException {
-        if (update.hasCallbackQuery()) {
-            return update.getCallbackQuery().getData();
-        }
-        return getMessageFromUpdate(update).getText();
-    }
-
-    public static String getChatId(Update update) throws TelegramApiException {
-        return getMessageFromUpdate(update).getChatId().toString();
-    }
-
-    public static int getMessageId(Update update) throws TelegramApiException {
-        return getMessageFromUpdate(update).getMessageId();
-    }
-
-    public static String getLoginFromUpdate(Update update) throws TelegramApiException {
-        return getMessageFromUpdate(update).getFrom().getUserName();
     }
 
     public static InlineKeyboardMarkup getKeyboard(int rows) {
@@ -83,18 +57,5 @@ public class Utils {
         return Long.parseLong(taskId);
     }
 
-    // ================================================================================================================
-    //  Implementation
-    // ================================================================================================================
 
-    private static Message getMessageFromUpdate(Update update) throws TelegramApiException {
-        if (update.hasCallbackQuery()) {
-            return update.getCallbackQuery().getMessage();
-        } else if (update.hasMessage()) {
-            return update.getMessage();
-        } else {
-            log.error("Update with id={} has no message", update.getUpdateId());
-            throw new TelegramApiException("Update has no message");
-        }
-    }
 }

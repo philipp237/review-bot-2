@@ -7,7 +7,7 @@ import dev.reviewbot2.app.impl.camunda.ProcessAccessor;
 import dev.reviewbot2.domain.member.Member;
 import dev.reviewbot2.domain.review.Review;
 import dev.reviewbot2.domain.task.Task;
-import dev.reviewbot2.webhook.WebhookRestClient;
+import dev.reviewbot2.adapter.WebhookRestClient;
 import lombok.RequiredArgsConstructor;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
@@ -28,7 +28,7 @@ public class SendNotificationDelegate implements JavaDelegate {
     private final WebhookRestClient webhookRestClient;
 
     @Override
-    public void execute(DelegateExecution execution) throws Exception {
+    public void execute(DelegateExecution execution) {
         String taskUuid = processAccessor.getTaskUuid(execution);
         Task task = taskService.getTaskByUuid(taskUuid);
         Review review = reviewService.getReviewByTask(task);

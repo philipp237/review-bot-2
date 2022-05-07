@@ -1,10 +1,10 @@
 package dev.reviewbot2.exceptions;
 
-import org.telegram.telegrambots.meta.api.objects.Update;
+import dev.reviewbot2.domain.MessageInfo;
 
 public class NotRequiredReviewGroupException extends ReviewBotException {
 
-    public NotRequiredReviewGroupException(Update update) {
-        super(update);
+    public NotRequiredReviewGroupException(MessageInfo messageInfo) {
+        super(messageInfo);
     }
 }

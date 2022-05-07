@@ -3,16 +3,15 @@ package dev.reviewbot2.app.impl;
 import dev.reviewbot2.app.api.UpdateService;
 import dev.reviewbot2.app.impl.ts.*;
 import dev.reviewbot2.config.Config;
+import dev.reviewbot2.domain.MessageInfo;
 import dev.reviewbot2.domain.task.TaskType;
-import dev.reviewbot2.webhook.WebhookRestClient;
+import dev.reviewbot2.adapter.WebhookRestClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
-import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import static dev.reviewbot2.processor.Utils.*;
 
@@ -39,18 +38,18 @@ public class UpdateServiceImpl implements UpdateService {
     private final GetStartMessageTransactionScript getStartMessage;
 
     @Override
-    public void deletePreviousMessage(Update update) throws TelegramApiException {
-        Integer messageId = getMessageId(update);
-        String chatId = getChatId(update);
+    public void deletePreviousMessage(MessageInfo messageInfo) {
+        Integer messageId = messageInfo.getMessageId();
+        String chatId = messageInfo.getChatId();
 
         DeleteMessage deleteMessage = getDeleteMessage(chatId, messageId);
         webhookRestClient.deleteMessage(deleteMessage);
     }
 
     @Override
-    public SendMessage processTaskLink(Update update) throws TelegramApiException {
-        String chatId = getChatId(update);
-        String link = getTextFromUpdate(update);
+    public SendMessage processTaskLink(MessageInfo messageInfo) {
+        String chatId = messageInfo.getChatId();
+        String link = messageInfo.getText();
         String taskName = getTaskNameFromLink(link);
 
         validateTaskName(taskName);
@@ -64,80 +63,79 @@ public class UpdateServiceImpl implements UpdateService {
         InlineKeyboardMarkup keyboard = getKeyboard(TaskType.values().length);
         fillKeyboardWithTaskTypes(keyboard, link);
 
-        String TASK_TYPE_CHOOSE_HINT = "Выберите тип задачи";
-        return sendMessage(chatId, TASK_TYPE_CHOOSE_HINT, keyboard);
+        return sendMessage(chatId, "Выберите тип задачи", keyboard);
     }
 
     @Override
-    public SendMessage takeInReview(Update update) throws TelegramApiException {
-        return takeInReview.execute(update);
+    public SendMessage takeInReview(MessageInfo messageInfo) {
+        return takeInReview.execute(messageInfo);
     }
 
     @Override
-    public SendMessage acceptReview(Update update) throws TelegramApiException {
-        return acceptReview.execute(update);
+    public SendMessage acceptReview(MessageInfo messageInfo) {
+        return acceptReview.execute(messageInfo);
     }
 
     @Override
-    public SendMessage completeReview(Update update, boolean isApproved) throws TelegramApiException {
-        return completeReview.execute(update, isApproved);
+    public SendMessage completeReview(MessageInfo messageInfo, boolean isApproved) {
+        return completeReview.execute(messageInfo, isApproved);
     }
 
     @Override
-    public SendMessage submitForReview(Update update) throws TelegramApiException {
-        return submitForReview.execute(update);
+    public SendMessage submitForReview(MessageInfo messageInfo) {
+        return submitForReview.execute(messageInfo);
     }
 
     @Override
-    public SendMessage closeTask(Update update) throws TelegramApiException {
-        return closeTask.execute(update);
+    public SendMessage closeTask(MessageInfo messageInfo) {
+        return closeTask.execute(messageInfo);
     }
 
     @Override
-    public SendMessage start(Update update) throws TelegramApiException {
-        return getStartMessage.execute(update);
+    public SendMessage start(MessageInfo messageInfo) {
+        return getStartMessage.execute(messageInfo);
     }
 
     @Override
-    public SendMessage createTask(Update update) throws TelegramApiException {
-        String chatId = getChatId(update);
+    public SendMessage createTask(MessageInfo messageInfo) {
+        String chatId = messageInfo.getChatId();
 
         return sendMessage(chatId, "Вставь ссылку на задачу");
     }
 
     @Override
-    public SendMessage getMemberReviews(Update update) throws TelegramApiException {
-        return getMemberReviews.execute(update);
+    public SendMessage getMemberReviews(MessageInfo messageInfo) {
+        return getMemberReviews.execute(messageInfo);
     }
 
     @Override
-    public void updateMemberLogin(String chatId, String login) {
-        updateLogin.execute(chatId, login);
+    public void updateMemberLogin(MessageInfo messageInfo) {
+        updateLogin.execute(messageInfo);
     }
 
     @Override
-    public void updateChatId(String chatId, String login) {
-        updateChatId.execute(chatId, login);
+    public void updateChatId(MessageInfo messageInfo) {
+        updateChatId.execute(messageInfo);
     }
 
     @Override
-    public SendMessage getMemberTasks(Update update) throws TelegramApiException {
-        return getMemberTasks.execute(update);
+    public SendMessage getMemberTasks(MessageInfo messageInfo) {
+        return getMemberTasks.execute(messageInfo);
     }
 
     @Override
-    public SendMessage addMember(Update update) throws TelegramApiException {
-        return addMember.execute(update);
+    public SendMessage addMember(MessageInfo messageInfo) {
+        return addMember.execute(messageInfo);
     }
 
     @Override
-    public SendMessage updateMember(Update update) throws TelegramApiException {
-        return updateMember.execute(update);
+    public SendMessage updateMember(MessageInfo messageInfo) {
+        return updateMember.execute(messageInfo);
     }
 
     @Override
-    public SendMessage getTaskInfo(Update update) throws TelegramApiException {
-        return getTaskInfo.execute(update);
+    public SendMessage getTaskInfo(MessageInfo messageInfo) {
+        return getTaskInfo.execute(messageInfo);
     }
 
     // ================================================================================================================
@@ -167,9 +165,9 @@ public class UpdateServiceImpl implements UpdateService {
         return TaskType.valueOf(parsedUrl[parsedUrl.length - 1]);
     }
 
-    private void validateTaskName(String taskName) throws TelegramApiException {
+    private void validateTaskName(String taskName) {
         if (config.getDASHBOARDS().stream().noneMatch(taskName::contains)) {
-            throw new TelegramApiException("Incorrect task name " + taskName);
+            throw new IllegalArgumentException("Incorrect task name " + taskName);
         }
     }
 

@@ -5,6 +5,7 @@ import dev.reviewbot2.app.api.MemberService;
 import dev.reviewbot2.app.api.ReviewService;
 import dev.reviewbot2.app.api.TaskService;
 import dev.reviewbot2.app.impl.camunda.ProcessAccessor;
+import dev.reviewbot2.domain.MessageInfo;
 import dev.reviewbot2.domain.member.Member;
 import dev.reviewbot2.domain.review.MemberReview;
 import dev.reviewbot2.domain.review.Review;
@@ -15,8 +16,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+
+import javax.transaction.Transactional;
 
 import static dev.reviewbot2.domain.task.TaskStatus.IN_REVIEW;
 import static dev.reviewbot2.processor.Utils.*;
@@ -32,9 +33,10 @@ public class CompleteReviewTransactionScript {
     private final MemberReviewService memberReviewService;
     private final ProcessAccessor processAccessor;
 
-    public SendMessage execute(Update update, boolean isApproved) throws TelegramApiException {
-        String text = getTextFromUpdate(update);
-        String chatId = getChatId(update);
+    @Transactional
+    public SendMessage execute(MessageInfo messageInfo, boolean isApproved) {
+        String text = messageInfo.getText();
+        String chatId = messageInfo.getChatId();
 
         Long taskId = getTaskIdFromText(text);
 
@@ -43,8 +45,8 @@ public class CompleteReviewTransactionScript {
         Review review = reviewService.getReviewByTask(task);
         MemberReview memberReview = memberReviewService.getActiveReview(review);
 
-        validateStatus(update, reviewer, review);
-        validateReviewer(update, reviewer, review, memberReview);
+        validateStatus(messageInfo, reviewer, review);
+        validateReviewer(messageInfo, reviewer, review, memberReview);
 
         memberReview.setEndTime(now());
         memberReviewService.save(memberReview);
@@ -60,19 +62,19 @@ public class CompleteReviewTransactionScript {
     //  Implementation
     // ================================================================================================================
 
-    private void validateStatus(Update update, Member reviewer, Review review) {
+    private void validateStatus(MessageInfo messageInfo, Member reviewer, Review review) {
         if (isStatusInvalid(review)) {
             log.info("Member {} tries to complete review with id={}, but task not in review",
                 reviewer.getLogin(), review.getId());
-            throw new NotRequiredTaskStatusException(update);
+            throw new NotRequiredTaskStatusException(messageInfo);
         }
     }
 
-    private void validateReviewer(Update update, Member reviewer, Review review, MemberReview memberReview) {
+    private void validateReviewer(MessageInfo messageInfo, Member reviewer, Review review, MemberReview memberReview) {
         if (isSameReviewer(reviewer, memberReview)) {
             log.info("Member {} tries to complete review with id={} authored by {}",
                 reviewer.getLogin(), review.getId(), memberReview.getReviewer().getLogin());
-            throw new NotSameReviewerException(update);
+            throw new NotSameReviewerException(messageInfo);
         }
     }
 

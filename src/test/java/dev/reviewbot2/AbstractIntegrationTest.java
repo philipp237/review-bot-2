@@ -7,7 +7,7 @@ import dev.reviewbot2.repository.MemberRepository;
 import dev.reviewbot2.repository.MemberReviewRepository;
 import dev.reviewbot2.repository.ReviewRepository;
 import dev.reviewbot2.repository.TaskRepository;
-import dev.reviewbot2.webhook.WebhookRestClient;
+import dev.reviewbot2.adapter.WebhookRestClient;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.OptimisticLockingException;
 import org.camunda.bpm.engine.RepositoryService;
@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
 import static dev.reviewbot2.processor.Command.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest("ReveiwBot2Application")
+@SpringBootTest("ReviewBot2Application")
 @AutoConfigureMockMvc
 public abstract class AbstractIntegrationTest extends AbstractTest {
 
@@ -99,33 +99,33 @@ public abstract class AbstractIntegrationTest extends AbstractTest {
     }
 
     protected SendMessage performTakeInReview(String chatId, TaskType taskType, int reviewGroup, Long taskId) throws Exception {
-        Update update = getUpdateWithCallbackQuery(String.format(COMMAND, TAKE_IN_REVIEW, taskId), chatId);
+        Update update = getUpdateWithCallbackQuery(getCommand(TAKE_IN_REVIEW, taskId), chatId);
 
         return performUpdateReceived(update);
     }
 
     protected void performAcceptReview(String chatId, Long taskId) throws Exception {
-        Update update = getUpdateWithCallbackQuery(String.format(COMMAND, ACCEPT_REVIEW, taskId), chatId);
+        Update update = getUpdateWithCallbackQuery(getCommand(ACCEPT_REVIEW, taskId), chatId);
         performUpdateReceived(update);
     }
 
     protected void performApprove(String chatId, Long taskId) throws Exception {
-        Update update = getUpdateWithCallbackQuery(String.format(COMMAND, APPROVE, taskId), chatId);
+        Update update = getUpdateWithCallbackQuery(getCommand(APPROVE, taskId), chatId);
         performUpdateReceived(update);
     }
 
     protected void performDecline(String chatId, Long taskId) throws Exception {
-        Update update = getUpdateWithCallbackQuery(String.format(COMMAND, DECLINE, taskId), chatId);
+        Update update = getUpdateWithCallbackQuery(getCommand(DECLINE, taskId), chatId);
         performUpdateReceived(update);
     }
 
     protected void performSubmit(String chatId, Long taskId) throws Exception {
-        Update update = getUpdateWithCallbackQuery(String.format(COMMAND, SUBMIT, taskId), chatId);
+        Update update = getUpdateWithCallbackQuery(getCommand(SUBMIT, taskId), chatId);
         performUpdateReceived(update);
     }
 
     protected void performClose(String chatId, Long taskId) throws Exception {
-        Update update = getUpdateWithCallbackQuery(String.format(COMMAND, CLOSE, taskId), chatId);
+        Update update = getUpdateWithCallbackQuery(getCommand(CLOSE, taskId), chatId);
         performUpdateReceived(update);
     }
 

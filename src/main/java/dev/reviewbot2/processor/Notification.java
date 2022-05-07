@@ -4,13 +4,12 @@ import dev.reviewbot2.app.api.MemberService;
 import dev.reviewbot2.app.api.ReviewService;
 import dev.reviewbot2.domain.member.Member;
 import dev.reviewbot2.domain.review.Review;
-import dev.reviewbot2.webhook.WebhookRestClient;
+import dev.reviewbot2.adapter.WebhookRestClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.List;
 
@@ -36,7 +35,7 @@ public class Notification {
     private final WebhookRestClient webhookRestClient;
 
     @Scheduled(cron = NOTIFY_CRON)
-    private void notifyReviewers() throws TelegramApiException {
+    private void notifyReviewers() {
         List<Member> allMembers = memberService.getAllMembers();
 
         List<Review> allReviews = reviewService.getAllReviewsForTaskReadyForReview();

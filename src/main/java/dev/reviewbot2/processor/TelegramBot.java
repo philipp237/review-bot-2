@@ -1,13 +1,14 @@
 package dev.reviewbot2.processor;
 
+import dev.reviewbot2.adapter.Mapper;
 import dev.reviewbot2.config.Config;
+import dev.reviewbot2.domain.MessageInfo;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramWebhookBot;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 @Slf4j
 @Component
@@ -15,15 +16,13 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 public class TelegramBot extends TelegramWebhookBot {
     private final Config config;
     private final MessageProcessor messageProcessor;
+    private final Mapper mapper;
 
     @Override
     public BotApiMethod<?> onWebhookUpdateReceived(Update update) {
-        try {
-            return messageProcessor.processMessage(update);
-        } catch (TelegramApiException e) {
-            log.error(e.getMessage(), e);
-            return null;
-        }
+        MessageInfo messageInfo = mapper.mapToMessageInfo(update);
+        return messageProcessor.processMessage(messageInfo);
+
     }
 
     @Override

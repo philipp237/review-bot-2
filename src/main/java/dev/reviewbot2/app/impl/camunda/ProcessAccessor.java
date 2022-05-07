@@ -3,7 +3,6 @@ package dev.reviewbot2.app.impl.camunda;
 import lombok.RequiredArgsConstructor;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.MessageCorrelationBuilder;
 import org.springframework.stereotype.Component;
 
@@ -71,7 +70,7 @@ public class ProcessAccessor {
     //  Implementation
     // ================================================================================================================
 
-    private Execution correlateProcess(MessageCorrelationBuilder correlation) {
-        return correlation.correlateWithResult().getExecution();
+    private void correlateProcess(MessageCorrelationBuilder correlation) {
+        correlation.correlateWithResult().getExecution();
     }
 }

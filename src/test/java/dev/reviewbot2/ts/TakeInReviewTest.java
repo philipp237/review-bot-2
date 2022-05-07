@@ -2,6 +2,7 @@ package dev.reviewbot2.ts;
 
 import dev.reviewbot2.AbstractUnitTest;
 import dev.reviewbot2.app.impl.ts.TakeInReviewTransactionScript;
+import dev.reviewbot2.domain.MessageInfo;
 import dev.reviewbot2.domain.member.Member;
 import dev.reviewbot2.domain.review.Review;
 import dev.reviewbot2.exceptions.NotRequiredReviewGroupException;
@@ -11,9 +12,7 @@ import dev.reviewbot2.mock.TaskServiceMock;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -45,86 +44,86 @@ public class TakeInReviewTest extends AbstractUnitTest {
     }
 
     @Test
-    void execute_firstGroupReviewer_taskInfo() throws TelegramApiException {
+    void execute_firstGroupReviewer_taskInfo() {
         Member reviewer = getMember(MEMBER_2_CHAT_ID, FIRST_REVIEW_GROUP, false, false);
-        Update update = getUpdateWithCallbackQuery(String.format(COMMAND, TAKE_IN_REVIEW, review1.getTask().getId()), MEMBER_2_CHAT_ID);
+        MessageInfo messageInfo = getSimpleMessageInfo(MEMBER_2_CHAT_ID, getCommand(TAKE_IN_REVIEW, review1.getTask().getId()));
 
         memberServiceMock.mockGetMemberByChatId(reviewer);
         taskServiceMock.mockGetTaskById(review1.getTask());
 
-        SendMessage sendMessage = takeInReview.execute(update);
+        SendMessage sendMessage = takeInReview.execute(messageInfo);
 
         assertEquals(2, ((InlineKeyboardMarkup) sendMessage.getReplyMarkup()).getKeyboard().size());
         assertEquals("/" + TAKE_IN_REVIEW,
             ((InlineKeyboardMarkup) sendMessage.getReplyMarkup()).getKeyboard().get(0).get(0).getCallbackData());
-        assertEquals(String.format(COMMAND, ACCEPT_REVIEW, review1.getTask().getId()),
+        assertEquals(getCommand(ACCEPT_REVIEW, review1.getTask().getId()),
             ((InlineKeyboardMarkup) sendMessage.getReplyMarkup()).getKeyboard().get(1).get(0).getCallbackData());
     }
 
     @Test
-    void execute_firstGroupReviewer_reviewList() throws TelegramApiException {
+    void execute_firstGroupReviewer_reviewList() {
         Member reviewer = getMember(MEMBER_2_CHAT_ID, FIRST_REVIEW_GROUP, false, false);
-        Update update = getUpdateWithCallbackQuery("/" + TAKE_IN_REVIEW, MEMBER_2_CHAT_ID);
+        MessageInfo messageInfo = getSimpleMessageInfo(MEMBER_2_CHAT_ID, "/" + TAKE_IN_REVIEW);
         List<Review> reviews = Stream.of(review1, review2).collect(toList());
 
         memberServiceMock.mockGetMemberByChatId(reviewer);
         reviewServiceMock.mockGetReview(reviews);
 
-        SendMessage sendMessage = takeInReview.execute(update);
+        SendMessage sendMessage = takeInReview.execute(messageInfo);
 
         assertEquals(2, ((InlineKeyboardMarkup) sendMessage.getReplyMarkup()).getKeyboard().size());
-        assertEquals(String.format(COMMAND, TAKE_IN_REVIEW, reviews.get(0).getTask().getId()),
+        assertEquals(getCommand(TAKE_IN_REVIEW, reviews.get(0).getTask().getId()),
             ((InlineKeyboardMarkup) sendMessage.getReplyMarkup()).getKeyboard().get(0).get(0).getCallbackData());
-        assertEquals(String.format(COMMAND, TAKE_IN_REVIEW, reviews.get(1).getTask().getId()),
+        assertEquals(getCommand(TAKE_IN_REVIEW, reviews.get(1).getTask().getId()),
             ((InlineKeyboardMarkup) sendMessage.getReplyMarkup()).getKeyboard().get(1).get(0).getCallbackData());
     }
 
     @Test
-    void execute_secondGroupReviewer_taskInfo() throws TelegramApiException {
+    void execute_secondGroupReviewer_taskInfo() {
         Member reviewer = getMember(MEMBER_2_CHAT_ID, SECOND_REVIEW_GROUP, false, false);
-        Update update = getUpdateWithCallbackQuery(String.format(COMMAND, TAKE_IN_REVIEW, review3.getTask().getId()), MEMBER_2_CHAT_ID);
+        MessageInfo messageInfo = getSimpleMessageInfo(MEMBER_2_CHAT_ID, getCommand(TAKE_IN_REVIEW, review3.getTask().getId()));
 
         memberServiceMock.mockGetMemberByChatId(reviewer);
         taskServiceMock.mockGetTaskById(review3.getTask());
 
-        SendMessage sendMessage = takeInReview.execute(update);
+        SendMessage sendMessage = takeInReview.execute(messageInfo);
 
         assertEquals(2, ((InlineKeyboardMarkup) sendMessage.getReplyMarkup()).getKeyboard().size());
         assertEquals("/" + TAKE_IN_REVIEW,
             ((InlineKeyboardMarkup) sendMessage.getReplyMarkup()).getKeyboard().get(0).get(0).getCallbackData());
-        assertEquals(String.format(COMMAND, ACCEPT_REVIEW, review3.getTask().getId()),
+        assertEquals(getCommand(ACCEPT_REVIEW, review3.getTask().getId()),
             ((InlineKeyboardMarkup) sendMessage.getReplyMarkup()).getKeyboard().get(1).get(0).getCallbackData());
     }
 
     @Test
-    void execute_secondGroupReviewerAndDesign_reviewList() throws TelegramApiException {
+    void execute_secondGroupReviewerAndDesign_reviewList() {
         Member reviewer = getMember(MEMBER_2_CHAT_ID, SECOND_REVIEW_GROUP, true, false);
-        Update update = getUpdateWithCallbackQuery("/" + TAKE_IN_REVIEW, MEMBER_2_CHAT_ID);
+        MessageInfo messageInfo = getSimpleMessageInfo(MEMBER_2_CHAT_ID, "/" + TAKE_IN_REVIEW);
         List<Review> reviews = Stream.of(review3, review4).collect(toList());
 
         memberServiceMock.mockGetMemberByChatId(reviewer);
         reviewServiceMock.mockGetReview(reviews);
 
-        SendMessage sendMessage = takeInReview.execute(update);
+        SendMessage sendMessage = takeInReview.execute(messageInfo);
 
         assertEquals(2, ((InlineKeyboardMarkup) sendMessage.getReplyMarkup()).getKeyboard().size());
-        assertEquals(String.format(COMMAND, TAKE_IN_REVIEW, reviews.get(0).getTask().getId()),
+        assertEquals(getCommand(TAKE_IN_REVIEW, reviews.get(0).getTask().getId()),
             ((InlineKeyboardMarkup) sendMessage.getReplyMarkup()).getKeyboard().get(0).get(0).getCallbackData());
-        assertEquals(String.format(COMMAND, TAKE_IN_REVIEW, reviews.get(1).getTask().getId()),
+        assertEquals(getCommand(TAKE_IN_REVIEW, reviews.get(1).getTask().getId()),
             ((InlineKeyboardMarkup) sendMessage.getReplyMarkup()).getKeyboard().get(1).get(0).getCallbackData());
     }
 
     @Test
-    void execute_emptyReviewList() throws TelegramApiException {
+    void execute_emptyReviewList() {
         String memberChatId = MEMBER_1_CHAT_ID;
         Member reviewer = getMember(memberChatId, FIRST_REVIEW_GROUP, false, false);
-        Update update = getUpdateWithCallbackQuery("/" + TAKE_IN_REVIEW, memberChatId);
+        MessageInfo messageInfo = getSimpleMessageInfo(memberChatId, "/" + TAKE_IN_REVIEW);
         List<Review> reviews = Stream.of(review1, review2).collect(toList());
 
         memberServiceMock.mockGetMemberByChatId(reviewer);
         reviewServiceMock.mockGetReview(reviews);
 
-        SendMessage sendMessage = takeInReview.execute(update);
+        SendMessage sendMessage = takeInReview.execute(messageInfo);
 
         assertEquals("Нет доступных для ревью задач", sendMessage.getText());
     }
@@ -132,11 +131,11 @@ public class TakeInReviewTest extends AbstractUnitTest {
     @Test
     void execute_nonReviewer() {
         Member member = getMember(MEMBER_2_CHAT_ID, NON_REVIEWER, false, false);
-        Update update = getUpdateWithCallbackQuery(String.format(COMMAND, TAKE_IN_REVIEW, review1.getTask().getId()), MEMBER_2_CHAT_ID);
+        MessageInfo messageInfo = getSimpleMessageInfo(MEMBER_2_CHAT_ID, getCommand(TAKE_IN_REVIEW, review1.getTask().getId()));
 
         memberServiceMock.mockGetMemberByChatId(member);
         taskServiceMock.mockGetTaskById(review1.getTask());
 
-        assertThrows(NotRequiredReviewGroupException.class, () -> takeInReview.execute(update));
+        assertThrows(NotRequiredReviewGroupException.class, () -> takeInReview.execute(messageInfo));
     }
 }

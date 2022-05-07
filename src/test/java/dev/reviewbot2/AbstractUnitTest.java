@@ -6,6 +6,7 @@ import dev.reviewbot2.app.api.ReviewService;
 import dev.reviewbot2.app.api.TaskService;
 import dev.reviewbot2.app.impl.camunda.ProcessAccessor;
 import dev.reviewbot2.config.Config;
+import dev.reviewbot2.domain.MessageInfo;
 import dev.reviewbot2.domain.member.Member;
 import dev.reviewbot2.domain.review.MemberReview;
 import dev.reviewbot2.domain.review.Review;
@@ -59,5 +60,19 @@ public abstract class AbstractUnitTest extends AbstractTest {
     @AfterEach
     void close() throws Exception {
         closeable.close();
+    }
+
+    protected MessageInfo getMessageInfo(int messageId, String chatId, String text, String login, boolean hasCallbackQuery) {
+        return MessageInfo.builder()
+            .messageId(messageId)
+            .chatId(chatId)
+            .text(text)
+            .login(login)
+            .hasCallbackQuery(hasCallbackQuery)
+            .build();
+    }
+
+    protected MessageInfo getSimpleMessageInfo(String chatId, String text) {
+        return getMessageInfo(1, chatId, text, LOGIN, false);
     }
 }

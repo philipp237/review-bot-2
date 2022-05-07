@@ -1,10 +1,10 @@
 package dev.reviewbot2.exceptions;
 
-import org.telegram.telegrambots.meta.api.objects.Update;
+import dev.reviewbot2.domain.MessageInfo;
 
 public class NoPermissionException extends ReviewBotException {
 
-    public NoPermissionException(Update update) {
-        super(update);
+    public NoPermissionException(MessageInfo messageInfo) {
+        super(messageInfo);
     }
 }

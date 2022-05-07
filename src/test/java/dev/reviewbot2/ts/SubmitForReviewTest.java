@@ -2,6 +2,7 @@ package dev.reviewbot2.ts;
 
 import dev.reviewbot2.AbstractUnitTest;
 import dev.reviewbot2.app.impl.ts.SubmitForReviewTransactionScript;
+import dev.reviewbot2.domain.MessageInfo;
 import dev.reviewbot2.domain.member.Member;
 import dev.reviewbot2.domain.task.Task;
 import dev.reviewbot2.exceptions.NotAuthorException;
@@ -12,8 +13,6 @@ import dev.reviewbot2.mock.TaskServiceMock;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import static dev.reviewbot2.domain.task.TaskStatus.*;
 import static dev.reviewbot2.domain.task.TaskType.IMPLEMENTATION;
@@ -37,19 +36,19 @@ public class SubmitForReviewTest extends AbstractUnitTest {
     }
 
     @Test
-    void execute() throws TelegramApiException {
+    void execute() {
         String chatId = MEMBER_1_CHAT_ID;
         Task task = getTask(IMPLEMENTATION, UUID_1, TASK_NAME_1, TASK_ID_1, chatId);
         task.setStatus(IN_PROGRESS);
         Member member = task.getAuthor();
-        Update update = getUpdateWithCallbackQuery(String.format(COMMAND, SUBMIT, task.getId()), chatId);
+        MessageInfo messageInfo = getSimpleMessageInfo(chatId, getCommand(SUBMIT, task.getId()));
 
         taskServiceMock.mockGetTaskById(task);
         taskServiceMock.mockSave(task);
         memberServiceMock.mockGetMemberByChatId(member);
         processAccessorMock.mockSubmitForReview();
 
-        SendMessage submitForReviewMessage = submitForReview.execute(update);
+        SendMessage submitForReviewMessage = submitForReview.execute(messageInfo);
 
         verify(taskService, times(1)).save(taskArgumentCaptor.capture());
 
@@ -63,14 +62,14 @@ public class SubmitForReviewTest extends AbstractUnitTest {
         Task task = getTask(IMPLEMENTATION, UUID_1, TASK_NAME_1, TASK_ID_1, MEMBER_1_CHAT_ID);
         task.setStatus(IN_PROGRESS);
         Member member = getMember(chatId, NON_REVIEWER, false, false);
-        Update update = getUpdateWithCallbackQuery(String.format(COMMAND, SUBMIT, task.getId()), chatId);
+        MessageInfo messageInfo = getSimpleMessageInfo(chatId, getCommand(SUBMIT, task.getId()));
 
         taskServiceMock.mockGetTaskById(task);
         taskServiceMock.mockSave(task);
         memberServiceMock.mockGetMemberByChatId(member);
         processAccessorMock.mockSubmitForReview();
 
-        assertThrows(NotAuthorException.class, () -> submitForReview.execute(update));
+        assertThrows(NotAuthorException.class, () -> submitForReview.execute(messageInfo));
     }
 
     @Test
@@ -79,13 +78,13 @@ public class SubmitForReviewTest extends AbstractUnitTest {
         Task task = getTask(IMPLEMENTATION, UUID_1, TASK_NAME_1, TASK_ID_1, chatId);
         task.setStatus(IN_REVIEW);
         Member member = task.getAuthor();
-        Update update = getUpdateWithCallbackQuery(String.format(COMMAND, SUBMIT, task.getId()), chatId);
+        MessageInfo messageInfo = getSimpleMessageInfo(chatId, getCommand(SUBMIT, task.getId()));
 
         taskServiceMock.mockGetTaskById(task);
         taskServiceMock.mockSave(task);
         memberServiceMock.mockGetMemberByChatId(member);
         processAccessorMock.mockSubmitForReview();
 
-        assertThrows(NotRequiredTaskStatusException.class, () -> submitForReview.execute(update));
+        assertThrows(NotRequiredTaskStatusException.class, () -> submitForReview.execute(messageInfo));
     }
 }

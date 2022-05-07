@@ -2,15 +2,16 @@ package dev.reviewbot2.app.impl.ts;
 
 import dev.reviewbot2.app.api.MemberService;
 import dev.reviewbot2.app.api.TaskService;
+import dev.reviewbot2.domain.MessageInfo;
 import dev.reviewbot2.domain.member.Member;
 import dev.reviewbot2.domain.task.Task;
 import dev.reviewbot2.exceptions.NotAuthorException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+
+import javax.transaction.Transactional;
 
 import static dev.reviewbot2.domain.task.TaskStatus.IN_PROGRESS;
 import static dev.reviewbot2.processor.Command.CLOSE;
@@ -23,15 +24,16 @@ public class GetTaskInfoTransactionScript {
     private final MemberService memberService;
     private final TaskService taskService;
 
-    public SendMessage execute(Update update) throws TelegramApiException {
-        String chatId = getChatId(update);
-        String text = getTextFromUpdate(update);
+    @Transactional
+    public SendMessage execute(MessageInfo messageInfo) {
+        String chatId = messageInfo.getChatId();
+        String text = messageInfo.getText();
 
         Long taskId = getTaskIdFromText(text);
         Task task = taskService.getTaskById(taskId);
         Member member = memberService.getMemberByChatId(chatId);
 
-        validateAuthor(update, task, member);
+        validateAuthor(messageInfo, task, member);
 
         InlineKeyboardMarkup keyboard = getKeyboard((IN_PROGRESS.equals(task.getStatus()) && (memberIsAuthorOrNonOmni(member, task))) ? 2 : 1);
         fillKeyboardWithActions(keyboard, task, member);
@@ -43,9 +45,9 @@ public class GetTaskInfoTransactionScript {
     //  Implementation
     // ================================================================================================================
 
-    private void validateAuthor(Update update, Task task, Member member) {
+    private void validateAuthor(MessageInfo messageInfo, Task task, Member member) {
         if (!task.getAuthor().equals(member) && !member.getIsOmni()) {
-            throw new NotAuthorException(update);
+            throw new NotAuthorException(messageInfo);
         }
     }
 

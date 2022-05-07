@@ -1,10 +1,10 @@
 package dev.reviewbot2.exceptions;
 
-import org.telegram.telegrambots.meta.api.objects.Update;
+import dev.reviewbot2.domain.MessageInfo;
 
 public class NotAuthorException extends ReviewBotException {
 
-    public NotAuthorException(Update update) {
-        super(update);
+    public NotAuthorException(MessageInfo messageInfo) {
+        super(messageInfo);
     }
 }

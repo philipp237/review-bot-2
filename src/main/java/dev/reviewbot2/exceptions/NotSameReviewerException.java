@@ -1,10 +1,10 @@
 package dev.reviewbot2.exceptions;
 
-import org.telegram.telegrambots.meta.api.objects.Update;
+import dev.reviewbot2.domain.MessageInfo;
 
 public class NotSameReviewerException extends ReviewBotException {
 
-    public NotSameReviewerException(Update update) {
-        super(update);
+    public NotSameReviewerException(MessageInfo messageInfo) {
+        super(messageInfo);
     }
 }

@@ -1,6 +1,7 @@
 package dev.reviewbot2.app.impl.ts;
 
 import dev.reviewbot2.app.api.MemberService;
+import dev.reviewbot2.domain.MessageInfo;
 import dev.reviewbot2.domain.member.Member;
 import dev.reviewbot2.exceptions.NoPermissionException;
 import lombok.RequiredArgsConstructor;
@@ -8,10 +9,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import javax.transaction.Transactional;
 import java.util.List;
 
 import static dev.reviewbot2.processor.Command.UPDATE_MEMBER;
@@ -26,13 +26,14 @@ public class UpdateMemberTransactionScript {
     @Value("${settings.number-of-review-stages}")
     private int numberOfReviewStages;
 
-    public SendMessage execute(Update update) throws TelegramApiException {
-        String chatId = getChatId(update);
-        String text =  getTextFromUpdate(update);
+    @Transactional
+    public SendMessage execute(MessageInfo messageInfo) {
+        String chatId = messageInfo.getChatId();
+        String text = messageInfo.getText();
 
         Member member = memberService.getMemberByChatId(chatId);
 
-        validateOmni(update, member);
+        validateOmni(messageInfo, member);
 
         if (text.contains("#")) {
             String[] parsedText = text.split("#");
@@ -65,9 +66,9 @@ public class UpdateMemberTransactionScript {
     //  Implementation
     // ================================================================================================================
 
-    private void validateOmni(Update update, Member member) {
+    private void validateOmni(MessageInfo messageInfo, Member member) {
         if (!member.getIsOmni()) {
-            throw new NoPermissionException(update);
+            throw new NoPermissionException(messageInfo);
         }
     }
 

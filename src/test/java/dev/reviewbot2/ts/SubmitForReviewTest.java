@@ -14,6 +14,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 
+import static dev.reviewbot2.domain.task.TaskSegment.BF;
 import static dev.reviewbot2.domain.task.TaskStatus.*;
 import static dev.reviewbot2.domain.task.TaskType.IMPLEMENTATION;
 import static dev.reviewbot2.processor.Command.SUBMIT;
@@ -38,7 +39,7 @@ public class SubmitForReviewTest extends AbstractUnitTest {
     @Test
     void execute() {
         String chatId = MEMBER_1_CHAT_ID;
-        Task task = getTask(IMPLEMENTATION, UUID_1, TASK_NAME_1, TASK_ID_1, chatId);
+        Task task = getTask(IMPLEMENTATION, BF, UUID_1, TASK_NAME_1, TASK_ID_1, chatId);
         task.setStatus(IN_PROGRESS);
         Member member = task.getAuthor();
         MessageInfo messageInfo = getSimpleMessageInfo(chatId, getCommand(SUBMIT, task.getId()));
@@ -59,7 +60,7 @@ public class SubmitForReviewTest extends AbstractUnitTest {
     @Test
     void execute_validationError_notAuthor() {
         String chatId = MEMBER_2_CHAT_ID;
-        Task task = getTask(IMPLEMENTATION, UUID_1, TASK_NAME_1, TASK_ID_1, MEMBER_1_CHAT_ID);
+        Task task = getTask(IMPLEMENTATION, BF, UUID_1, TASK_NAME_1, TASK_ID_1, MEMBER_1_CHAT_ID);
         task.setStatus(IN_PROGRESS);
         Member member = getMember(chatId, NON_REVIEWER, false, false);
         MessageInfo messageInfo = getSimpleMessageInfo(chatId, getCommand(SUBMIT, task.getId()));
@@ -75,7 +76,7 @@ public class SubmitForReviewTest extends AbstractUnitTest {
     @Test
     void execute_validationError_invalidStatus() {
         String chatId = MEMBER_1_CHAT_ID;
-        Task task = getTask(IMPLEMENTATION, UUID_1, TASK_NAME_1, TASK_ID_1, chatId);
+        Task task = getTask(IMPLEMENTATION, BF, UUID_1, TASK_NAME_1, TASK_ID_1, chatId);
         task.setStatus(IN_REVIEW);
         Member member = task.getAuthor();
         MessageInfo messageInfo = getSimpleMessageInfo(chatId, getCommand(SUBMIT, task.getId()));

@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 
+import static dev.reviewbot2.domain.task.TaskSegment.BF;
 import static dev.reviewbot2.domain.task.TaskStatus.IN_PROGRESS;
 import static dev.reviewbot2.domain.task.TaskType.IMPLEMENTATION;
 import static dev.reviewbot2.processor.Command.*;
@@ -36,7 +37,7 @@ public class GetTaskInfoTest extends AbstractUnitTest {
         String memberChatId = MEMBER_1_CHAT_ID;
         long taskId = TASK_ID_1;
         Member member = getMember(memberChatId, FIRST_REVIEW_GROUP, false, false);
-        Task task = getTask(IMPLEMENTATION, UUID_1, TASK_NAME_1, taskId, memberChatId);
+        Task task = getTask(IMPLEMENTATION, BF, UUID_1, TASK_NAME_1, taskId, memberChatId);
 
         MessageInfo messageInfo = getSimpleMessageInfo(memberChatId, getCommand(INFO, task.getId()));
 
@@ -55,7 +56,7 @@ public class GetTaskInfoTest extends AbstractUnitTest {
         String memberChatId = MEMBER_1_CHAT_ID;
         long taskId = TASK_ID_1;
         Member member = getMember(memberChatId, FIRST_REVIEW_GROUP, false, false);
-        Task task = getTask(IMPLEMENTATION, UUID_1, TASK_NAME_1, taskId, memberChatId);
+        Task task = getTask(IMPLEMENTATION, BF, UUID_1, TASK_NAME_1, taskId, memberChatId);
         task.setStatus(IN_PROGRESS);
 
         MessageInfo messageInfo = getSimpleMessageInfo(memberChatId, getCommand(INFO, task.getId()));
@@ -77,7 +78,7 @@ public class GetTaskInfoTest extends AbstractUnitTest {
         String memberChatId = MEMBER_1_CHAT_ID;
         long taskId = TASK_ID_1;
         Member member = getMember(memberChatId, FIRST_REVIEW_GROUP, false, true);
-        Task task = getTask(IMPLEMENTATION, UUID_1, TASK_NAME_1, taskId, MEMBER_2_CHAT_ID);
+        Task task = getTask(IMPLEMENTATION, BF, UUID_1, TASK_NAME_1, taskId, MEMBER_2_CHAT_ID);
         task.setStatus(IN_PROGRESS);
 
         MessageInfo messageInfo = getSimpleMessageInfo(memberChatId, getCommand(INFO, task.getId()));
@@ -96,7 +97,7 @@ public class GetTaskInfoTest extends AbstractUnitTest {
     void getTaskInfo_error_notAuthor() {
         String memberChatId = MEMBER_1_CHAT_ID;
         Member member = getMember(memberChatId, FIRST_REVIEW_GROUP, false, false);
-        Task task = getTask(IMPLEMENTATION, UUID_1, TASK_NAME_1, TASK_ID_1, MEMBER_2_CHAT_ID);
+        Task task = getTask(IMPLEMENTATION, BF, UUID_1, TASK_NAME_1, TASK_ID_1, MEMBER_2_CHAT_ID);
         task.setStatus(IN_PROGRESS);
 
         MessageInfo messageInfo = getSimpleMessageInfo(memberChatId, getCommand(INFO, task.getId()));

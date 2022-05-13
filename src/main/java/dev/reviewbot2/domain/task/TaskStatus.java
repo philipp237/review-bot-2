@@ -7,7 +7,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static java.util.Arrays.*;
+import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toList;
 
 /**
@@ -44,7 +44,12 @@ public enum TaskStatus {
     /**
      * Задача закрыта принудительно
      */
-    FORCE_CLOSED("force-closed");
+    FORCE_CLOSED("force-closed"),
+
+    /**
+     * Задача выведена в продакшн
+     */
+    IN_PRODUCTION("in-production");
 
     private final String activityId;
 
@@ -56,6 +61,10 @@ public enum TaskStatus {
     }
 
     public static List<TaskStatus> getClosedStatuses() {
+        return Stream.of(CLOSED, FORCE_CLOSED, IN_PRODUCTION).collect(toList());
+    }
+
+    public static List<TaskStatus> getStatusesReadyForIncorporation() {
         return Stream.of(CLOSED, FORCE_CLOSED).collect(toList());
     }
 }

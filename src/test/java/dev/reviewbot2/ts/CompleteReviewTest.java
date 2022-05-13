@@ -13,6 +13,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 
+import static dev.reviewbot2.domain.task.TaskSegment.BF;
 import static dev.reviewbot2.domain.task.TaskStatus.IN_REVIEW;
 import static dev.reviewbot2.domain.task.TaskStatus.READY_FOR_REVIEW;
 import static dev.reviewbot2.domain.task.TaskType.IMPLEMENTATION;
@@ -42,7 +43,7 @@ public class CompleteReviewTest extends AbstractUnitTest {
         String taskUuid = UUID_1;
         String reviewerChatId = MEMBER_2_CHAT_ID;
         Member reviewer = getMember(reviewerChatId, FIRST_REVIEW_GROUP, false, false);
-        Review review = getReview(IMPLEMENTATION, FIRST_REVIEW_GROUP, taskUuid, TASK_NAME_1, TASK_ID_1, MEMBER_1_CHAT_ID);
+        Review review = getReview(IMPLEMENTATION, BF, FIRST_REVIEW_GROUP, taskUuid, TASK_NAME_1, TASK_ID_1, MEMBER_1_CHAT_ID);
         review.getTask().setStatus(IN_REVIEW);
         MessageInfo messageInfo = getSimpleMessageInfo(reviewerChatId, getCommand(APPROVE, review.getTask().getId()));
 
@@ -60,7 +61,7 @@ public class CompleteReviewTest extends AbstractUnitTest {
     @Test
     void execute_happyPath_declined() {
         Member reviewer = getMember(MEMBER_2_CHAT_ID, FIRST_REVIEW_GROUP, false, false);
-        Review review = getReview(IMPLEMENTATION, FIRST_REVIEW_GROUP, UUID_1, TASK_NAME_1, TASK_ID_1, MEMBER_1_CHAT_ID);
+        Review review = getReview(IMPLEMENTATION, BF, FIRST_REVIEW_GROUP, UUID_1, TASK_NAME_1, TASK_ID_1, MEMBER_1_CHAT_ID);
         review.getTask().setStatus(IN_REVIEW);
         MessageInfo messageInfo = getSimpleMessageInfo(MEMBER_2_CHAT_ID, getCommand(DECLINE, review.getTask().getId()));
 
@@ -79,7 +80,7 @@ public class CompleteReviewTest extends AbstractUnitTest {
     void execute_validationFailed_invalidStatus() {
         String reviewerChatId = MEMBER_2_CHAT_ID;
         Member reviewer = getMember(reviewerChatId, FIRST_REVIEW_GROUP, false, false);
-        Review review = getReview(IMPLEMENTATION, FIRST_REVIEW_GROUP, UUID_1, TASK_NAME_1, TASK_ID_1, MEMBER_1_CHAT_ID);
+        Review review = getReview(IMPLEMENTATION, BF, FIRST_REVIEW_GROUP, UUID_1, TASK_NAME_1, TASK_ID_1, MEMBER_1_CHAT_ID);
         review.getTask().setStatus(READY_FOR_REVIEW);
         MemberReview memberReview = getMemberReview(review, reviewer);
         MessageInfo messageInfo = getSimpleMessageInfo(reviewerChatId, getCommand(DECLINE, review.getTask().getId()));
@@ -98,7 +99,7 @@ public class CompleteReviewTest extends AbstractUnitTest {
     void execute_validationFailed_notSameReviewer() {
         Member reviewer1 = getMember(MEMBER_2_CHAT_ID, FIRST_REVIEW_GROUP, false, false);
         Member reviewer2 = getMember(MEMBER_3_CHAT_ID, FIRST_REVIEW_GROUP, false, false);
-        Review review = getReview(IMPLEMENTATION, FIRST_REVIEW_GROUP, UUID_1, TASK_NAME_1, TASK_ID_1, MEMBER_1_CHAT_ID);
+        Review review = getReview(IMPLEMENTATION, BF, FIRST_REVIEW_GROUP, UUID_1, TASK_NAME_1, TASK_ID_1, MEMBER_1_CHAT_ID);
         review.getTask().setStatus(IN_REVIEW);
         MemberReview memberReview = getMemberReview(review, reviewer1);
         MessageInfo messageInfo = getSimpleMessageInfo(MEMBER_3_CHAT_ID, getCommand(DECLINE, review.getTask().getId()));

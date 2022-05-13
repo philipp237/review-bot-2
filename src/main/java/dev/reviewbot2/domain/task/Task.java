@@ -16,7 +16,7 @@ import java.time.Instant;
 @SuperBuilder
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class Task extends DomainObject {
+public class Task extends DomainObject implements Comparable<Task> {
 
     /**
      * uuid задачи
@@ -61,6 +61,12 @@ public class Task extends DomainObject {
     private TaskStatus status;
 
     /**
+     * Сегмент задачи
+     */
+    @Enumerated(EnumType.STRING)
+    private TaskSegment segment;
+
+    /**
      * Автор задачи
      */
     @JoinColumn(name = "author_id")
@@ -69,5 +75,15 @@ public class Task extends DomainObject {
 
     public Instant getLastActionTime() {
         return lastReviewTime == null ? creationTime : lastReviewTime;
+    }
+
+    @Override
+    public int compareTo(Task task) {
+        int segmentCheck = this.segment.compareTo(task.getSegment());
+        if (segmentCheck != 0) {
+            return segmentCheck;
+        } else {
+            return this.name.compareTo(task.getName());
+        }
     }
 }

@@ -4,6 +4,7 @@ import dev.reviewbot2.domain.member.Member;
 import dev.reviewbot2.domain.review.MemberReview;
 import dev.reviewbot2.domain.review.Review;
 import dev.reviewbot2.domain.task.Task;
+import dev.reviewbot2.domain.task.TaskSegment;
 import dev.reviewbot2.domain.task.TaskType;
 import dev.reviewbot2.processor.Command;
 import org.telegram.telegrambots.meta.api.objects.*;
@@ -33,6 +34,7 @@ public class AbstractTest {
     protected static final String MEMBER_1_CHAT_ID = "57164325";
     protected static final String MEMBER_2_CHAT_ID = "27621396";
     protected static final String MEMBER_3_CHAT_ID = "56247114";
+    protected static final String MEMBER_4_CHAT_ID = "74652049";
 
     protected static final long TASK_ID_1 = 1L;
     protected static final long TASK_ID_2 = 2L;
@@ -96,7 +98,7 @@ public class AbstractTest {
             .build();
     }
 
-    protected Task getTask(TaskType taskType, String uuid, String taskName, long taskId, String chatId) {
+    protected Task getTask(TaskType taskType, TaskSegment taskSegment, String uuid, String taskName, long taskId, String chatId) {
         return Task.builder()
             .id(taskId)
             .uuid(uuid)
@@ -104,16 +106,17 @@ public class AbstractTest {
             .link(JIRA_LINK + taskName)
             .creationTime(now())
             .taskType(taskType)
+            .segment(taskSegment)
             .status(READY_FOR_REVIEW)
             .author(getMember(chatId, 0, false, false))
             .build();
     }
 
-    protected Review getReview(TaskType taskType, int reviewStage, String uuid, String taskName, long taskId, String chatId) {
+    protected Review getReview(TaskType taskType, TaskSegment taskSegment, int reviewStage, String uuid, String taskName, long taskId, String chatId) {
         return Review.builder()
             .id(1L)
             .reviewStage(reviewStage)
-            .task(getTask(taskType, uuid, taskName, taskId, chatId))
+            .task(getTask(taskType, taskSegment, uuid, taskName, taskId, chatId))
             .build();
     }
 

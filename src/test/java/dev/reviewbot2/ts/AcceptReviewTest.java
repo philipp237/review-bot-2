@@ -11,6 +11,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 
+import static dev.reviewbot2.domain.task.TaskSegment.BF;
 import static dev.reviewbot2.domain.task.TaskStatus.CLOSED;
 import static dev.reviewbot2.domain.task.TaskStatus.IN_REVIEW;
 import static dev.reviewbot2.domain.task.TaskType.IMPLEMENTATION;
@@ -40,7 +41,7 @@ public class AcceptReviewTest extends AbstractUnitTest {
     void execute() {
         String reviewerChatId = MEMBER_2_CHAT_ID;
         String taskName = TASK_NAME_1;
-        Review review = getReview(IMPLEMENTATION, 1, UUID_1, taskName, TASK_ID_1, MEMBER_1_CHAT_ID);
+        Review review = getReview(IMPLEMENTATION, BF,1, UUID_1, taskName, TASK_ID_1, MEMBER_1_CHAT_ID);
         MessageInfo messageInfo = getSimpleMessageInfo(reviewerChatId, getCommand(ACCEPT_REVIEW, review.getTask().getId()));
 
         memberServiceMock.mockGetMemberByChatId(getMember(reviewerChatId, FIRST_REVIEW_GROUP, false, false));
@@ -61,7 +62,7 @@ public class AcceptReviewTest extends AbstractUnitTest {
     @Test
     void execute_taskAlreadyInReview() {
         String reviewerChatId = MEMBER_2_CHAT_ID;
-        Review review = getReview(IMPLEMENTATION, FIRST_REVIEW_GROUP, UUID_1, TASK_NAME_1, TASK_ID_1, MEMBER_1_CHAT_ID);
+        Review review = getReview(IMPLEMENTATION, BF, FIRST_REVIEW_GROUP, UUID_1, TASK_NAME_1, TASK_ID_1, MEMBER_1_CHAT_ID);
         review.getTask().setStatus(IN_REVIEW);
         MessageInfo messageInfo = getSimpleMessageInfo(reviewerChatId, getCommand(ACCEPT_REVIEW, review.getTask().getId()));
 
@@ -77,7 +78,7 @@ public class AcceptReviewTest extends AbstractUnitTest {
     @Test
     void execute_invalidStatus() {
         String reviewerChatId = MEMBER_2_CHAT_ID;
-        Review review = getReview(IMPLEMENTATION, FIRST_REVIEW_GROUP, UUID_1, TASK_NAME_1, TASK_ID_1, MEMBER_1_CHAT_ID);
+        Review review = getReview(IMPLEMENTATION, BF, FIRST_REVIEW_GROUP, UUID_1, TASK_NAME_1, TASK_ID_1, MEMBER_1_CHAT_ID);
         review.getTask().setStatus(CLOSED);
         MessageInfo messageInfo = getSimpleMessageInfo(reviewerChatId, getCommand(ACCEPT_REVIEW, review.getTask().getId()));
 

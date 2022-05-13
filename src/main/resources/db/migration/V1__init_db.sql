@@ -14,6 +14,7 @@ CREATE TABLE task (
     link                VARCHAR NOT NULL,
     task_type           VARCHAR NOT NULL,
     status              VARCHAR,
+    segment             VARCHAR NOT NULL,
     creation_time       TIMESTAMP,
     close_time          TIMESTAMP,
     last_review_time    TIMESTAMP,

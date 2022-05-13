@@ -134,4 +134,21 @@ public interface UpdateService {
      * @return сообщение с информацией о задаче и возможных действиях
      */
     SendMessage getTaskInfo(MessageInfo messageInfo);
+
+    /**
+     * Получить список всех закрытых задач, готовых для внедрения в продакшн
+     *
+     * @param messageInfo обновление, в котором содержится сообщение с командой получения информации о закрытых задачах
+     * @return сообщение со списком закрытых задач
+     */
+    SendMessage getTaskReadyForIncorporation(MessageInfo messageInfo);
+
+    /**
+     * Внедрить задачи в продакшн
+     *
+     * @param messageInfo обновление, в котором содержится сообщение с командой о внедрении задач в продакшн
+     * @return сообщение об успехе перевода статуса задач или сообщение со списком задач, для которых это сделать не
+     * получилось
+     */
+    SendMessage incorporateTasks(MessageInfo messageInfo);
 }

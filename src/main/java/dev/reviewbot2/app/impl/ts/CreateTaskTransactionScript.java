@@ -7,6 +7,7 @@ import dev.reviewbot2.app.impl.camunda.ProcessAccessor;
 import dev.reviewbot2.domain.member.Member;
 import dev.reviewbot2.domain.review.Review;
 import dev.reviewbot2.domain.task.Task;
+import dev.reviewbot2.domain.task.TaskSegment;
 import dev.reviewbot2.domain.task.TaskType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,7 +32,7 @@ public class CreateTaskTransactionScript {
     private final ProcessAccessor processAccessor;
 
     @Transactional
-    public SendMessage execute(String chatId, String taskName, String link, TaskType taskType) {
+    public SendMessage execute(String chatId, String taskName, String link, TaskSegment taskSegment, TaskType taskType) {
         Member author = memberService.getMemberByChatId(chatId);
 
         Task task = Task.builder()
@@ -40,6 +41,7 @@ public class CreateTaskTransactionScript {
                 .link(link)
                 .creationTime(Instant.now())
                 .taskType(taskType)
+                .segment(taskSegment)
                 .author(author)
                 .build();
 

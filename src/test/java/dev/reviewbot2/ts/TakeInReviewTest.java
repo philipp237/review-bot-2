@@ -17,6 +17,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import java.util.List;
 import java.util.stream.Stream;
 
+import static dev.reviewbot2.domain.task.TaskSegment.BF;
 import static dev.reviewbot2.domain.task.TaskType.DESIGN;
 import static dev.reviewbot2.domain.task.TaskType.IMPLEMENTATION;
 import static dev.reviewbot2.processor.Command.ACCEPT_REVIEW;
@@ -27,10 +28,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.MockitoAnnotations.openMocks;
 
 public class TakeInReviewTest extends AbstractUnitTest {
-    private final Review review1 = getReview(IMPLEMENTATION, FIRST_REVIEW_GROUP, UUID_1, TASK_NAME_1, 1, MEMBER_1_CHAT_ID);
-    private final Review review2 = getReview(IMPLEMENTATION, FIRST_REVIEW_GROUP, UUID_2, TASK_NAME_2, 2, MEMBER_1_CHAT_ID);
-    private final Review review3 = getReview(IMPLEMENTATION, SECOND_REVIEW_GROUP, UUID_3, TASK_NAME_3, 3, MEMBER_1_CHAT_ID);
-    private final Review review4 = getReview(DESIGN, FIRST_REVIEW_GROUP, UUID_4, TASK_NAME_4, 4, MEMBER_1_CHAT_ID);
+    private final Review review1 = getReview(IMPLEMENTATION, BF, FIRST_REVIEW_GROUP, UUID_1, TASK_NAME_1, 1, MEMBER_1_CHAT_ID);
+    private final Review review2 = getReview(IMPLEMENTATION, BF, FIRST_REVIEW_GROUP, UUID_2, TASK_NAME_2, 2, MEMBER_1_CHAT_ID);
+    private final Review review3 = getReview(IMPLEMENTATION, BF, SECOND_REVIEW_GROUP, UUID_3, TASK_NAME_3, 3, MEMBER_1_CHAT_ID);
+    private final Review review4 = getReview(DESIGN, BF, FIRST_REVIEW_GROUP, UUID_4, TASK_NAME_4, 4, MEMBER_1_CHAT_ID);
 
     private TakeInReviewTransactionScript takeInReview;
 

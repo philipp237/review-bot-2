@@ -25,4 +25,8 @@ public class TaskServiceMock {
     public void mockGetMemberTasks(List<Task> tasks) {
         doReturn(tasks).when(taskService).getMemberTasks(any());
     }
+
+    public void mockGetClosedTasks(List<Task> tasks) {
+        doReturn(tasks).when(taskService).getClosedTasks();
+    }
 }

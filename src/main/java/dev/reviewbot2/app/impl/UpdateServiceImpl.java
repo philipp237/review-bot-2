@@ -4,6 +4,7 @@ import dev.reviewbot2.app.api.UpdateService;
 import dev.reviewbot2.app.impl.ts.*;
 import dev.reviewbot2.config.Config;
 import dev.reviewbot2.domain.MessageInfo;
+import dev.reviewbot2.domain.task.TaskSegment;
 import dev.reviewbot2.domain.task.TaskType;
 import dev.reviewbot2.adapter.WebhookRestClient;
 import lombok.RequiredArgsConstructor;
@@ -36,6 +37,8 @@ public class UpdateServiceImpl implements UpdateService {
     private final GetMemberTasksTransactionScript getMemberTasks;
     private final GetTaskInfoTransactionScript getTaskInfo;
     private final GetStartMessageTransactionScript getStartMessage;
+    private final GetTasksReadyForIncorporationTransactionScript getTasksReadyForIncorporation;
+    private final IncorporateTaskTransactionScript incorporateTask;
 
     @Override
     public void deletePreviousMessage(MessageInfo messageInfo) {
@@ -55,9 +58,17 @@ public class UpdateServiceImpl implements UpdateService {
         validateTaskName(taskName);
 
         if (link.contains("#")) {
-            TaskType taskType = getTaskTypeFromLink(link);
+            String[] splittedLink = link.split("#");
+            if (splittedLink.length == 2) {
+                InlineKeyboardMarkup keyboard = getKeyboard(TaskSegment.values().length);
+                fillKeyboardWithTaskSegments(keyboard, link);
+
+                return sendMessage(chatId, "Выбери сегмент задачи:", keyboard);
+            }
+            TaskType taskType = getTaskTypeFromLink(splittedLink);
+            TaskSegment taskSegment = getTaskSegmentFromLink(splittedLink);
             link = link.split("#")[0];
-            return createTask.execute(chatId, taskName, link, taskType);
+            return createTask.execute(chatId, taskName, link, taskSegment, taskType);
         }
 
         InlineKeyboardMarkup keyboard = getKeyboard(TaskType.values().length);
@@ -138,6 +149,17 @@ public class UpdateServiceImpl implements UpdateService {
         return getTaskInfo.execute(messageInfo);
     }
 
+    @Override
+    public SendMessage getTaskReadyForIncorporation(MessageInfo messageInfo) {
+        return getTasksReadyForIncorporation.execute(messageInfo);
+    }
+
+    @Override
+    public SendMessage incorporateTasks(MessageInfo messageInfo) {
+        incorporateTask.execute(messageInfo);
+        return getTasksReadyForIncorporation.execute(messageInfo);
+    }
+
     // ================================================================================================================
     //  Implementation
     // ================================================================================================================
@@ -160,14 +182,26 @@ public class UpdateServiceImpl implements UpdateService {
         return rowTaskName;
     }
 
-    private TaskType getTaskTypeFromLink(String text) {
-        String[] parsedUrl = text.split("#");
+    private TaskType getTaskTypeFromLink(String[] parsedUrl) {
         return TaskType.valueOf(parsedUrl[parsedUrl.length - 1]);
+    }
+
+    private TaskSegment getTaskSegmentFromLink(String[] parsedUrl) {
+        return TaskSegment.valueOf(parsedUrl[parsedUrl.length - 2]);
     }
 
     private void validateTaskName(String taskName) {
         if (config.getDASHBOARDS().stream().noneMatch(taskName::contains)) {
             throw new IllegalArgumentException("Incorrect task name " + taskName);
+        }
+    }
+
+    private void fillKeyboardWithTaskSegments(InlineKeyboardMarkup keyboard, String link) {
+        int i = 0;
+
+        for (TaskSegment taskSegment : TaskSegment.values()) {
+            keyboard.getKeyboard().get(i).add(getButton(taskSegment.getText(), link + "#" + taskSegment.toString()));
+            i++;
         }
     }
 

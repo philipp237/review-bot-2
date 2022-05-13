@@ -46,4 +46,11 @@ public interface TaskService {
      * @return список незакрытых задач за авторством пользователя
      */
     List<Task> getMemberTasks(Member author);
+
+    /**
+     * Получить все закрытые задачи
+     *
+     * @return список всех закрытых задач
+     */
+    List<Task> getClosedTasks();
 }

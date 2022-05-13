@@ -16,6 +16,7 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import java.util.List;
 import java.util.stream.Stream;
 
+import static dev.reviewbot2.domain.task.TaskSegment.BF;
 import static dev.reviewbot2.domain.task.TaskStatus.APPROVED;
 import static dev.reviewbot2.domain.task.TaskStatus.IN_REVIEW;
 import static dev.reviewbot2.domain.task.TaskType.IMPLEMENTATION;
@@ -41,7 +42,7 @@ public class CloseTaskTest extends AbstractUnitTest {
     @Test
     void execute() {
         String chatId = MEMBER_1_CHAT_ID;
-        Task task = getTask(IMPLEMENTATION, UUID_1, TASK_NAME_1, TASK_ID_1, chatId);
+        Task task = getTask(IMPLEMENTATION, BF, UUID_1, TASK_NAME_1, TASK_ID_1, chatId);
         task.setStatus(APPROVED);
         Member member = task.getAuthor();
         MessageInfo messageInfo = getSimpleMessageInfo(chatId, getCommand(CLOSE, task.getId()));
@@ -62,7 +63,7 @@ public class CloseTaskTest extends AbstractUnitTest {
     @Test
     void execute_forceClose() {
         String chatId = MEMBER_1_CHAT_ID;
-        Task task = getTask(IMPLEMENTATION, UUID_1, TASK_NAME_1, TASK_ID_1, chatId);
+        Task task = getTask(IMPLEMENTATION, BF, UUID_1, TASK_NAME_1, TASK_ID_1, chatId);
         task.setStatus(IN_REVIEW);
         Member member = task.getAuthor();
         List<Member> otherMembers = Stream.of(
@@ -88,7 +89,7 @@ public class CloseTaskTest extends AbstractUnitTest {
     @Test
     void execute_validationFailed() {
         String chatId = MEMBER_1_CHAT_ID;
-        Task task = getTask(IMPLEMENTATION, UUID_1, TASK_NAME_1, TASK_ID_1, chatId);
+        Task task = getTask(IMPLEMENTATION, BF, UUID_1, TASK_NAME_1, TASK_ID_1, chatId);
         task.setStatus(APPROVED);
         Member member = getMember(MEMBER_2_CHAT_ID, FIRST_REVIEW_GROUP, false, false);
         MessageInfo messageInfo = getSimpleMessageInfo(chatId, getCommand(CLOSE, task.getId()));

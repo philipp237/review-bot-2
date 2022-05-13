@@ -2,6 +2,7 @@ package dev.reviewbot2;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.reviewbot2.domain.member.Member;
+import dev.reviewbot2.domain.task.TaskSegment;
 import dev.reviewbot2.domain.task.TaskType;
 import dev.reviewbot2.repository.MemberRepository;
 import dev.reviewbot2.repository.MemberReviewRepository;
@@ -93,8 +94,8 @@ public abstract class AbstractIntegrationTest extends AbstractTest {
         memberRepository.deleteAll();
     }
 
-    protected void performCreateTask(String chatId, TaskType taskType) throws Exception {
-        Update update = getUpdateWithMessage(JIRA_LINK + TASK_NAME_1 + "#" + taskType, chatId);
+    protected void performCreateTask(String chatId, TaskSegment segment, TaskType taskType) throws Exception {
+        Update update = getUpdateWithMessage(JIRA_LINK + TASK_NAME_1 + "#" + segment + "#" + taskType, chatId);
         performUpdateReceived(update);
     }
 
@@ -129,6 +130,11 @@ public abstract class AbstractIntegrationTest extends AbstractTest {
         performUpdateReceived(update);
     }
 
+    protected void performSendingToProduction(String chatId, Long taskId) throws Exception {
+        Update update = getUpdateWithCallbackQuery(getCommand(INCORPORATE, taskId), chatId);
+        performUpdateReceived(update);
+    }
+
     protected SendMessage performUpdateReceived(Update update) throws Exception {
         MvcResult result = mockMvc.perform(
             MockMvcRequestBuilders.post("/")
@@ -138,6 +144,10 @@ public abstract class AbstractIntegrationTest extends AbstractTest {
             .andReturn();
 
         String content = result.getResponse().getContentAsString();
+
+        if (content.isEmpty()) {
+            return null;
+        }
         return objectMapper.readValue(content, SendMessage.class);
     }
 

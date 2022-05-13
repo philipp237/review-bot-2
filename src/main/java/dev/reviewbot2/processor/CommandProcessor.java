@@ -41,6 +41,10 @@ public class CommandProcessor {
                 return updateService.updateMember(messageInfo);
             case INFO:
                 return updateService.getTaskInfo(messageInfo);
+            case CLOSED_TASKS:
+                return updateService.getTaskReadyForIncorporation(messageInfo);
+            case INCORPORATE:
+                return updateService.incorporateTasks(messageInfo);
         }
         return null;
     }

@@ -17,6 +17,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import java.util.List;
 import java.util.stream.Stream;
 
+import static dev.reviewbot2.domain.task.TaskSegment.BF;
 import static dev.reviewbot2.domain.task.TaskType.DESIGN;
 import static dev.reviewbot2.domain.task.TaskType.IMPLEMENTATION;
 import static java.util.Collections.emptyList;
@@ -49,9 +50,9 @@ public class GetMemberTasksTest extends AbstractUnitTest {
         MessageInfo messageInfo = getSimpleMessageInfo(memberChatId, "/my_tasks");
 
         List<Review> reviews = Stream.of(
-            getReview(IMPLEMENTATION, FIRST_REVIEW_GROUP, UUID_1, TASK_NAME_1, taskId1, memberChatId),
-            getReview(IMPLEMENTATION, FIRST_REVIEW_GROUP, UUID_2, TASK_NAME_2, taskId2, memberChatId),
-            getReview(DESIGN, FIRST_REVIEW_GROUP, UUID_3, TASK_NAME_3, taskId3, memberChatId)
+            getReview(IMPLEMENTATION, BF, FIRST_REVIEW_GROUP, UUID_1, TASK_NAME_1, taskId1, memberChatId),
+            getReview(IMPLEMENTATION, BF, FIRST_REVIEW_GROUP, UUID_2, TASK_NAME_2, taskId2, memberChatId),
+            getReview(DESIGN, BF, FIRST_REVIEW_GROUP, UUID_3, TASK_NAME_3, taskId3, memberChatId)
         ).collect(toList());
 
         List<Task> tasks = reviews.stream().map(Review::getTask).collect(toList());

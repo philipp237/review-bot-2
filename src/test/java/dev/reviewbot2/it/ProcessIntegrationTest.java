@@ -4,6 +4,7 @@ import dev.reviewbot2.AbstractIntegrationTest;
 import dev.reviewbot2.domain.member.Member;
 import dev.reviewbot2.domain.task.Task;
 import dev.reviewbot2.domain.task.TaskStatus;
+import dev.reviewbot2.domain.task.TaskType;
 import dev.reviewbot2.exceptions.ReviewBotExceptionHandler;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +17,9 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.nio.charset.StandardCharsets;
 
+import static dev.reviewbot2.domain.task.TaskSegment.BF;
 import static dev.reviewbot2.domain.task.TaskStatus.*;
+import static dev.reviewbot2.domain.task.TaskType.DESIGN;
 import static dev.reviewbot2.domain.task.TaskType.IMPLEMENTATION;
 import static dev.reviewbot2.processor.Command.ACCEPT_REVIEW;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -32,12 +35,14 @@ class ProcessIntegrationTest extends AbstractIntegrationTest {
         String authorChatId = MEMBER_1_CHAT_ID;
         String firstStageReviewerChatId = MEMBER_2_CHAT_ID;
         String secondStageReviewerChatId = MEMBER_3_CHAT_ID;
+        String omniChatId = MEMBER_4_CHAT_ID;
 
         addMemberToDB(authorChatId, 1, false, false);
         addMemberToDB(firstStageReviewerChatId, 1, false, false);
         addMemberToDB(secondStageReviewerChatId, 2, true, false);
+        addMemberToDB(omniChatId, 2, true, true);
 
-        String uuid = memberCreatesTask(authorChatId);
+        String uuid = memberCreatesTask(authorChatId, IMPLEMENTATION);
         reviewerTakesTaskInReview(firstStageReviewerChatId, uuid);
         reviewerDeclinesTask(firstStageReviewerChatId, uuid);
         authorSubmitsTaskForReview(authorChatId, uuid);
@@ -46,19 +51,43 @@ class ProcessIntegrationTest extends AbstractIntegrationTest {
         reviewerTakesTaskInReview(secondStageReviewerChatId, uuid);
         reviewerApprovesTask(secondStageReviewerChatId, uuid);
         authorClosesTask(authorChatId, uuid);
+        omniSendsTaskInProduction(omniChatId, uuid);
+    }
+
+    @Test
+    void happyPath_design() throws Exception {
+        String authorChatId = MEMBER_1_CHAT_ID;
+        String designReviewerChatId = MEMBER_2_CHAT_ID;
+        String omniChatId = MEMBER_4_CHAT_ID;
+
+        addMemberToDB(authorChatId, 1, false, false);
+        addMemberToDB(designReviewerChatId, 2, true, false);
+        addMemberToDB(omniChatId, 2, true, true);
+
+        String uuid = memberCreatesTask(authorChatId, DESIGN);
+        reviewerTakesTaskInReview(designReviewerChatId, uuid);
+        reviewerDeclinesTask(designReviewerChatId, uuid);
+        authorSubmitsTaskForReview(authorChatId, uuid);
+        reviewerTakesTaskInReview(designReviewerChatId, uuid);
+        reviewerApprovesTask(designReviewerChatId, uuid);
+        authorClosesTask(authorChatId, uuid);
+        omniSendsTaskInProduction(omniChatId, uuid);
     }
 
     @Test
     void happyPath_forceClose() throws Exception {
         String authorChatId = MEMBER_1_CHAT_ID;
         String firstStageReviewerChatId = MEMBER_2_CHAT_ID;
+        String omniChatId = MEMBER_4_CHAT_ID;
 
         addMemberToDB(authorChatId, 1, false, false);
         addMemberToDB(firstStageReviewerChatId, 1, false, false);
+        addMemberToDB(omniChatId, 2, true, true);
 
-        String uuid = memberCreatesTask(authorChatId);
+        String uuid = memberCreatesTask(authorChatId, IMPLEMENTATION);
         reviewerTakesTaskInReview(firstStageReviewerChatId, uuid);
         authorClosesTask(authorChatId, uuid);
+        omniSendsTaskInProduction(omniChatId, uuid);
     }
 
     @Test
@@ -69,7 +98,7 @@ class ProcessIntegrationTest extends AbstractIntegrationTest {
         addMemberToDB(authorChatId, 1, false, false);
         addMemberToDB(notReviewerChatId, 0, false, false);
 
-        String uuid = memberCreatesTask(authorChatId);
+        String uuid = memberCreatesTask(authorChatId, IMPLEMENTATION);
 
         Long taskId = getTask(uuid).getId();
         Update update = getUpdateWithCallbackQuery(getCommand(ACCEPT_REVIEW, taskId), notReviewerChatId);
@@ -88,8 +117,8 @@ class ProcessIntegrationTest extends AbstractIntegrationTest {
     //  Implementation
     // ================================================================================================================
 
-    private String memberCreatesTask(String authorChatId) throws Exception {
-        performCreateTask(authorChatId, IMPLEMENTATION);
+    private String memberCreatesTask(String authorChatId, TaskType taskType) throws Exception {
+        performCreateTask(authorChatId, BF, taskType);
         String uuid = getUuidFromProcess();
         Thread.sleep(100);
         assertEquals(READY_FOR_REVIEW, getTask(uuid).getStatus());
@@ -148,6 +177,13 @@ class ProcessIntegrationTest extends AbstractIntegrationTest {
         performClose(authorChatId, task.getId());
         Thread.sleep(100);
         assertEquals(expectedStatus, getTask(uuid).getStatus());
+    }
+
+    private void omniSendsTaskInProduction(String omniChatId, String uuid) throws Exception {
+        Long taskId = getTask(uuid).getId();
+        performSendingToProduction(omniChatId, taskId);
+        Thread.sleep(100);
+        assertEquals(IN_PRODUCTION, getTask(uuid).getStatus());
     }
 
     private Task getTask(String uuid) {

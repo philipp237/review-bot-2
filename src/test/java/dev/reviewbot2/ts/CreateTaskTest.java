@@ -14,6 +14,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 
+import static dev.reviewbot2.domain.task.TaskSegment.BF;
 import static dev.reviewbot2.domain.task.TaskType.IMPLEMENTATION;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.times;
@@ -39,14 +40,14 @@ public class CreateTaskTest extends AbstractUnitTest {
         String taskName = TASK_NAME_1;
         String chatId = MEMBER_1_CHAT_ID;
 
-        Review review = getReview(taskType, FIRST_REVIEW_GROUP, UUID_1, taskName, TASK_ID_1, chatId);
+        Review review = getReview(taskType, BF, FIRST_REVIEW_GROUP, UUID_1, taskName, TASK_ID_1, chatId);
         Member member = review.getTask().getAuthor();
 
         memberServiceMock.mockGetMemberByChatId(member);
         reviewServiceMock.mockSave();
         processAccessorMock.mockStartProcess();
 
-        SendMessage createMessageTask = createTaskTransactionScript.execute(chatId, taskName, JIRA_LINK + taskName, taskType);
+        SendMessage createMessageTask = createTaskTransactionScript.execute(chatId, taskName, JIRA_LINK + taskName, BF, taskType);
 
         verify(reviewService, times(1)).save(reviewArgumentCaptor.capture());
         assertReview(review, reviewArgumentCaptor.getValue());

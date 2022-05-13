@@ -17,9 +17,11 @@ public class ProcessAccessor {
     private final String SUBMIT_FOR_REVIEW_MESSAGE = "submit-for-review-message";
     private final String CLOSE_TASK_MESSAGE = "close-task-message";
     private final String FORCE_CLOSE_TASK_MESSAGE = "force-close-task-message";
+    private final String INTO_PRODUCTION_MESSAGE = "into-production-message";
     private final String VAR_TASK_UUID = "taskUuid";
     private final String VAR_NEEDS_REWORK = "needsRework";
     private final String VAR_LAST_STAGE = "lastStage";
+    private final String VAR_TASK_TYPE = "taskType";
 
     private final RuntimeService runtimeService;
 
@@ -28,6 +30,7 @@ public class ProcessAccessor {
                 put(VAR_TASK_UUID, uuid);
                 put(VAR_NEEDS_REWORK, "");
                 put(VAR_LAST_STAGE, "");
+                put(VAR_TASK_TYPE, "");
             }}
         );
     }
@@ -64,6 +67,15 @@ public class ProcessAccessor {
 
     public void checkReviewStage(String executionId, boolean isLastStage) {
         runtimeService.setVariable(executionId, VAR_LAST_STAGE, isLastStage);
+    }
+
+    public void setDesignTaskType(String executionId) {
+        runtimeService.setVariable(executionId, VAR_TASK_TYPE, "design");
+    }
+
+    public void sendIntoProduction(String taskUuid) {
+        correlateProcess(runtimeService.createMessageCorrelation(INTO_PRODUCTION_MESSAGE)
+            .processInstanceVariableEquals(VAR_TASK_UUID, taskUuid));
     }
 
     // ================================================================================================================

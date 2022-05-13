@@ -41,7 +41,7 @@ public class UpdateTaskStatusTransactionScript {
 
         task.setStatus(status);
         taskService.save(task);
-        log.info("Task with uuid={} was changed status to {}", taskUuid, status);
+        log.info("Status was changed to {} for task with uuid={}", status, taskUuid);
     }
 
     // ================================================================================================================
@@ -66,6 +66,7 @@ public class UpdateTaskStatusTransactionScript {
                 taskForceClosedNotify(review);
                 break;
             case CLOSED:
+                break;
         }
     }
 

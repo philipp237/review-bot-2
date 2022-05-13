@@ -10,6 +10,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+import static dev.reviewbot2.domain.task.TaskType.IMPLEMENTATION;
+
 @Component
 @RequiredArgsConstructor
 public class TaskServiceImpl implements TaskService {
@@ -38,5 +40,10 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public List<Task> getMemberTasks(Member author) {
         return taskRepository.getTaskByAuthorAndStatusNotIn(author, TaskStatus.getClosedStatuses());
+    }
+
+    @Override
+    public List<Task> getClosedTasks() {
+        return taskRepository.getTaskByStatusInAndTaskType(TaskStatus.getStatusesReadyForIncorporation(), IMPLEMENTATION);
     }
 }

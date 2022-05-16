@@ -23,7 +23,8 @@ public class GetStartMessageTransactionScript {
     private static final List<Command> AVAILABLE_COMMANDS_FROM_START =
         Stream.of(CREATE_TASK, TAKE_IN_REVIEW, MY_REVIEWS, MY_TASKS)
         .collect(toList());
-    private static final List<Command> ADDITIONAL_COMMANDS_FOR_OMNI = Stream.of(ADD_MEMBER, UPDATE_MEMBER)
+    private static final List<Command> ADDITIONAL_COMMANDS_FOR_OMNI = Stream.of(ADD_MEMBER, UPDATE_MEMBER,
+        CLOSED_TASKS, INCORPORATE)
         .collect(toList());
 
     private final MemberService memberService;

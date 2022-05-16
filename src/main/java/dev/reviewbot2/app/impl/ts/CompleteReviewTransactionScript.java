@@ -20,7 +20,7 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import javax.transaction.Transactional;
 
 import static dev.reviewbot2.domain.task.TaskStatus.IN_REVIEW;
-import static dev.reviewbot2.processor.Utils.*;
+import static dev.reviewbot2.utils.UpdateUtils.*;
 import static java.time.Instant.now;
 
 @Slf4j

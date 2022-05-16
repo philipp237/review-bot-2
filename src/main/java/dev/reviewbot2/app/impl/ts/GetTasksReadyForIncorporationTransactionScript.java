@@ -16,7 +16,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static dev.reviewbot2.processor.Command.INCORPORATE;
-import static dev.reviewbot2.processor.Utils.*;
+import static dev.reviewbot2.utils.UpdateUtils.*;
 
 @Component
 @AllArgsConstructor

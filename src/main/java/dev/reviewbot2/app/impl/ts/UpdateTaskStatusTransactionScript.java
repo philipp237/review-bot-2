@@ -18,7 +18,7 @@ import javax.transaction.Transactional;
 import java.util.List;
 
 import static dev.reviewbot2.domain.task.TaskStatus.getTaskStatusFromActivityId;
-import static dev.reviewbot2.processor.Utils.sendMessage;
+import static dev.reviewbot2.utils.UpdateUtils.sendMessage;
 import static java.util.Objects.isNull;
 import static java.util.stream.Collectors.toList;
 

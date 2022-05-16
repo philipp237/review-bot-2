@@ -17,7 +17,7 @@ import javax.transaction.Transactional;
 
 import static dev.reviewbot2.domain.task.TaskStatus.IN_PROGRESS;
 import static dev.reviewbot2.domain.task.TaskStatus.READY_FOR_REVIEW;
-import static dev.reviewbot2.processor.Utils.*;
+import static dev.reviewbot2.utils.UpdateUtils.*;
 
 @Slf4j
 @Component

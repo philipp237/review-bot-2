@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 
-import static dev.reviewbot2.processor.Utils.sendMessage;
+import static dev.reviewbot2.utils.UpdateUtils.sendMessage;
 
 @Slf4j
 @ControllerAdvice

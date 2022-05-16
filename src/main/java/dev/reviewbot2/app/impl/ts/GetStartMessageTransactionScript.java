@@ -14,14 +14,14 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import static dev.reviewbot2.processor.Command.*;
-import static dev.reviewbot2.processor.Utils.*;
+import static dev.reviewbot2.utils.UpdateUtils.*;
 import static java.util.stream.Collectors.toList;
 
 @Component
 @RequiredArgsConstructor
 public class GetStartMessageTransactionScript {
     private static final List<Command> AVAILABLE_COMMANDS_FROM_START =
-        Stream.of(CREATE_TASK, TAKE_IN_REVIEW, MY_REVIEWS, MY_TASKS)
+        Stream.of(CREATE_TASK, TAKE_IN_REVIEW, MY_REVIEWS, MY_TASKS, SPRINT)
         .collect(toList());
     private static final List<Command> ADDITIONAL_COMMANDS_FOR_OMNI = Stream.of(ADD_MEMBER, UPDATE_MEMBER,
         CLOSED_TASKS, INCORPORATE)

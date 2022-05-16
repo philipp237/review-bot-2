@@ -15,7 +15,7 @@ import java.util.List;
 
 import static dev.reviewbot2.domain.task.TaskType.DESIGN;
 import static dev.reviewbot2.domain.task.TaskType.IMPLEMENTATION;
-import static dev.reviewbot2.processor.Utils.sendMessage;
+import static dev.reviewbot2.utils.UpdateUtils.sendMessage;
 import static java.util.stream.Collectors.toList;
 
 // TODO Нецелевое решение, в дальнейшем будет переработано для возможности гибкой настройки через переменные окружения

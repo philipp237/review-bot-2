@@ -1,6 +1,7 @@
 package dev.reviewbot2.app.api;
 
 import dev.reviewbot2.domain.MessageInfo;
+import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 
 /**
@@ -151,4 +152,12 @@ public interface UpdateService {
      * получилось
      */
     SendMessage incorporateTasks(MessageInfo messageInfo);
+
+    /**
+     * Получить номер спринта
+     *
+     * @param messageInfo обновление, в котором содержится сообщение с командой вывода номера спринта
+     * @return сообщение с номером спринта
+     */
+    SendMessage getSprintValue(MessageInfo messageInfo);
 }

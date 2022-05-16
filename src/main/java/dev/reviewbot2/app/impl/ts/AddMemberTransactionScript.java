@@ -11,7 +11,7 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 
 import javax.transaction.Transactional;
 
-import static dev.reviewbot2.processor.Utils.*;
+import static dev.reviewbot2.utils.UpdateUtils.*;
 
 @Slf4j
 @Component

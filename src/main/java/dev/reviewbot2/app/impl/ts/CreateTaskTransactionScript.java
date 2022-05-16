@@ -18,7 +18,7 @@ import javax.transaction.Transactional;
 import java.time.Instant;
 import java.util.UUID;
 
-import static dev.reviewbot2.processor.Utils.sendMessage;
+import static dev.reviewbot2.utils.UpdateUtils.sendMessage;
 
 @Slf4j
 @Component

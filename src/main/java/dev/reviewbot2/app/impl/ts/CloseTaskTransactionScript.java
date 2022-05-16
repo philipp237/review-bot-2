@@ -8,7 +8,7 @@ import dev.reviewbot2.domain.member.Member;
 import dev.reviewbot2.domain.task.Task;
 import dev.reviewbot2.domain.task.TaskStatus;
 import dev.reviewbot2.exceptions.NotAuthorException;
-import dev.reviewbot2.processor.Utils;
+import dev.reviewbot2.utils.UpdateUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -17,7 +17,7 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import javax.transaction.Transactional;
 
 import static dev.reviewbot2.domain.task.TaskStatus.APPROVED;
-import static dev.reviewbot2.processor.Utils.*;
+import static dev.reviewbot2.utils.UpdateUtils.*;
 import static java.time.Instant.now;
 
 @Slf4j
@@ -35,7 +35,7 @@ public class CloseTaskTransactionScript {
 
         Member member = memberService.getMemberByChatId(chatId);
 
-        Long taskId = Utils.getTaskIdFromText(text);
+        Long taskId = UpdateUtils.getTaskIdFromText(text);
         Task task = taskService.getTaskById(taskId);
         TaskStatus lastTaskStatus = task.getStatus();
 

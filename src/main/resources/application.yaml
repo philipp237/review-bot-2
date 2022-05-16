@@ -15,6 +15,12 @@ jira:
 
 settings:
   number-of-review-stages: ${NUMBER_OF_REVIEW_STAGES}
+  sprint:
+    start-date: ${SPRINT_START_DATE}
+    start-number: ${SPRINT_START_NUMBER}
+    length: ${SPRINT_LENGTH}
+    first-sprint-num: ${FIRST_SPRINT_NUM}
+    sprints-in-super-sprint: ${SPRINTS_IN_SUPER_SUPERSPRINT}
 
 logging:
   level:

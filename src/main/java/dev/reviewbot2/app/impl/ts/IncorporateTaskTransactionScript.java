@@ -14,8 +14,8 @@ import org.springframework.stereotype.Component;
 import javax.transaction.Transactional;
 import java.util.List;
 
-import static dev.reviewbot2.processor.Utils.getTaskIdFromText;
-import static dev.reviewbot2.processor.Utils.sendMessage;
+import static dev.reviewbot2.utils.UpdateUtils.getTaskIdFromText;
+import static dev.reviewbot2.utils.UpdateUtils.sendMessage;
 
 @Component
 @RequiredArgsConstructor

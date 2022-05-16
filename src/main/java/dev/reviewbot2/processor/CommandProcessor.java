@@ -45,6 +45,8 @@ public class CommandProcessor {
                 return updateService.getTaskReadyForIncorporation(messageInfo);
             case INCORPORATE:
                 return updateService.incorporateTasks(messageInfo);
+            case SPRINT:
+                return updateService.getSprintValue(messageInfo);
         }
         return null;
     }

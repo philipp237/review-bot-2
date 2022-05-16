@@ -25,7 +25,7 @@ import java.util.List;
 import static dev.reviewbot2.domain.task.TaskStatus.IN_REVIEW;
 import static dev.reviewbot2.domain.task.TaskStatus.READY_FOR_REVIEW;
 import static dev.reviewbot2.domain.task.TaskType.DESIGN;
-import static dev.reviewbot2.processor.Utils.*;
+import static dev.reviewbot2.utils.UpdateUtils.*;
 import static java.time.Instant.now;
 import static org.springframework.util.CollectionUtils.isEmpty;
 

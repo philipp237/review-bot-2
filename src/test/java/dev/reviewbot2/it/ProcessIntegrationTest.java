@@ -6,6 +6,8 @@ import dev.reviewbot2.domain.task.Task;
 import dev.reviewbot2.domain.task.TaskStatus;
 import dev.reviewbot2.domain.task.TaskType;
 import dev.reviewbot2.exceptions.ReviewBotExceptionHandler;
+import dev.reviewbot2.utils.DateUtils;
+import dev.reviewbot2.utils.UpdateUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -16,13 +18,16 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
 
 import static dev.reviewbot2.domain.task.TaskSegment.BF;
 import static dev.reviewbot2.domain.task.TaskStatus.*;
 import static dev.reviewbot2.domain.task.TaskType.DESIGN;
 import static dev.reviewbot2.domain.task.TaskType.IMPLEMENTATION;
 import static dev.reviewbot2.processor.Command.ACCEPT_REVIEW;
+import static dev.reviewbot2.processor.Command.SPRINT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mockStatic;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 class ProcessIntegrationTest extends AbstractIntegrationTest {
@@ -102,15 +107,22 @@ class ProcessIntegrationTest extends AbstractIntegrationTest {
 
         Long taskId = getTask(uuid).getId();
         Update update = getUpdateWithCallbackQuery(getCommand(ACCEPT_REVIEW, taskId), notReviewerChatId);
-        MvcResult result = mockMvc.perform(
-            MockMvcRequestBuilders.post("/")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(update)))
-            .andExpect(status().isOk())
-            .andReturn();
-        SendMessage sendMessage = objectMapper.readValue(result.getResponse().getContentAsString().getBytes(StandardCharsets.ISO_8859_1), SendMessage.class);
+        SendMessage sendMessage = performWithAnswer(update);
 
         assertEquals("Ты не можешь взять эту задачу в ревью, ты не в той группе ревью", sendMessage.getText());
+    }
+
+    @Test
+    void getSprintValue() throws Exception {
+        String memberChatId = MEMBER_1_CHAT_ID;
+
+        addMemberToDB(memberChatId, 1, false, false);
+
+        mockGetTodayDate();
+        Update update = getUpdateWithCallbackQuery("/" + SPRINT, memberChatId);
+        SendMessage springValueMessage = performWithAnswer(update);
+
+        assertEquals("Сейчас идёт спринт 2.3 (52)", springValueMessage.getText());
     }
 
     // ================================================================================================================
@@ -188,5 +200,22 @@ class ProcessIntegrationTest extends AbstractIntegrationTest {
 
     private Task getTask(String uuid) {
         return taskRepository.getByUuid(uuid);
+    }
+
+    private void mockGetTodayDate() {
+        mockStatic(DateUtils.class)
+            .when(DateUtils::getTodayDate)
+            .thenReturn(LocalDate.of(2022, 5, 16));
+    }
+
+    private SendMessage performWithAnswer(Update update) throws Exception {
+        MvcResult result = mockMvc.perform(
+            MockMvcRequestBuilders.post("/")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(update)))
+            .andExpect(status().isOk())
+            .andReturn();
+
+        return objectMapper.readValue(result.getResponse().getContentAsString().getBytes(StandardCharsets.ISO_8859_1), SendMessage.class);
     }
 }

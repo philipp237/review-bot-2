@@ -16,7 +16,7 @@ import javax.transaction.Transactional;
 import java.util.List;
 
 import static dev.reviewbot2.processor.Command.INFO;
-import static dev.reviewbot2.processor.Utils.*;
+import static dev.reviewbot2.utils.UpdateUtils.*;
 
 @Component
 @RequiredArgsConstructor

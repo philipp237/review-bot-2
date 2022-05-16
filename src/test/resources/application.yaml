@@ -16,6 +16,12 @@ jira:
 
 settings:
   number-of-review-stages: 2
+  sprint:
+    start-date: "2022-01-19"
+    start-number: 44
+    length: 14
+    first-sprint-num: 38
+    sprints-in-super-sprint: 6
 
 camunda:
   bpm:

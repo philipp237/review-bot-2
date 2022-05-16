@@ -27,13 +27,15 @@ public class GetStartMessageTest extends AbstractUnitTest {
         Stream.of(String.format(COMMAND, CREATE_TASK.toString()),
         String.format(COMMAND, TAKE_IN_REVIEW.toString()),
         String.format(COMMAND, MY_REVIEWS.toString()),
-        String.format(COMMAND, MY_TASKS.toString()))
+        String.format(COMMAND, MY_TASKS.toString()),
+        String.format(COMMAND, SPRINT.toString()))
         .collect(toList());
     private static final List<String> AVAILABLE_COMMANDS_FOR_OMNI =
         Stream.of(String.format(COMMAND, CREATE_TASK.toString()),
         String.format(COMMAND, TAKE_IN_REVIEW.toString()),
         String.format(COMMAND, MY_REVIEWS.toString()),
         String.format(COMMAND, MY_TASKS.toString()),
+        String.format(COMMAND, SPRINT.toString()),
         String.format(COMMAND, ADD_MEMBER.toString()),
         String.format(COMMAND, UPDATE_MEMBER.toString()),
         String.format(COMMAND, CLOSED_TASKS.toString()),
@@ -61,7 +63,7 @@ public class GetStartMessageTest extends AbstractUnitTest {
         SendMessage startMessage = getStartMessage.execute(messageInfo);
 
         List<List<InlineKeyboardButton>> keyboard = ((InlineKeyboardMarkup) startMessage.getReplyMarkup()).getKeyboard();
-        assertEquals(4, keyboard.size());
+        assertEquals(5, keyboard.size());
         assertTrue(keyboard.stream().allMatch(row -> AVAILABLE_COMMANDS.contains(row.get(0).getCallbackData())));
     }
 
@@ -77,7 +79,7 @@ public class GetStartMessageTest extends AbstractUnitTest {
         SendMessage startMessage = getStartMessage.execute(messageInfo);
 
         List<List<InlineKeyboardButton>> keyboard = ((InlineKeyboardMarkup) startMessage.getReplyMarkup()).getKeyboard();
-        assertEquals(8, keyboard.size());
+        assertEquals(9, keyboard.size());
         assertTrue(keyboard.stream().allMatch(row -> AVAILABLE_COMMANDS_FOR_OMNI.contains(row.get(0).getCallbackData())));
     }
 }

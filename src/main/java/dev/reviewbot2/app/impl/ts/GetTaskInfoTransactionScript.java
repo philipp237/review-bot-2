@@ -16,7 +16,7 @@ import javax.transaction.Transactional;
 import static dev.reviewbot2.domain.task.TaskStatus.IN_PROGRESS;
 import static dev.reviewbot2.processor.Command.CLOSE;
 import static dev.reviewbot2.processor.Command.SUBMIT;
-import static dev.reviewbot2.processor.Utils.*;
+import static dev.reviewbot2.utils.UpdateUtils.*;
 
 @Component
 @RequiredArgsConstructor

@@ -22,7 +22,6 @@ public class TelegramBot extends TelegramWebhookBot {
     public BotApiMethod<?> onWebhookUpdateReceived(Update update) {
         MessageInfo messageInfo = mapper.mapToMessageInfo(update);
         return messageProcessor.processMessage(messageInfo);
-
     }
 
     @Override

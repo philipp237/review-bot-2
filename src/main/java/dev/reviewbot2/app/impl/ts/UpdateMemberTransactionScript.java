@@ -15,7 +15,7 @@ import javax.transaction.Transactional;
 import java.util.List;
 
 import static dev.reviewbot2.processor.Command.UPDATE_MEMBER;
-import static dev.reviewbot2.processor.Utils.*;
+import static dev.reviewbot2.utils.UpdateUtils.*;
 
 @Slf4j
 @Component

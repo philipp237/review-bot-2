@@ -1,4 +1,4 @@
-package dev.reviewbot2.processor;
+package dev.reviewbot2.utils;
 
 import lombok.extern.slf4j.Slf4j;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -6,6 +6,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -13,7 +14,7 @@ import java.util.List;
 import java.util.Locale;
 
 @Slf4j
-public class Utils {
+public class UpdateUtils {
     public static SendMessage sendMessage (String chatId, String text) {
         return sendMessage(chatId, text, null);
     }
@@ -56,6 +57,4 @@ public class Utils {
         String taskId = text.split("#")[1];
         return Long.parseLong(taskId);
     }
-
-
 }

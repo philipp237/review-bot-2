@@ -21,7 +21,7 @@ import static dev.reviewbot2.domain.task.TaskStatus.READY_FOR_REVIEW;
 import static dev.reviewbot2.domain.task.TaskType.DESIGN;
 import static dev.reviewbot2.processor.Command.ACCEPT_REVIEW;
 import static dev.reviewbot2.processor.Command.TAKE_IN_REVIEW;
-import static dev.reviewbot2.processor.Utils.*;
+import static dev.reviewbot2.utils.UpdateUtils.*;
 import static java.util.stream.Collectors.toList;
 
 @Slf4j

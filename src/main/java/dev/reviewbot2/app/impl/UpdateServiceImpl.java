@@ -1,20 +1,25 @@
 package dev.reviewbot2.app.impl;
 
+import dev.reviewbot2.adapter.WebhookRestClient;
 import dev.reviewbot2.app.api.UpdateService;
 import dev.reviewbot2.app.impl.ts.*;
 import dev.reviewbot2.config.Config;
 import dev.reviewbot2.domain.MessageInfo;
 import dev.reviewbot2.domain.task.TaskSegment;
 import dev.reviewbot2.domain.task.TaskType;
-import dev.reviewbot2.adapter.WebhookRestClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 
-import static dev.reviewbot2.processor.Utils.*;
+import java.time.LocalDate;
+
+import static dev.reviewbot2.utils.DateUtils.getTodayDate;
+import static dev.reviewbot2.utils.UpdateUtils.*;
+import static java.time.temporal.ChronoUnit.DAYS;
 
 @Slf4j
 @Component
@@ -39,6 +44,17 @@ public class UpdateServiceImpl implements UpdateService {
     private final GetStartMessageTransactionScript getStartMessage;
     private final GetTasksReadyForIncorporationTransactionScript getTasksReadyForIncorporation;
     private final IncorporateTaskTransactionScript incorporateTask;
+
+    @Value("#{T(java.time.LocalDate).parse('${settings.sprint.start-date}')}")
+    private LocalDate startSprintDate;
+    @Value("${settings.sprint.start-number}")
+    private int startSprintNumber;
+    @Value("${settings.sprint.length}")
+    private int sprintLength;
+    @Value("${settings.sprint.first-sprint-num}")
+    private int firstSprintNumInSuperSprintFormat;
+    @Value("${settings.sprint.sprints-in-super-sprint}")
+    private int sprintsInSuperSprint;
 
     @Override
     public void deletePreviousMessage(MessageInfo messageInfo) {
@@ -158,6 +174,19 @@ public class UpdateServiceImpl implements UpdateService {
     public SendMessage incorporateTasks(MessageInfo messageInfo) {
         incorporateTask.execute(messageInfo);
         return getTasksReadyForIncorporation.execute(messageInfo);
+    }
+
+    @Override
+    public SendMessage getSprintValue(MessageInfo messageInfo) {
+        String chatId = messageInfo.getChatId();
+
+        LocalDate today = getTodayDate();
+        long sprintNum = DAYS.between(startSprintDate, today) / sprintLength + startSprintNumber;
+
+        String superSprintFormatNum = String.format("%s.%s",
+            (sprintNum - firstSprintNumInSuperSprintFormat) / sprintsInSuperSprint,
+            (sprintNum - firstSprintNumInSuperSprintFormat) % sprintsInSuperSprint + 1);
+        return sendMessage(chatId, String.format("Сейчас идёт спринт %s (%d)", superSprintFormatNum, sprintNum));
     }
 
     // ================================================================================================================

@@ -76,7 +76,7 @@ public class UpdateServiceImpl implements UpdateService {
         if (link.contains("#")) {
             String[] splittedLink = link.split("#");
             if (splittedLink.length == 2) {
-                InlineKeyboardMarkup keyboard = getKeyboard(TaskSegment.values().length);
+                InlineKeyboardMarkup keyboard = getKeyboard(TaskType.values().length);
                 fillKeyboardWithTaskTypes(keyboard, link);
 
                 return sendMessage(chatId, "Выберите тип задачи", keyboard);
@@ -87,7 +87,7 @@ public class UpdateServiceImpl implements UpdateService {
             return createTask.execute(chatId, taskName, link, taskSegment, taskType);
         }
 
-        InlineKeyboardMarkup keyboard = getKeyboard(TaskType.values().length);
+        InlineKeyboardMarkup keyboard = getKeyboard(TaskSegment.values().length);
         fillKeyboardWithTaskSegments(keyboard, link);
 
         return sendMessage(chatId, "Выбери сегмент задачи:", keyboard);

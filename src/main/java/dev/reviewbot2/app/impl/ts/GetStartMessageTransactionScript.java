@@ -10,6 +10,7 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 
 import javax.transaction.Transactional;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -46,7 +47,7 @@ public class GetStartMessageTransactionScript {
     // ================================================================================================================
 
     private List<Command> getAvailableCommands(Boolean isOmni) {
-        List<Command> availableCommandsFromStart = AVAILABLE_COMMANDS_FROM_START;
+        List<Command> availableCommandsFromStart = new ArrayList<>(AVAILABLE_COMMANDS_FROM_START);
 
         if (isOmni) {
             availableCommandsFromStart.addAll(ADDITIONAL_COMMANDS_FOR_OMNI);

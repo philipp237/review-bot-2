@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import static dev.reviewbot2.domain.task.TaskSegment.BF;
-import static dev.reviewbot2.domain.task.TaskSegment.DEFECT;
+import static dev.reviewbot2.domain.task.TaskSegment.DF;
 import static dev.reviewbot2.domain.task.TaskStatus.CLOSED;
 import static dev.reviewbot2.domain.task.TaskType.IMPLEMENTATION;
 import static dev.reviewbot2.processor.Command.CLOSED_TASKS;
@@ -47,7 +47,7 @@ public class GetTasksReadyForIncorporationTest extends AbstractUnitTest {
         long taskId2 = TASK_ID_2;
         List<Review> reviews = Stream.of(
             getReview(IMPLEMENTATION, BF, FIRST_REVIEW_GROUP, UUID_1, TASK_NAME_1, taskId1, memberChatId),
-            getReview(IMPLEMENTATION, DEFECT, FIRST_REVIEW_GROUP, UUID_2, TASK_NAME_2, taskId2, memberChatId)
+            getReview(IMPLEMENTATION, DF, FIRST_REVIEW_GROUP, UUID_2, TASK_NAME_2, taskId2, memberChatId)
         ).collect(toList());
 
         List<Task> tasks = reviews.stream().map(Review::getTask)
@@ -65,7 +65,7 @@ public class GetTasksReadyForIncorporationTest extends AbstractUnitTest {
 
         List<List<InlineKeyboardButton>> keyboard = ((InlineKeyboardMarkup) closedTasks.getReplyMarkup()).getKeyboard();
         String expectedText = String.format("Закрытые задачи (нажми на задачу, чтобы ее закрыть):\n%-16s%8s%n%-16s%8s",
-            TASK_NAME_2, DEFECT.getText(), TASK_NAME_1, BF.getText()).trim();
+            TASK_NAME_2, DF.getText(), TASK_NAME_1, BF.getText()).trim();
         assertEquals(expectedText, closedTasks.getText());
         assertEquals(3, keyboard.size());
         assertEquals(getCommand(INCORPORATE, taskId2), keyboard.get(0).get(0).getCallbackData());

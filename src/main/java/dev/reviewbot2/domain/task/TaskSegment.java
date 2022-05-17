@@ -13,7 +13,7 @@ public enum TaskSegment implements Comparable<TaskSegment> {
     /**
      * Дефект
      */
-    DEFECT("Дефект"),
+    DF("Дефект"),
 
     /**
      * Бизнес-функционал

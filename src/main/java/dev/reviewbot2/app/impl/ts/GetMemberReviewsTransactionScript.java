@@ -30,6 +30,10 @@ public class GetMemberReviewsTransactionScript {
         Member member = memberService.getMemberByChatId(chatId);
         List<Task> taskInMemberReview = taskService.getTaskInMemberReview(member);
 
+        if (taskInMemberReview.isEmpty()) {
+            return sendMessage(chatId, "Нет задач в ревью");
+        }
+
         InlineKeyboardMarkup keyboard = getKeyboard(taskInMemberReview.size());
         fillKeyboardWithTask(keyboard, taskInMemberReview);
 

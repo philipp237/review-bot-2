@@ -5,6 +5,7 @@ import dev.reviewbot2.domain.MessageInfo;
 import dev.reviewbot2.domain.member.Member;
 import dev.reviewbot2.processor.Command;
 import lombok.RequiredArgsConstructor;
+import org.checkerframework.checker.units.qual.A;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
@@ -22,7 +23,10 @@ import static java.util.stream.Collectors.toList;
 @RequiredArgsConstructor
 public class GetStartMessageTransactionScript {
     private static final List<Command> AVAILABLE_COMMANDS_FROM_START =
-        Stream.of(CREATE_TASK, TAKE_IN_REVIEW, MY_REVIEWS, MY_TASKS, SPRINT)
+        Stream.of(CREATE_TASK, MY_TASKS, SPRINT)
+        .collect(toList());
+    private static final List<Command> ADDITIONAL_COMMANDS_FOR_FOR_REVIEWERS =
+        Stream.of(TAKE_IN_REVIEW, MY_REVIEWS)
         .collect(toList());
     private static final List<Command> ADDITIONAL_COMMANDS_FOR_OMNI = Stream.of(ADD_MEMBER, UPDATE_MEMBER,
         CLOSED_TASKS, INCORPORATE)
@@ -35,7 +39,7 @@ public class GetStartMessageTransactionScript {
         String chatId = messageInfo.getChatId();
         Member member = memberService.getMemberByChatId(chatId);
 
-        List<Command> availableCommandsFromStart = getAvailableCommands(member.getIsOmni());
+        List<Command> availableCommandsFromStart = getAvailableCommands(member);
 
         InlineKeyboardMarkup keyboard = getKeyboard(availableCommandsFromStart.size());
         fillKeyboardWithCommands(keyboard, availableCommandsFromStart);
@@ -46,10 +50,14 @@ public class GetStartMessageTransactionScript {
     //  Implementation
     // ================================================================================================================
 
-    private List<Command> getAvailableCommands(Boolean isOmni) {
+    private List<Command> getAvailableCommands(Member member) {
         List<Command> availableCommandsFromStart = new ArrayList<>(AVAILABLE_COMMANDS_FROM_START);
 
-        if (isOmni) {
+        if (member.getReviewGroup() > 0) {
+            availableCommandsFromStart.addAll(ADDITIONAL_COMMANDS_FOR_FOR_REVIEWERS);
+        }
+
+        if (member.getIsOmni()) {
             availableCommandsFromStart.addAll(ADDITIONAL_COMMANDS_FOR_OMNI);
         }
 

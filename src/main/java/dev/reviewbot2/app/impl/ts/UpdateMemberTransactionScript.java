@@ -47,8 +47,8 @@ public class UpdateMemberTransactionScript {
             } else {
                 int reviewGroup = getReviewGroup(parsedText);
 
-                member.setReviewGroup(reviewGroup);
-                memberService.save(member);
+                memberForUpdate.setReviewGroup(reviewGroup);
+                memberService.save(memberForUpdate);
 
                 log.info("{} transfered member {} to {} review group", member.getLogin(), memberForUpdate.getLogin(), reviewGroup);
                 return sendMessage(chatId, String.format("@%s переведен в %d группу ревью", memberForUpdate.getLogin(), reviewGroup));

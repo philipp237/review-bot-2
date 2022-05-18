@@ -103,7 +103,7 @@ public abstract class AbstractIntegrationTest extends AbstractTest {
         performUpdateReceived(update);
     }
 
-    protected SendMessage performTakeInReview(String chatId, TaskType taskType, int reviewGroup, Long taskId) throws Exception {
+    protected SendMessage performTakeInReview(String chatId, Long taskId) throws Exception {
         Update update = getUpdateWithCallbackQuery(getCommand(TAKE_IN_REVIEW, taskId), chatId);
 
         return performUpdateReceived(update);

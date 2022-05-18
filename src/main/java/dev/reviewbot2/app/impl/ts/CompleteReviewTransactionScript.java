@@ -19,6 +19,8 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 
 import javax.transaction.Transactional;
 
+import java.time.Instant;
+
 import static dev.reviewbot2.domain.task.TaskStatus.IN_REVIEW;
 import static dev.reviewbot2.utils.UpdateUtils.*;
 import static java.time.Instant.now;
@@ -48,8 +50,12 @@ public class CompleteReviewTransactionScript {
         validateStatus(messageInfo, reviewer, review);
         validateReviewer(messageInfo, reviewer, review, memberReview);
 
-        memberReview.setEndTime(now());
+        Instant reviewTime = Instant.now();
+        memberReview.setEndTime(reviewTime);
+        task.setLastReviewTime(reviewTime);
+
         memberReviewService.save(memberReview);
+        taskService.save(task);
 
         log.info("Review with id={} was completed by {} with resolution={}",
             review.getId(), reviewer.getLogin(), isApproved ? "approved" : "declined");

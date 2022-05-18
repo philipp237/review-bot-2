@@ -34,6 +34,10 @@ public class GetTasksReadyForIncorporationTransactionScript {
         List<Task> tasks = taskService.getClosedTasks();
         Collections.sort(tasks);
 
+        if (tasks.isEmpty()) {
+            return sendMessage(chatId, "Нет закрытых задач");
+        }
+
         StringBuilder textBuilder = new StringBuilder("Закрытые задачи (нажми на задачу, чтобы ее закрыть):\n");
         InlineKeyboardMarkup keyboard = getKeyboard(tasks.size() + 1);
         int i = 0;

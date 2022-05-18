@@ -76,8 +76,6 @@ public class UpdateTaskStatusTransactionScript {
         List<Member> membersToNotify = memberService.getMembersByReviewGroup(reviewGroupToNotify).stream()
             .filter(reviewer -> !reviewer.getChatId().equals(authorChatId))
             .collect(toList());
-        List<Member> omniMembers = memberService.getOmniMembers();
-        membersToNotify.addAll(omniMembers);
 
         for (Member reviewer : membersToNotify) {
             webhookRestClient.sendMessage(sendMessage(reviewer.getChatId(),
@@ -92,38 +90,25 @@ public class UpdateTaskStatusTransactionScript {
             .findFirst()
             .get().getReviewer().getLogin();
 
-        List<String> membersChatIdsToNotify = memberService.getOmniMembers().stream().map(Member::getChatId).collect(toList());
-        membersChatIdsToNotify.add(authorChatId);
+        webhookRestClient.sendMessage(sendMessage(authorChatId,
+            String.format("%s взял в ревью задачу %s", reviewerLogin, review.getTask().getName())));
 
-        for (String chatId : membersChatIdsToNotify) {
-            webhookRestClient.sendMessage(sendMessage(chatId,
-                String.format("%s взял в ревью задачу %s", reviewerLogin, review.getTask().getName())));
-        }
 
     }
 
     private void taskInProgressAuthorNotify(Review review) {
         String authorChatId = review.getTask().getAuthor().getChatId();
 
-        List<String> membersChatIdsToNotify = memberService.getOmniMembers().stream().map(Member::getChatId).collect(toList());
-        membersChatIdsToNotify.add(authorChatId);
-
-        for (String chatId : membersChatIdsToNotify) {
-            webhookRestClient.sendMessage(sendMessage(chatId,
-                String.format("Задача %s вернулась с ревью", review.getTask().getName())));
-        }
+        webhookRestClient.sendMessage(sendMessage(authorChatId,
+            String.format("Задача %s вернулась с ревью", review.getTask().getName())));
     }
 
     private void taskApprovedAuthorNotify(Review review) {
         String authorChatId = review.getTask().getAuthor().getChatId();
 
-        List<String> membersChatIdsToNotify = memberService.getOmniMembers().stream().map(Member::getChatId).collect(toList());
-        membersChatIdsToNotify.add(authorChatId);
+        webhookRestClient.sendMessage(sendMessage(authorChatId,
+            String.format("Задача %s одобрена", review.getTask().getName())));
 
-        for (String chatId : membersChatIdsToNotify) {
-            webhookRestClient.sendMessage(sendMessage(chatId,
-                String.format("Задача %s одобрена", review.getTask().getName())));
-        }
     }
 
     private void taskForceClosedNotify(Review review) {

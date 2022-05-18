@@ -54,7 +54,7 @@ public class GetMemberReviewsTransactionScript {
         if (task.getTaskType().equals(DESIGN)) {
             text.append(" (дизайн)");
         }
-        text.append("\n").append(task.getCreationTime());
+        text.append("\n").append(getFormattedTime(task.getCreationTime()));
         return text.toString();
     }
 }

@@ -112,7 +112,7 @@ public class TakeInReviewTransactionScript {
 
     private void fillKeyboardWithTakeInReviewActions(InlineKeyboardMarkup keyboard, Task task) {
         keyboard.getKeyboard().get(0).add(getButton("Назад", "/" + TAKE_IN_REVIEW));
-        if (task.getStatus().equals(READY_FOR_REVIEW)) {
+        if (READY_FOR_REVIEW.equals(task.getStatus())) {
             keyboard.getKeyboard().get(1).add(getButton("Взять в ревью", "/" + ACCEPT_REVIEW + "#" + task.getId()));
         }
     }

@@ -14,6 +14,7 @@ import javax.transaction.Transactional;
 import java.util.List;
 
 import static dev.reviewbot2.domain.task.TaskType.DESIGN;
+import static dev.reviewbot2.processor.Command.COMPLETE_REVIEW;
 import static dev.reviewbot2.processor.Command.TAKE_IN_REVIEW;
 import static dev.reviewbot2.utils.UpdateUtils.*;
 
@@ -48,7 +49,7 @@ public class GetMemberReviewsTransactionScript {
         int i = 0;
 
         for (Task task : tasks) {
-            keyboard.getKeyboard().get(i).add(getButton(getText(task),"/" + TAKE_IN_REVIEW + "#" + task.getId()));
+            keyboard.getKeyboard().get(i).add(getButton(getText(task),"/" + COMPLETE_REVIEW + "#" + task.getId()));
             i++;
         }
     }

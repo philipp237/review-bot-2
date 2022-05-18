@@ -17,6 +17,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 
 import java.time.LocalDate;
 
+import static dev.reviewbot2.processor.Command.*;
 import static dev.reviewbot2.utils.DateUtils.getTodayDate;
 import static dev.reviewbot2.utils.UpdateUtils.*;
 import static java.time.temporal.ChronoUnit.DAYS;
@@ -101,6 +102,16 @@ public class UpdateServiceImpl implements UpdateService {
     @Override
     public SendMessage acceptReview(MessageInfo messageInfo) {
         return acceptReview.execute(messageInfo);
+    }
+
+    @Override
+    public SendMessage completeReview(MessageInfo messageInfo) {
+        String chatId = messageInfo.getChatId();
+        Long taskId = getTaskIdFromText(messageInfo.getText());
+
+        InlineKeyboardMarkup keyboard = getKeyboard(3);
+        fillKeyboardWithCompleteReviewResolutions(keyboard, taskId);
+        return sendMessage(chatId, "Выбери действие:", keyboard);
     }
 
     @Override
@@ -241,5 +252,11 @@ public class UpdateServiceImpl implements UpdateService {
             keyboard.getKeyboard().get(i).add(getButton(taskType.getName(), link + "#" + taskType.toString()));
             i++;
         }
+    }
+
+    private void fillKeyboardWithCompleteReviewResolutions(InlineKeyboardMarkup keyboard, Long taskId) {
+        keyboard.getKeyboard().get(0).add(getButton("Одобрить", "/" + APPROVE + "#" + taskId));
+        keyboard.getKeyboard().get(1).add(getButton("Вернуть на доработку", "/" + DECLINE + "#" + taskId));
+        keyboard.getKeyboard().get(2).add(getButton("Назад", "/" + MY_REVIEWS));
     }
 }

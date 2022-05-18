@@ -21,6 +21,8 @@ public class CommandProcessor {
                 return updateService.takeInReview(messageInfo);
             case ACCEPT_REVIEW:
                 return updateService.acceptReview(messageInfo);
+            case COMPLETE_REVIEW:
+                return updateService.completeReview(messageInfo);
             case APPROVE:
                 return updateService.completeReview(messageInfo, true);
             case DECLINE:

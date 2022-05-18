@@ -103,9 +103,16 @@ public class TakeInReviewTransactionScript {
         int i = 0;
 
         for(Review review : reviews) {
-            String text = review.getTask().getName() + "\n" + getFormattedTime(review.getTask().getLastActionTime());
+            StringBuilder textBuilder = new StringBuilder(review.getTask().getName())
+                .append("\n")
+                .append(getFormattedTime(review.getTask().getLastActionTime()));
+
+            if (DESIGN.equals(review.getTask().getTaskType())) {
+                textBuilder.append(" (дизайн)");
+            }
+
             String callbackData = "/" + TAKE_IN_REVIEW + "#" + review.getTask().getId();
-            keyboard.getKeyboard().get(i).add(getButton(text, callbackData));
+            keyboard.getKeyboard().get(i).add(getButton(textBuilder.toString(), callbackData));
             i++;
         }
     }

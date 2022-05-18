@@ -42,7 +42,15 @@ public interface UpdateService {
     SendMessage acceptReview(MessageInfo messageInfo);
 
     /**
-     * Завершить ревью
+     * Вывести список возможных вариантов завершения ревью
+     *
+     * @param messageInfo обновление, в котором содержится сообщение с командой подтверждения завершения ревью
+     * @return список возможных вариантов завершения ревью
+     */
+    SendMessage completeReview(MessageInfo messageInfo);
+
+    /**
+     * Завершить ревью c резолюцией
      *
      * @param messageInfo обновление, в котором содержится сообщение с командой подтверждения завершения ревью
      * @param isApproved резолюция окончания ревью

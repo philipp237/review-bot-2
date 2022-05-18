@@ -25,6 +25,11 @@ public enum Command {
     ACCEPT_REVIEW("Взять в ревью"),
 
     /**
+     * Завершить ревью
+     */
+    COMPLETE_REVIEW("Завершить ревью"),
+
+    /**
      * Одобрить задачу
      */
     APPROVE("Одобрить"),

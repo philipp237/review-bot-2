@@ -38,8 +38,7 @@ public class GetStartMessageTest extends AbstractUnitTest {
         String.format(COMMAND, SPRINT.toString()),
         String.format(COMMAND, ADD_MEMBER.toString()),
         String.format(COMMAND, UPDATE_MEMBER.toString()),
-        String.format(COMMAND, CLOSED_TASKS.toString()),
-        String.format(COMMAND, INCORPORATE.toString()))
+        String.format(COMMAND, CLOSED_TASKS.toString()))
         .collect(toList());
 
     private GetStartMessageTransactionScript getStartMessage;
@@ -79,7 +78,7 @@ public class GetStartMessageTest extends AbstractUnitTest {
         SendMessage startMessage = getStartMessage.execute(messageInfo);
 
         List<List<InlineKeyboardButton>> keyboard = ((InlineKeyboardMarkup) startMessage.getReplyMarkup()).getKeyboard();
-        assertEquals(9, keyboard.size());
+        assertEquals(8, keyboard.size());
         assertTrue(keyboard.stream().allMatch(row -> AVAILABLE_COMMANDS_FOR_OMNI.contains(row.get(0).getCallbackData())));
     }
 }

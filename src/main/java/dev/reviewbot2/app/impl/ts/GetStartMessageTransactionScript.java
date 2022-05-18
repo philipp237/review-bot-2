@@ -29,7 +29,7 @@ public class GetStartMessageTransactionScript {
         Stream.of(TAKE_IN_REVIEW, MY_REVIEWS)
         .collect(toList());
     private static final List<Command> ADDITIONAL_COMMANDS_FOR_OMNI = Stream.of(ADD_MEMBER, UPDATE_MEMBER,
-        CLOSED_TASKS, INCORPORATE)
+        CLOSED_TASKS)
         .collect(toList());
 
     private final MemberService memberService;

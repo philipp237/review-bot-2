@@ -16,6 +16,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static dev.reviewbot2.processor.Command.INCORPORATE;
+import static dev.reviewbot2.processor.Command.START;
 import static dev.reviewbot2.utils.UpdateUtils.*;
 
 @Component
@@ -49,6 +50,7 @@ public class GetTasksReadyForIncorporationTransactionScript {
             i++;
         }
         keyboard.getKeyboard().get(i).add(getButton("Закрыть все задачи", "/" + INCORPORATE));
+        keyboard.getKeyboard().get(i).add(getButton("Отмена", "/" + START));
 
         return sendMessage(chatId, textBuilder.toString().trim(), keyboard);
     }
